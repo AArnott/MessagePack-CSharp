@@ -1,11 +1,12 @@
 <Project>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)..\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
-    <BaseOutputPath Condition=" '$(BaseOutputPath)' == '' ">$(MSBuildThisFileDirectory)..\bin\$(MSBuildProjectName)\</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <BaseOutputPath Condition=" '$(BaseOutputPath)' == '' ">$(MSBuildThisFileDirectory)bin\$(MSBuildProjectName)\</BaseOutputPath>
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <LangVersion>7.3</LangVersion>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
 
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Authors>Microsoft</Authors>

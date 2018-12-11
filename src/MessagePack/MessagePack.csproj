@@ -6,7 +6,7 @@
         <SignAssembly>True</SignAssembly>
         <AssemblyOriginatorKeyFile>..\..\opensource.snk</AssemblyOriginatorKeyFile>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-        <NoWarn>$(NoWarn);CS1591;CS0649</NoWarn>
+        <NoWarn>$(NoWarn);CS0649</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU' AND '$(TargetFramework)' != 'net45'">
