@@ -59,22 +59,22 @@ steps:
     configuration: $(BuildConfiguration)
   displayName: Build Visual Studio solution
 
-# - task: DotNetCoreCLI@2
-#   displayName: Run tests
-#   inputs:
-#     command: test
-#     projects: tests/**/*.Tests.csproj
-#     arguments: --configuration $(BuildConfiguration) --no-build -v n --logger "trx;LogFileName=$(Build.ArtifactStagingDirectory)\TestLogs\TestResults.trx"
+- task: DotNetCoreCLI@2
+  displayName: Run tests
+  inputs:
+    command: test
+    projects: tests/**/*.Tests.csproj
+    arguments: --configuration $(BuildConfiguration) --no-build -v n --logger "trx;LogFileName=$(Build.ArtifactStagingDirectory)\TestLogs\TestResults.trx"
 
-# - task: PublishTestResults@2
-#   displayName: Publish test results
-#   inputs:
-#     testResultsFormat: VSTest
-#     testResultsFiles: '*.trx'
-#     searchFolder: $(Build.ArtifactStagingDirectory)\TestLogs
-#     buildPlatform: $(BuildPlatform)
-#     buildConfiguration: $(BuildConfiguration)
-#   condition: always()
+- task: PublishTestResults@2
+  displayName: Publish test results
+  inputs:
+    testResultsFormat: VSTest
+    testResultsFiles: '*.trx'
+    searchFolder: $(Build.ArtifactStagingDirectory)\TestLogs
+    buildPlatform: $(BuildPlatform)
+    buildConfiguration: $(BuildConfiguration)
+  condition: always()
 
 - task: CopyFiles@1
   inputs:
