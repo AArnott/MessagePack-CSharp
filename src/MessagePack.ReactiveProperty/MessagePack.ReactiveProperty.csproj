@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6;netstandard2.0;net46;net47</TargetFrameworks>
+
+    <IsPackable>true</IsPackable>
+    <Title>MessagePack for C# Extension Support for ReactiveProperty</Title>
+    <Description>Extremely Fast MessagePack Serializer for C#(.NET, .NET Core, Unity, Xamarin). Extension support for ReactiveProperty.</Description>
+    <PackageTags>MsgPack;MessagePack;Serialization;Formatter;Serializer;ReactiveProperty</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
