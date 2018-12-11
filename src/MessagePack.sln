@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagePack", "MessagePack\MessagePack.csproj", "{A006296D-9313-4D15-A7CF-5FC928DCF16E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessagePack", "MessagePack\MessagePack.csproj", "{A006296D-9313-4D15-A7CF-5FC928DCF16E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedData", "..\sandbox\SharedData\SharedData.csproj", "{E2F9364D-26B0-4117-A60F-05244D28C681}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SharedData", "..\sandbox\SharedData\SharedData.csproj", "{E2F9364D-26B0-4117-A60F-05244D28C681}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagePack.ImmutableCollection", "MessagePack.ImmutableCollection\MessagePack.ImmutableCollection.csproj", "{77F6AA96-8816-4780-808F-DE93EB0E1A26}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessagePack.ImmutableCollection", "MessagePack.ImmutableCollection\MessagePack.ImmutableCollection.csproj", "{77F6AA96-8816-4780-808F-DE93EB0E1A26}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessagePack.ReactiveProperty", "MessagePack.ReactiveProperty\MessagePack.ReactiveProperty.csproj", "{3806420A-33C1-4CBE-BF2A-4591E149A51A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,5 +32,9 @@ Global
 		{77F6AA96-8816-4780-808F-DE93EB0E1A26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77F6AA96-8816-4780-808F-DE93EB0E1A26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{77F6AA96-8816-4780-808F-DE93EB0E1A26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3806420A-33C1-4CBE-BF2A-4591E149A51A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3806420A-33C1-4CBE-BF2A-4591E149A51A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3806420A-33C1-4CBE-BF2A-4591E149A51A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3806420A-33C1-4CBE-BF2A-4591E149A51A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
