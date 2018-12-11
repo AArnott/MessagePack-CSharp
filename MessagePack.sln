@@ -18,7 +18,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{344DC89D-8
 		make_unity_symlink.bat = make_unity_symlink.bat
 		nuget\MessagePack.AspNetCoreMvcFormatter.nuspec = nuget\MessagePack.AspNetCoreMvcFormatter.nuspec
 		nuget\MessagePack.ImmutableCollection.nuspec = nuget\MessagePack.ImmutableCollection.nuspec
-		nuget\MessagePack.nuspec = nuget\MessagePack.nuspec
 		nuget\MessagePack.ReactiveProperty.nuspec = nuget\MessagePack.ReactiveProperty.nuspec
 		nuget\MessagePack.UnityShims.nuspec = nuget\MessagePack.UnityShims.nuspec
 		nuget\MessagePackAnalyzer.nuspec = nuget\MessagePackAnalyzer.nuspec

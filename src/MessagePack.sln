@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessagePack.Tests", "..\tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessagePack.AspNetCoreMvcFormatter", "MessagePack.AspNetCoreMvcFormatter\MessagePack.AspNetCoreMvcFormatter.csproj", "{17831017-C29C-4A48-B159-849BCE5079FB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagePackAnalyzer", "MessagePackAnalyzer\MessagePackAnalyzer.csproj", "{F5B1EAC9-2EBF-4DD9-9BD4-DAA2B03FDEC1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,5 +56,9 @@ Global
 		{17831017-C29C-4A48-B159-849BCE5079FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17831017-C29C-4A48-B159-849BCE5079FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17831017-C29C-4A48-B159-849BCE5079FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5B1EAC9-2EBF-4DD9-9BD4-DAA2B03FDEC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5B1EAC9-2EBF-4DD9-9BD4-DAA2B03FDEC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5B1EAC9-2EBF-4DD9-9BD4-DAA2B03FDEC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5B1EAC9-2EBF-4DD9-9BD4-DAA2B03FDEC1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
