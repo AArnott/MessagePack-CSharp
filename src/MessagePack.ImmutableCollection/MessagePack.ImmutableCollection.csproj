@@ -2,14 +2,6 @@
 
     <PropertyGroup>
         <TargetFrameworks>netstandard1.6;netstandard2.0;net45;net47</TargetFrameworks>
-        <SignAssembly>True</SignAssembly>
-        <AssemblyOriginatorKeyFile>..\..\opensource.snk</AssemblyOriginatorKeyFile>
-        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <DocumentationFile>bin\Release\netstandard2.0\MessagePack.ImmutableCollection.xml</DocumentationFile>
-        <NoWarn>1701;1702;1705;1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,7 +9,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\MessagePack\MessagePack.csproj" />
+        <ProjectReference Include="..\MessagePack\MessagePack.csproj" />
     </ItemGroup>
 
 </Project>

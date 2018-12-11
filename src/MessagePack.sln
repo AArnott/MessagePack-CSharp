@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagePack", "MessagePack\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedData", "..\sandbox\SharedData\SharedData.csproj", "{E2F9364D-26B0-4117-A60F-05244D28C681}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagePack.ImmutableCollection", "MessagePack.ImmutableCollection\MessagePack.ImmutableCollection.csproj", "{77F6AA96-8816-4780-808F-DE93EB0E1A26}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{E2F9364D-26B0-4117-A60F-05244D28C681}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E2F9364D-26B0-4117-A60F-05244D28C681}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E2F9364D-26B0-4117-A60F-05244D28C681}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77F6AA96-8816-4780-808F-DE93EB0E1A26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77F6AA96-8816-4780-808F-DE93EB0E1A26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77F6AA96-8816-4780-808F-DE93EB0E1A26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77F6AA96-8816-4780-808F-DE93EB0E1A26}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
