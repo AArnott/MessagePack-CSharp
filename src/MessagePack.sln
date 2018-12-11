@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicCodeDumper", "..\san
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestData2", "..\sandbox\TestData2\TestData2.csproj", "{79DA9A48-6658-461D-BA6C-B4F6C98125FF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagePack.CodeGenerator", "MessagePack.CodeGenerator\MessagePack.CodeGenerator.csproj", "{7235BD28-6048-49DD-80E6-9FE83EEF2FEF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,5 +80,9 @@ Global
 		{79DA9A48-6658-461D-BA6C-B4F6C98125FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79DA9A48-6658-461D-BA6C-B4F6C98125FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79DA9A48-6658-461D-BA6C-B4F6C98125FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7235BD28-6048-49DD-80E6-9FE83EEF2FEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7235BD28-6048-49DD-80E6-9FE83EEF2FEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7235BD28-6048-49DD-80E6-9FE83EEF2FEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7235BD28-6048-49DD-80E6-9FE83EEF2FEF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
