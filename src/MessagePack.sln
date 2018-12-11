@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagePack.CodeGenerator",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerfNetFramework", "..\sandbox\PerfNetFramework\PerfNetFramework.csproj", "{F784AF1C-3DEA-48E8-A48C-7C4FBF9AAE05}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerfBenchmarkDotNet", "..\sandbox\PerfBenchmarkDotNet\PerfBenchmarkDotNet.csproj", "{28F8338E-9027-4BA5-9EED-15AF80B85A19}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -90,5 +92,9 @@ Global
 		{F784AF1C-3DEA-48E8-A48C-7C4FBF9AAE05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F784AF1C-3DEA-48E8-A48C-7C4FBF9AAE05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F784AF1C-3DEA-48E8-A48C-7C4FBF9AAE05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28F8338E-9027-4BA5-9EED-15AF80B85A19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28F8338E-9027-4BA5-9EED-15AF80B85A19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28F8338E-9027-4BA5-9EED-15AF80B85A19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28F8338E-9027-4BA5-9EED-15AF80B85A19}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

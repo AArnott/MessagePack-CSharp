@@ -1,0 +1,7 @@
+<Project>
+  <Import Project="..\Directory.Build.props" />
+  <PropertyGroup>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)..\opensource.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+</Project>

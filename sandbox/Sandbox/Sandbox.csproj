@@ -5,7 +5,6 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <Prefer32Bit>False</Prefer32Bit>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <NoWarn>$(NoWarn);CS8002</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
