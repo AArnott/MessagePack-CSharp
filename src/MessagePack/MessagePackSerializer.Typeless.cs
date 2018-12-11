@@ -1,6 +1,4 @@
-﻿#if NETSTANDARD
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using MessagePack.Resolvers;
@@ -106,5 +104,3 @@ namespace MessagePack
         }
     }
 }
-
-#endif

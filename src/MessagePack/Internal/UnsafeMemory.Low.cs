@@ -1,6 +1,4 @@
-﻿#if NETSTANDARD
-
-using System;
+﻿using System;
 using System.Runtime.CompilerServices;
 
 namespace MessagePack.Internal
@@ -163,5 +161,3 @@ namespace MessagePack.Internal
         }
     }
 }
-
-#endif

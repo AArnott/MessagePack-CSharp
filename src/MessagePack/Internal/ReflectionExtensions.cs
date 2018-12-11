@@ -33,8 +33,6 @@ namespace MessagePack.Internal
             return propertyInfo.GetIndexParameters().Length > 0;
         }
 
-#if NETSTANDARD
-
         public static bool IsConstructedGenericType(this System.Reflection.TypeInfo type)
         {
             return type.AsType().IsConstructedGenericType;
@@ -49,8 +47,6 @@ namespace MessagePack.Internal
         {
             return propInfo.SetMethod;
         }
-
-#endif
     }
 }
 

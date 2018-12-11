@@ -1,5 +1,4 @@
-﻿#if NETSTANDARD
-using MessagePack.Formatters;
+﻿using MessagePack.Formatters;
 
 namespace MessagePack.Resolvers
 {
@@ -54,4 +53,3 @@ namespace MessagePack.Resolvers
         }
     }
 }
-#endif

@@ -262,7 +262,6 @@ namespace MessagePack
                         builder.Append(dt.ToString("o", CultureInfo.InvariantCulture));
                         builder.Append("\"");
                     }
-#if NETSTANDARD
                     else if (extHeader.TypeCode == TypelessFormatter.ExtensionTypeCode)
                     {
                         int startOffset = offset;
@@ -294,7 +293,6 @@ namespace MessagePack
                         }
                         readSize = offset - startOffset;
                     }
-#endif
                     else
                     {
                         var ext = MessagePackBinary.ReadExtensionFormat(bytes, offset, out readSize);

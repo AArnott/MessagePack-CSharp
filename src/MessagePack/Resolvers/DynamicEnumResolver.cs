@@ -32,14 +32,6 @@ namespace MessagePack.Resolvers
             assembly = new DynamicAssembly(ModuleName);
         }
 
-
-#if NET_35
-        public AssemblyBuilder Save()
-        {
-            return assembly.Save();
-        }
-#endif
-
         public IMessagePackFormatter<T> GetFormatter<T>()
         {
             return FormatterCache<T>.formatter;

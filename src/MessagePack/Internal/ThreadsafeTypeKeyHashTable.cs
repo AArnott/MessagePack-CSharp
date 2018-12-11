@@ -181,26 +181,12 @@ namespace MessagePack.Internal
 
         static void VolatileWrite(ref Entry location, Entry value)
         {
-#if NETSTANDARD
             System.Threading.Volatile.Write(ref location, value);
-#elif UNITY_WSA || NET_4_6
-            System.Threading.Volatile.Write(ref location, value);
-#else
-            System.Threading.Thread.MemoryBarrier();
-            location = value;
-#endif
         }
 
         static void VolatileWrite(ref Entry[] location, Entry[] value)
         {
-#if NETSTANDARD
             System.Threading.Volatile.Write(ref location, value);
-#elif UNITY_WSA || NET_4_6
-            System.Threading.Volatile.Write(ref location, value);
-#else
-            System.Threading.Thread.MemoryBarrier();
-            location = value;
-#endif
         }
 
         class Entry

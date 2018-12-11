@@ -1,6 +1,4 @@
-﻿#if NETSTANDARD
-
-using MessagePack.Formatters;
+﻿using MessagePack.Formatters;
 using MessagePack.Internal;
 using System;
 
@@ -59,5 +57,3 @@ namespace MessagePack.Internal
         }
     }
 }
-
-#endif

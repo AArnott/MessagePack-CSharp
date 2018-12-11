@@ -160,17 +160,13 @@ namespace MessagePack.Internal
             throw new ArgumentException("Invalid Guid Pattern.");
         }
 
-#if NETSTANDARD
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         static byte Parse(byte[] bytes, int highOffset)
         {
             return unchecked((byte)(SwitchParse(bytes[highOffset]) * 16 + SwitchParse(bytes[highOffset + 1])));
         }
 
-#if NETSTANDARD
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         static byte SwitchParse(byte b)
         {
             // '0'(48) ~ '9'(57) => -48

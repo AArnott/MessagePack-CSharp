@@ -1,17 +1,14 @@
 ﻿#if !UNITY_WSA
 
-using MessagePack.Formatters;
-using System.Linq;
-using MessagePack.Internal;
 using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Collections.ObjectModel;
 using System.Collections;
-
-#if NETSTANDARD
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
-#endif
+using MessagePack.Formatters;
+using MessagePack.Internal;
 
 namespace MessagePack.Resolvers
 {
@@ -62,7 +59,6 @@ namespace MessagePack.Internal
               {typeof(SortedList<,>), typeof(SortedListFormatter<,>)},
               {typeof(ILookup<,>), typeof(InterfaceLookupFormatter<,>)},
               {typeof(IGrouping<,>), typeof(InterfaceGroupingFormatter<,>)},
-#if NETSTANDARD
               {typeof(ObservableCollection<>), typeof(ObservableCollectionFormatter<>)},
               {typeof(ReadOnlyObservableCollection<>),(typeof(ReadOnlyObservableCollectionFormatter<>))},
               {typeof(IReadOnlyList<>), typeof(InterfaceReadOnlyListFormatter<>)},
@@ -76,7 +72,6 @@ namespace MessagePack.Internal
               {typeof(System.Collections.Concurrent.ConcurrentDictionary<,>), typeof(ConcurrentDictionaryFormatter<,>)},
               {typeof(Lazy<>), typeof(LazyFormatter<>)},
               {typeof(Task<>), typeof(TaskValueFormatter<>)},
-#endif
         };
 
         // Reduce IL2CPP code generate size(don't write long code in <T>)
@@ -128,8 +123,6 @@ namespace MessagePack.Internal
                 {
                     return CreateInstance(typeof(NullableFormatter<>), new[] { nullableElementType });
                 }
-
-#if NETSTANDARD
 
                 // ValueTask
                 else if (genericType == typeof(ValueTask<>))
@@ -214,8 +207,6 @@ namespace MessagePack.Internal
 
                     return CreateInstance(tupleFormatterType, ti.GenericTypeArguments);
                 }
-
-#endif
 
                 // ArraySegement
                 else if (genericType == typeof(ArraySegment<>))

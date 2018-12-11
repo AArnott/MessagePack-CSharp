@@ -84,11 +84,7 @@ namespace MessagePack.Internal
             if (entry == null) goto NOT_FOUND;
 
             {
-#if NETSTANDARD
                 ref var v = ref entry[0];
-#else
-                var v = entry[0];
-#endif
                 if (ByteArrayComparer.Equals(key.Array, key.Offset, key.Count, v.Key))
                 {
                     value = v.Value;
@@ -98,11 +94,7 @@ namespace MessagePack.Internal
 
             for (int i = 1; i < entry.Length; i++)
             {
-#if NETSTANDARD
                 ref var v = ref entry[i];
-#else
-                var v = entry[i];
-#endif
                 if (ByteArrayComparer.Equals(key.Array, key.Offset, key.Count, v.Key))
                 {
                     value = v.Value;
@@ -115,16 +107,11 @@ namespace MessagePack.Internal
             return false;
         }
 
-#if NETSTANDARD
         static readonly bool Is32Bit = (IntPtr.Size == 4);
-#endif
 
-#if NETSTANDARD
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         static ulong ByteArrayGetHashCode(byte[] x, int offset, int count)
         {
-#if NETSTANDARD
             // FarmHash https://github.com/google/farmhash
             if (x == null) return 0;
 
@@ -136,25 +123,6 @@ namespace MessagePack.Internal
             {
                 return FarmHash.Hash64(x, offset, count);
             }
-
-#else
-
-            // FNV1-1a 32bit https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
-            uint hash = 0;
-            if (x != null)
-            {
-                var max = offset + count;
-
-                hash = 2166136261;
-                for (int i = offset; i < max; i++)
-                {
-                    hash = unchecked((x[i] ^ hash) * 16777619);
-                }
-            }
-
-            return (ulong)hash;
-
-#endif
         }
 
         static int CalculateCapacity(int collectionSize, float loadFactor)

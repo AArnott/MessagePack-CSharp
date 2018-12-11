@@ -22,11 +22,7 @@ namespace MessagePack.Resolvers
         const string ModuleName = "MessagePack.Resolvers.DynamicUnionResolver";
 
         static readonly DynamicAssembly assembly;
-#if NETSTANDARD
         static readonly Regex SubtractFullNameRegex = new Regex(@", Version=\d+.\d+.\d+.\d+, Culture=\w+, PublicKeyToken=\w+", RegexOptions.Compiled);
-#else
-        static readonly Regex SubtractFullNameRegex = new Regex(@", Version=\d+.\d+.\d+.\d+, Culture=\w+, PublicKeyToken=\w+");
-#endif
 
         static int nameSequence = 0;
 
@@ -39,13 +35,6 @@ namespace MessagePack.Resolvers
         {
             assembly = new DynamicAssembly(ModuleName);
         }
-
-#if NET_35
-        public AssemblyBuilder Save()
-        {
-            return assembly.Save();
-        }
-#endif
 
         public IMessagePackFormatter<T> GetFormatter<T>()
         {

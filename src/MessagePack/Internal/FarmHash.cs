@@ -1,6 +1,4 @@
-﻿#if NETSTANDARD
-
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace MessagePack.Internal
 {
@@ -600,5 +598,3 @@ namespace MessagePack.Internal
         #endregion
     }
 }
-
-#endif

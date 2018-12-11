@@ -35,13 +35,6 @@ namespace MessagePack.Resolvers
             assembly = new DynamicAssembly(ModuleName);
         }
 
-#if NET_35
-        public AssemblyBuilder Save()
-        {
-            return assembly.Save();
-        }
-#endif
-
         public IMessagePackFormatter<T> GetFormatter<T>()
         {
             return FormatterCache<T>.formatter;
@@ -163,13 +156,6 @@ namespace MessagePack.Resolvers
             assembly = new DynamicAssembly(ModuleName);
         }
 
-#if NET_35
-        public AssemblyBuilder Save()
-        {
-            return assembly.Save();
-        }
-#endif
-
         public IMessagePackFormatter<T> GetFormatter<T>()
         {
             return FormatterCache<T>.formatter;
@@ -280,11 +266,7 @@ namespace MessagePack.Internal
 {
     internal static class DynamicObjectTypeBuilder
     {
-#if NETSTANDARD
         static readonly Regex SubtractFullNameRegex = new Regex(@", Version=\d+.\d+.\d+.\d+, Culture=\w+, PublicKeyToken=\w+", RegexOptions.Compiled);
-#else
-        static readonly Regex SubtractFullNameRegex = new Regex(@", Version=\d+.\d+.\d+.\d+, Culture=\w+, PublicKeyToken=\w+");
-#endif
 
         static int nameSequence = 0;
 
@@ -676,7 +658,6 @@ namespace MessagePack.Internal
                         il.Emit(OpCodes.Ldelem_Ref);
 
                         // Optimize, WriteRaw(Unity, large) or UnsafeMemory32/64.WriteRawX
-#if NETSTANDARD
                         var valueLen = MessagePackBinary.GetEncodedStringBytes(item.StringKey).Length;
                         if (valueLen <= MessagePackRange.MaxFixStringLength)
                         {
@@ -690,7 +671,6 @@ namespace MessagePack.Internal
                             }
                         }
                         else
-#endif
                         {
                             il.EmitCall(MessagePackBinaryTypeInfo.WriteRaw);
                         }

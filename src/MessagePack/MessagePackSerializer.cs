@@ -127,8 +127,6 @@ namespace MessagePack
             return resolver.GetFormatterWithVerify<T>().Serialize(ref bytes, offset, value, resolver);
         }
 
-#if NETSTANDARD
-
         /// <summary>
         /// Serialize to stream(async).
         /// </summary>
@@ -159,8 +157,6 @@ namespace MessagePack
                 BufferPool.Default.Return(rentBuffer);
             }
         }
-
-#endif
 
         public static T Deserialize<T>(byte[] bytes)
         {
@@ -212,7 +208,7 @@ namespace MessagePack
 
             if (!readStrict)
             {
-#if NETSTANDARD && !NET45
+#if !NET45
 
                 var ms = stream as MemoryStream;
                 if (ms != null)
@@ -254,8 +250,6 @@ namespace MessagePack
             return resolver.GetFormatterWithVerify<T>().Deserialize(bytes, offset, resolver, out readSize);
         }
 
-#if NETSTANDARD
-
         public static System.Threading.Tasks.Task<T> DeserializeAsync<T>(Stream stream)
         {
             return DeserializeAsync<T>(stream, defaultResolver);
@@ -287,8 +281,6 @@ namespace MessagePack
                 BufferPool.Default.Return(rentBuffer);
             }
         }
-
-#endif
 
         static int FillFromStream(Stream input, ref byte[] buffer)
         {
