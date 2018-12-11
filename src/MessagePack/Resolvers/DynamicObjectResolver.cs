@@ -35,6 +35,15 @@ namespace MessagePack.Resolvers
             assembly = new DynamicAssembly(ModuleName);
         }
 
+#if NETFRAMEWORK
+
+        public AssemblyBuilder Save()
+        {
+            return assembly.Save();
+        }
+
+#endif
+
         public IMessagePackFormatter<T> GetFormatter<T>()
         {
             return FormatterCache<T>.formatter;
@@ -156,6 +165,12 @@ namespace MessagePack.Resolvers
             assembly = new DynamicAssembly(ModuleName);
         }
 
+#if NETFRAMEWORK
+        public AssemblyBuilder Save()
+        {
+            return assembly.Save();
+        }
+#endif
         public IMessagePackFormatter<T> GetFormatter<T>()
         {
             return FormatterCache<T>.formatter;

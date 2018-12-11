@@ -8,6 +8,9 @@ namespace MessagePack.Internal
 {
     internal class DynamicAssembly
     {
+#if NETFRAMEWORK
+        readonly string moduleName;
+#endif
         readonly AssemblyBuilder assemblyBuilder;
         readonly ModuleBuilder moduleBuilder;
 
@@ -18,9 +21,15 @@ namespace MessagePack.Internal
 
         public DynamicAssembly(string moduleName)
         {
+#if NETFRAMEWORK
+            this.moduleName = moduleName;
+            this.assemblyBuilder = System.AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(moduleName), AssemblyBuilderAccess.RunAndSave);
+            this.moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName, moduleName + ".dll");
+#else
             this.assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(moduleName), AssemblyBuilderAccess.Run);
 
             this.moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName);
+#endif
         }
 
         // requires lock on mono environment. see: https://github.com/neuecc/MessagePack-CSharp/issues/161
@@ -48,6 +57,16 @@ namespace MessagePack.Internal
                 return moduleBuilder.DefineType(name, attr, parent, interfaces);
             }
         }
+
+#if NETFRAMEWORK
+
+        public AssemblyBuilder Save()
+        {
+            assemblyBuilder.Save(moduleName + ".dll");
+            return assemblyBuilder;
+        }
+
+#endif
     }
 }
 
