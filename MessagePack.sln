@@ -46,7 +46,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagePackAnalyzer", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagePackAnalyzer.Vsix", "src\MessagePackAnalyzer.Vsix\MessagePackAnalyzer.Vsix.csproj", "{09B87BEB-D9A3-4EEB-B56A-ED53D27DF1A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PertNetFramework", "sandbox\PertNetFramework\PertNetFramework.csproj", "{014A3DCE-50A6-4774-A4C1-C66EEAB67133}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerfNetFramework", "sandbox\PerfNetFramework\PerfNetFramework.csproj", "{014A3DCE-50A6-4774-A4C1-C66EEAB67133}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagePack.AspNetCoreMvcFormatter", "src\MessagePack.AspNetCoreMvcFormatter\MessagePack.AspNetCoreMvcFormatter.csproj", "{17831017-C29C-4A48-B159-849BCE5079FB}"
 EndProject

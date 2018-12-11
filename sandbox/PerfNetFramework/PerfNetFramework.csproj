@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{014A3DCE-50A6-4774-A4C1-C66EEAB67133}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>PertNetFramework</RootNamespace>
-    <AssemblyName>PertNetFramework</AssemblyName>
+    <RootNamespace>PerfNetFramework</RootNamespace>
+    <AssemblyName>PerfNetFramework</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
