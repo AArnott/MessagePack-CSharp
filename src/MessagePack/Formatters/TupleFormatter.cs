@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if NETSTANDARD || NETFRAMEWORK
+
+using System;
 
 namespace MessagePack.Formatters
 {
@@ -431,3 +433,5 @@ namespace MessagePack.Formatters
     }
 
 }
+
+#endif

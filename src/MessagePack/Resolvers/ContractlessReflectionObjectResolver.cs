@@ -1,4 +1,6 @@
-﻿using MessagePack.Formatters;
+﻿#if NETSTANDARD || NETFRAMEWORK
+
+using MessagePack.Formatters;
 using MessagePack.Internal;
 using System;
 using System.Collections.Generic;
@@ -297,3 +299,5 @@ namespace MessagePack.Resolvers
         }
     }
 }
+
+#endif

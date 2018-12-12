@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if NETSTANDARD || NETFRAMEWORK
+
+using System;
 
 namespace MessagePack.Internal
 {
@@ -271,3 +273,5 @@ namespace MessagePack.Internal
         }
     }
 }
+
+#endif

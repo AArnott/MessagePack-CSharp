@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if NETSTANDARD || NETFRAMEWORK
+
+using System;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
@@ -314,3 +316,5 @@ namespace MessagePack
         }
     }
 }
+
+#endif

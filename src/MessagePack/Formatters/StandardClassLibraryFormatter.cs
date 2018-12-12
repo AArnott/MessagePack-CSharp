@@ -1,10 +1,13 @@
-﻿using System;
+﻿using MessagePack.Internal;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+
+#if NETSTANDARD || NETFRAMEWORK
 using System.Threading.Tasks;
-using MessagePack.Internal;
+#endif
 
 namespace MessagePack.Formatters
 {
@@ -401,6 +404,8 @@ namespace MessagePack.Formatters
         }
     }
 
+#if NETSTANDARD || NETFRAMEWORK
+
     public sealed class BigIntegerFormatter : IMessagePackFormatter<System.Numerics.BigInteger>
     {
         public static readonly IMessagePackFormatter<System.Numerics.BigInteger> Instance = new BigIntegerFormatter();
@@ -568,4 +573,6 @@ namespace MessagePack.Formatters
             return new ValueTask<T>(v);
         }
     }
+
+#endif
 }

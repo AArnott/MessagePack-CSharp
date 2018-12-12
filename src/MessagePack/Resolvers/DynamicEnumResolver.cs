@@ -32,6 +32,7 @@ namespace MessagePack.Resolvers
             assembly = new DynamicAssembly(ModuleName);
         }
 
+
 #if NETFRAMEWORK
         public AssemblyBuilder Save()
         {

@@ -36,12 +36,10 @@ namespace MessagePack.Resolvers
         }
 
 #if NETFRAMEWORK
-
         public AssemblyBuilder Save()
         {
             return assembly.Save();
         }
-
 #endif
 
         public IMessagePackFormatter<T> GetFormatter<T>()
@@ -171,6 +169,7 @@ namespace MessagePack.Resolvers
             return assembly.Save();
         }
 #endif
+
         public IMessagePackFormatter<T> GetFormatter<T>()
         {
             return FormatterCache<T>.formatter;
@@ -281,7 +280,11 @@ namespace MessagePack.Internal
 {
     internal static class DynamicObjectTypeBuilder
     {
+#if NETSTANDARD || NETFRAMEWORK
         static readonly Regex SubtractFullNameRegex = new Regex(@", Version=\d+.\d+.\d+.\d+, Culture=\w+, PublicKeyToken=\w+", RegexOptions.Compiled);
+#else
+        static readonly Regex SubtractFullNameRegex = new Regex(@", Version=\d+.\d+.\d+.\d+, Culture=\w+, PublicKeyToken=\w+");
+#endif
 
         static int nameSequence = 0;
 
@@ -673,6 +676,7 @@ namespace MessagePack.Internal
                         il.Emit(OpCodes.Ldelem_Ref);
 
                         // Optimize, WriteRaw(Unity, large) or UnsafeMemory32/64.WriteRawX
+#if NETSTANDARD || NETFRAMEWORK
                         var valueLen = MessagePackBinary.GetEncodedStringBytes(item.StringKey).Length;
                         if (valueLen <= MessagePackRange.MaxFixStringLength)
                         {
@@ -686,6 +690,7 @@ namespace MessagePack.Internal
                             }
                         }
                         else
+#endif
                         {
                             il.EmitCall(MessagePackBinaryTypeInfo.WriteRaw);
                         }
@@ -1801,7 +1806,7 @@ typeof(int), typeof(int) });
             {
                 if (IsProperty)
                 {
-                    return PropertyInfo.GetValue(value);
+                    return PropertyInfo.GetValue(value, null);
                 }
                 else
                 {
@@ -1813,7 +1818,7 @@ typeof(int), typeof(int) });
             {
                 if (IsProperty)
                 {
-                    PropertyInfo.SetValue(obj, value);
+                    PropertyInfo.SetValue(obj, value, null);
                 }
                 else
                 {

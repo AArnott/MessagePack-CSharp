@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+
+#if NETSTANDARD || NETFRAMEWORK
+using System.Collections.Concurrent;
+#endif
 
 namespace MessagePack.Formatters
 {
@@ -232,7 +235,11 @@ namespace MessagePack.Formatters
                         {
                             while (e.MoveNext())
                             {
+#if NETSTANDARD || NETFRAMEWORK
                                 offset += formatter.Serialize(ref bytes, offset, e.Current, formatterResolver);
+#else
+                                offset += formatter.Serialize(ref bytes, (int)offset, (TElement)e.Current, (IFormatterResolver)formatterResolver);
+#endif
                             }
                         }
                         finally
@@ -259,7 +266,11 @@ namespace MessagePack.Formatters
                             while (e.MoveNext())
                             {
                                 count++;
+#if NETSTANDARD || NETFRAMEWORK
                                 var writeSize = formatter.Serialize(ref bytes, offset, e.Current, formatterResolver);
+#else
+                                var writeSize = formatter.Serialize(ref bytes, (int)offset, (TElement)e.Current, (IFormatterResolver)formatterResolver);
+#endif
                                 moveCount += writeSize;
                                 offset += writeSize;
                             }
@@ -321,6 +332,7 @@ namespace MessagePack.Formatters
             {
                 return collection.Count;
             }
+#if NETSTANDARD || NETFRAMEWORK
             else
             {
                 var c2 = sequence as IReadOnlyCollection<TElement>;
@@ -329,6 +341,7 @@ namespace MessagePack.Formatters
                     return c2.Count;
                 }
             }
+#endif
 
             return null;
         }
@@ -908,6 +921,8 @@ namespace MessagePack.Formatters
         }
     }
 
+#if NETSTANDARD || NETFRAMEWORK
+
     public sealed class ObservableCollectionFormatter<T> : CollectionFormatterBase<T, ObservableCollection<T>>
     {
         protected override void Add(ObservableCollection<T> collection, int index, T value)
@@ -1052,4 +1067,6 @@ namespace MessagePack.Formatters
             return new ConcurrentStack<T>(intermediateCollection);
         }
     }
+
+#endif
 }

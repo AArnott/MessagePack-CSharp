@@ -1,4 +1,6 @@
-﻿using MessagePack.Internal;
+﻿#if NETSTANDARD || NETFRAMEWORK
+
+using MessagePack.Internal;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -328,3 +330,5 @@ namespace MessagePack.Formatters
     }
 
 }
+
+#endif

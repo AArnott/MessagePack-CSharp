@@ -8,6 +8,8 @@ namespace MessagePack.Internal
     {
 #if ENABLE_UNSAFE_MSGPACK
 
+#if NETSTANDARD || NETFRAMEWORK
+
         static readonly bool Is32Bit = (IntPtr.Size == 4);
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
@@ -23,13 +25,19 @@ namespace MessagePack.Internal
             }
         }
 
+#endif
+
+#if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe bool Equals(byte[] xs, int xsOffset, int xsCount, byte[] ys)
         {
             return Equals(xs, xsOffset, xsCount, ys, 0, ys.Length);
         }
 
+#if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static unsafe bool Equals(byte[] xs, int xsOffset, int xsCount, byte[] ys, int ysOffset, int ysCount)
         {
             if (xs == null || ys == null || xsCount != ysCount)
@@ -89,7 +97,9 @@ namespace MessagePack.Internal
         }
 
 #else
+#if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static bool Equals(byte[] xs, int xsOffset, int xsCount, byte[] ys)
         {
             if (xs == null || ys == null || xsCount != ys.Length)
@@ -105,7 +115,9 @@ namespace MessagePack.Internal
             return true;
         }
 
+#if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static bool Equals(byte[] xs, int xsOffset, int xsCount, byte[] ys, int ysOffset, int ysCount)
         {
             if (xs == null || ys == null || xsCount != ysCount)
