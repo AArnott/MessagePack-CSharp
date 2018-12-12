@@ -1,3 +1,6 @@
+:: Generally this script isn't necessary, since git records the symlinks.
+:: But when creating new links, one could update this script, or just create the sym link and record it in git.
+
 pushd %~dp0
 
 :: Create the directories within which links will be created
@@ -6,7 +9,6 @@ md src\MessagePack.UnityClient\Assets\Scripts\MessagePack\Unity
 md src\MessagePack.UnityClient\Assets\Scripts\MessagePack\UnsafeExtensions
 
 :: Create the links and junctions themselves
-:: IMPORTANT! Any additions here should also be added to src\MessagePack.UnityClient\Assets\Scripts\.gitignore
 mklink ".\src\MessagePack.UnityClient\Assets\Scripts\MessagePack\Attributes.cs" "..\..\..\..\MessagePack\Attributes.cs"
 mklink ".\src\MessagePack.UnityClient\Assets\Scripts\MessagePack\FloatBits.cs" "..\..\..\..\MessagePack\FloatBits.cs"
 mklink ".\src\MessagePack.UnityClient\Assets\Scripts\MessagePack\IFormatterResolver.cs" "..\..\..\..\MessagePack\IFormatterResolver.cs"
