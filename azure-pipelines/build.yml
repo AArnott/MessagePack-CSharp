@@ -109,7 +109,6 @@ steps:
     TargetFolder: $(Build.ArtifactStagingDirectory)/deployables
     flattenFolders: true
   displayName: Collecting deployables
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
 
 - task: PublishBuildArtifacts@1
   inputs:
@@ -117,4 +116,4 @@ steps:
     ArtifactName: deployables
     ArtifactType: Container
   displayName: Publish deployables artifacts
-  condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), ne(variables['system.pullrequest.isfork'], true))
+  condition: and(succeededOrFailed(), ne(variables['system.pullrequest.isfork'], true))
