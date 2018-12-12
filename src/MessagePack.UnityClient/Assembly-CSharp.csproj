@@ -18,6 +18,8 @@
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
+    <SignAssembly>False</SignAssembly>
+    <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
