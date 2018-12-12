@@ -44,7 +44,7 @@ steps:
   inputs:
     command: restore
     verbosityRestore: normal # detailed, normal, minimal
-    projects: src/**/*.sln
+    projects: '**/*.sln'
     feedsToUse: config
     nugetConfigPath: nuget.config
 
@@ -52,7 +52,7 @@ steps:
 - task: VSBuild@1
   inputs:
     vsVersion: 15.0
-    solution: src\MessagePack.sln
+    solution: MessagePack.sln
     msbuildArgs: /t:build,pack /m /v:m /bl:"$(Build.ArtifactStagingDirectory)/build_logs/msbuild.binlog"
     platform: $(BuildPlatform)
     configuration: $(BuildConfiguration)
@@ -105,6 +105,7 @@ steps:
   inputs:
     Contents: |
       bin/**/$(BuildConfiguration)/**/*.nupkg
+      bin/**/$(BuildConfiguration)/**/*.vsix
     TargetFolder: $(Build.ArtifactStagingDirectory)/deployables
     flattenFolders: true
   displayName: Collecting deployables
