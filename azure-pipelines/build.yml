@@ -65,9 +65,6 @@ steps:
     projects: tests/**/*.Tests.csproj
     arguments: --configuration $(BuildConfiguration) --no-build -v n
 
-- script: make_unity_symlink.bat
-  displayName: Create symbol links for Unity build
-
 - task: VSBuild@1
   inputs:
     vsVersion: 15.0
@@ -76,6 +73,7 @@ steps:
     platform: $(BuildPlatform)
     configuration: $(BuildConfiguration)
   displayName: Build MessagePack.UnityClient.sln
+  enabled: false # The build fails till the solution is opened in Unity, after which HintPaths are machine-specific
 
 - task: CopyFiles@1
   inputs:
