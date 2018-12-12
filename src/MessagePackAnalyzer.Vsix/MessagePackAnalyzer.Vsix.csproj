@@ -43,6 +43,7 @@
     <VSSDKTargetPlatformRegRootSuffix>Roslyn</VSSDKTargetPlatformRegRootSuffix>
     <OutputPath>$(BaseOutputPath)$(Configuration)\</OutputPath>
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
+    <DeployExtension>$(BuildingInsideVisualStudio)</DeployExtension>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
