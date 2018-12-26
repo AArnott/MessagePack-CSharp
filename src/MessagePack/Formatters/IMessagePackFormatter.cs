@@ -1,9 +1,12 @@
-﻿namespace MessagePack.Formatters
+﻿using System;
+using System.Buffers;
+
+namespace MessagePack.Formatters
 {
     public interface IMessagePackFormatter<T>
     {
-        int Serialize(ref byte[] bytes, int offset, T value, IFormatterResolver formatterResolver);
+        void Serialize(IBufferWriter<byte> writer, T value, IFormatterResolver formatterResolver);
 
-        T Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize);
+        T Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver resolver);
     }
 }

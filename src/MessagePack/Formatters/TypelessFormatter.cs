@@ -123,7 +123,7 @@ namespace MessagePack.Formatters
             }
         }
 
-        public int Serialize(ref byte[] bytes, int offset, object value, IFormatterResolver formatterResolver)
+        public void Serialize(IBufferWriter<byte> writer, object value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
@@ -207,7 +207,7 @@ namespace MessagePack.Formatters
             return offset - startOffset;
         }
 
-        public object Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public object Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
             if (MessagePackBinary.IsNil(bytes, offset))
             {

@@ -48,7 +48,7 @@ namespace MessagePack.Formatters
 
 #endif
 
-        public int Serialize(ref byte[] bytes, int offset, object value, IFormatterResolver formatterResolver)
+        public void Serialize(IBufferWriter<byte> writer, object value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
@@ -156,7 +156,7 @@ namespace MessagePack.Formatters
             throw new InvalidOperationException("Not supported primitive object resolver. type:" + t.Name);
         }
 
-        public object Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public object Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
             var type = MessagePackBinary.GetMessagePackType(bytes, offset);
             switch (type)

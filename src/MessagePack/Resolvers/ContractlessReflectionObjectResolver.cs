@@ -149,7 +149,7 @@ namespace MessagePack.Resolvers
     //        }
     //    }
 
-    //    public int Serialize(ref byte[] bytes, int offset, T value, IFormatterResolver formatterResolver)
+    //    public void Serialize(IBufferWriter<byte> writer, T value, IFormatterResolver formatterResolver)
     //    {
     //        // reduce generic method size, avoid write code in <T> type.
     //        if (metaInfo.IsIntKey)
@@ -162,7 +162,7 @@ namespace MessagePack.Resolvers
     //        }
     //    }
 
-    //    public T Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+    //    public T Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
     //    {
     //        return (T)ReflectionObjectFormatterHelper.Deserialize(metaInfo, readMembers, constructorParameterIndexes, mapMemberDictionary, bytes, offset, formatterResolver, out readSize);
     //    }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Buffers;
 
 #if NETSTANDARD || NETFRAMEWORK
 using System.Collections.Concurrent;
@@ -12,49 +13,42 @@ namespace MessagePack.Formatters
 {
     public sealed class ArrayFormatter<T> : IMessagePackFormatter<T[]>
     {
-        public int Serialize(ref byte[] bytes, int offset, T[] value, IFormatterResolver formatterResolver)
+        public void Serialize(IBufferWriter<byte> writer, T[] value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                return MessagePackBinary.WriteNil(ref bytes, offset);
+                MessagePackBinary.WriteNil(writer);
             }
             else
             {
-                var startOffset = offset;
                 var formatter = formatterResolver.GetFormatterWithVerify<T>();
 
-                offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, value.Length);
+                MessagePackBinary.WriteArrayHeader(writer, value.Length);
 
                 for (int i = 0; i < value.Length; i++)
                 {
-                    offset += formatter.Serialize(ref bytes, offset, value[i], formatterResolver);
+                    formatter.Serialize(writer, value[i], formatterResolver);
                 }
-
-                return offset - startOffset;
             }
         }
 
-        public T[] Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public T[] Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
+            if (MessagePackBinary.IsNil(byteSequence))
             {
-                readSize = 1;
+                byteSequence = byteSequence.Slice(1);
                 return null;
             }
             else
             {
-                var startOffset = offset;
                 var formatter = formatterResolver.GetFormatterWithVerify<T>();
 
-                var len = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
-                offset += readSize;
+                var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 var array = new T[len];
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] = formatter.Deserialize(bytes, offset, formatterResolver, out readSize);
-                    offset += readSize;
+                    array[i] = formatter.Deserialize(ref byteSequence, formatterResolver);
                 }
-                readSize = offset - startOffset;
                 return array;
             }
         }
@@ -64,34 +58,34 @@ namespace MessagePack.Formatters
     {
         public static readonly ByteArraySegmentFormatter Instance = new ByteArraySegmentFormatter();
 
-        ByteArraySegmentFormatter()
+        private ByteArraySegmentFormatter()
         {
 
         }
 
-        public int Serialize(ref byte[] bytes, int offset, ArraySegment<byte> value, IFormatterResolver formatterResolver)
+        public void Serialize(IBufferWriter<byte> writer, ArraySegment<byte> value, IFormatterResolver formatterResolver)
         {
             if (value.Array == null)
             {
-                return MessagePackBinary.WriteNil(ref bytes, offset);
+                MessagePackBinary.WriteNil(writer);
             }
             else
             {
-                return MessagePackBinary.WriteBytes(ref bytes, offset, value.Array, value.Offset, value.Count);
+                MessagePackBinary.WriteBytes(writer, value);
             }
         }
 
-        public ArraySegment<byte> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public ArraySegment<byte> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
+            if (MessagePackBinary.IsNil(byteSequence))
             {
-                readSize = 1;
+                byteSequence = byteSequence.Slice(1);
                 return default(ArraySegment<byte>);
             }
             else
             {
                 // use ReadBytesSegment? But currently straem api uses memory pool so can't save arraysegment...
-                var binary = MessagePackBinary.ReadBytes(bytes, offset, out readSize);
+                byte[] binary = MessagePackBinary.ReadBytes(ref byteSequence);
                 return new ArraySegment<byte>(binary, 0, binary.Length);
             }
         }
@@ -99,7 +93,7 @@ namespace MessagePack.Formatters
 
     public sealed class ArraySegmentFormatter<T> : IMessagePackFormatter<ArraySegment<T>>
     {
-        public int Serialize(ref byte[] bytes, int offset, ArraySegment<T> value, IFormatterResolver formatterResolver)
+        public void Serialize(IBufferWriter<byte> writer, ArraySegment<T> value, IFormatterResolver formatterResolver)
         {
             if (value.Array == null)
             {
@@ -123,7 +117,7 @@ namespace MessagePack.Formatters
             }
         }
 
-        public ArraySegment<T> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public ArraySegment<T> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
             if (MessagePackBinary.IsNil(bytes, offset))
             {
@@ -141,7 +135,7 @@ namespace MessagePack.Formatters
     // List<T> is popular format, should avoid abstraction.
     public sealed class ListFormatter<T> : IMessagePackFormatter<List<T>>
     {
-        public int Serialize(ref byte[] bytes, int offset, List<T> value, IFormatterResolver formatterResolver)
+        public void Serialize(IBufferWriter<byte> writer, List<T> value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
@@ -164,7 +158,7 @@ namespace MessagePack.Formatters
             }
         }
 
-        public List<T> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public List<T> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
             if (MessagePackBinary.IsNil(bytes, offset))
             {
@@ -194,7 +188,7 @@ namespace MessagePack.Formatters
         where TCollection : IEnumerable<TElement>
         where TEnumerator : IEnumerator<TElement>
     {
-        public int Serialize(ref byte[] bytes, int offset, TCollection value, IFormatterResolver formatterResolver)
+        public void Serialize(IBufferWriter<byte> writer, TCollection value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
@@ -283,8 +277,14 @@ namespace MessagePack.Formatters
                         var headerLength = MessagePackBinary.GetArrayHeaderLength(count);
                         if (headerLength != 3)
                         {
-                            if (headerLength == 1) offset -= 2; // 1
-                            else offset += 2; // 5
+                            if (headerLength == 1)
+                            {
+                                offset -= 2; // 1
+                            }
+                            else
+                            {
+                                offset += 2; // 5
+                            }
 
                             MessagePackBinary.EnsureCapacity(ref bytes, offset, headerLength);
                             Buffer.BlockCopy(bytes, writeStarOffset + 3, bytes, writeStarOffset + headerLength, moveCount);
@@ -297,7 +297,7 @@ namespace MessagePack.Formatters
             }
         }
 
-        public TCollection Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public TCollection Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
             if (MessagePackBinary.IsNil(bytes, offset))
             {
@@ -571,7 +571,7 @@ namespace MessagePack.Formatters
     // [Key, [Array]]
     public sealed class InterfaceGroupingFormatter<TKey, TElement> : IMessagePackFormatter<IGrouping<TKey, TElement>>
     {
-        public int Serialize(ref byte[] bytes, int offset, IGrouping<TKey, TElement> value, IFormatterResolver formatterResolver)
+        public void Serialize(IBufferWriter<byte> writer, IGrouping<TKey, TElement> value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
@@ -587,7 +587,7 @@ namespace MessagePack.Formatters
             }
         }
 
-        public IGrouping<TKey, TElement> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public IGrouping<TKey, TElement> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
             if (MessagePackBinary.IsNil(bytes, offset))
             {
@@ -600,7 +600,10 @@ namespace MessagePack.Formatters
                 var count = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
                 offset += readSize;
 
-                if (count != 2) throw new InvalidOperationException("Invalid Grouping format.");
+                if (count != 2)
+                {
+                    throw new InvalidOperationException("Invalid Grouping format.");
+                }
 
                 var key = formatterResolver.GetFormatterWithVerify<TKey>().Deserialize(bytes, offset, formatterResolver, out readSize);
                 offset += readSize;
@@ -632,10 +635,10 @@ namespace MessagePack.Formatters
         }
     }
 
-    class Grouping<TKey, TElement> : IGrouping<TKey, TElement>
+    internal class Grouping<TKey, TElement> : IGrouping<TKey, TElement>
     {
-        readonly TKey key;
-        readonly IEnumerable<TElement> elements;
+        private readonly TKey key;
+        private readonly IEnumerable<TElement> elements;
 
         public Grouping(TKey key, IEnumerable<TElement> elements)
         {
@@ -662,9 +665,9 @@ namespace MessagePack.Formatters
         }
     }
 
-    class Lookup<TKey, TElement> : ILookup<TKey, TElement>
+    internal class Lookup<TKey, TElement> : ILookup<TKey, TElement>
     {
-        readonly Dictionary<TKey, IGrouping<TKey, TElement>> groupings;
+        private readonly Dictionary<TKey, IGrouping<TKey, TElement>> groupings;
 
         public Lookup(Dictionary<TKey, IGrouping<TKey, TElement>> groupings)
         {
@@ -708,7 +711,7 @@ namespace MessagePack.Formatters
     public sealed class NonGenericListFormatter<T> : IMessagePackFormatter<T>
         where T : class, IList, new()
     {
-        public int Serialize(ref byte[] bytes, int offset, T value, IFormatterResolver formatterResolver)
+        public void Serialize(IBufferWriter<byte> writer, T value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
@@ -728,7 +731,7 @@ namespace MessagePack.Formatters
             return offset - startOffset;
         }
 
-        public T Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public T Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
             if (MessagePackBinary.IsNil(bytes, offset))
             {
@@ -758,12 +761,12 @@ namespace MessagePack.Formatters
     {
         public static readonly IMessagePackFormatter<IList> Instance = new NonGenericInterfaceListFormatter();
 
-        NonGenericInterfaceListFormatter()
+        private NonGenericInterfaceListFormatter()
         {
 
         }
 
-        public int Serialize(ref byte[] bytes, int offset, IList value, IFormatterResolver formatterResolver)
+        public void Serialize(IBufferWriter<byte> writer, IList value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
@@ -783,7 +786,7 @@ namespace MessagePack.Formatters
             return offset - startOffset;
         }
 
-        public IList Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public IList Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
             if (MessagePackBinary.IsNil(bytes, offset))
             {
@@ -812,7 +815,7 @@ namespace MessagePack.Formatters
     public sealed class NonGenericDictionaryFormatter<T> : IMessagePackFormatter<T>
         where T : class, IDictionary, new()
     {
-        public int Serialize(ref byte[] bytes, int offset, T value, IFormatterResolver formatterResolver)
+        public void Serialize(IBufferWriter<byte> writer, T value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
@@ -833,7 +836,7 @@ namespace MessagePack.Formatters
             return offset - startOffset;
         }
 
-        public T Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public T Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
             if (MessagePackBinary.IsNil(bytes, offset))
             {
@@ -866,12 +869,12 @@ namespace MessagePack.Formatters
     {
         public static readonly IMessagePackFormatter<IDictionary> Instance = new NonGenericInterfaceDictionaryFormatter();
 
-        NonGenericInterfaceDictionaryFormatter()
+        private NonGenericInterfaceDictionaryFormatter()
         {
 
         }
 
-        public int Serialize(ref byte[] bytes, int offset, IDictionary value, IFormatterResolver formatterResolver)
+        public void Serialize(IBufferWriter<byte> writer, IDictionary value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
@@ -892,7 +895,7 @@ namespace MessagePack.Formatters
             return offset - startOffset;
         }
 
-        public IDictionary Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public IDictionary Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
             if (MessagePackBinary.IsNil(bytes, offset))
             {

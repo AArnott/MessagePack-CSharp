@@ -36,7 +36,7 @@ namespace MessagePack.Formatters
             return 18;
         }
 
-        public unsafe Guid Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public unsafe Guid Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
             if (!BitConverter.IsLittleEndian) throw new Exception("BinaryGuidFormatter only allows on little endian env.");
 
@@ -95,7 +95,7 @@ namespace MessagePack.Formatters
             return 18;
         }
 
-        public unsafe Decimal Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public unsafe Decimal Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
             if (!BitConverter.IsLittleEndian) throw new Exception("BinaryDecimalFormatter only allows on little endian env.");
 

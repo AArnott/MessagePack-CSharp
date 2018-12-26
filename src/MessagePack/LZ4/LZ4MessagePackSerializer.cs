@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.IO;
 using MessagePack.Internal;
 using MessagePack.LZ4;
@@ -157,7 +158,7 @@ namespace MessagePack
             }
         }
 
-        public override T Deserialize<T>(ArraySegment<byte> bytes, IFormatterResolver resolver, out int readSize) => DeserializeCore<T>(bytes, resolver, out readSize);
+        public override T Deserialize<T>(ReadOnlySequence<byte> bytes, IFormatterResolver resolver, out int readSize) => DeserializeCore<T>(bytes, resolver, out readSize);
 
         public static byte[] Decode(Stream stream, bool readStrict = false)
         {

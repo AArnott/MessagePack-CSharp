@@ -101,7 +101,7 @@ namespace MessagePack.Resolvers
                 il.Emit(OpCodes.Ret);
             }
 
-            // T Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize);
+            // T Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver);
             {
                 var method = typeBuilder.DefineMethod("Deserialize", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
                     enumType,

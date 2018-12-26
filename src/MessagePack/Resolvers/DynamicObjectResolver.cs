@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
+using System.Buffers;
 
 namespace MessagePack.Resolvers
 {
@@ -1282,13 +1283,13 @@ typeof(int), typeof(int) });
             this.deserialize = deserialize;
         }
 
-        public int Serialize(ref byte[] bytes, int offset, T value, IFormatterResolver formatterResolver)
+        public void Serialize(IBufferWriter<byte> writer, T value, IFormatterResolver formatterResolver)
         {
             if (serialize == null) throw new InvalidOperationException(this.GetType().Name + " does not support Serialize.");
             return serialize(stringByteKeysField, serializeCustomFormatters, ref bytes, offset, value, formatterResolver);
         }
 
-        public T Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public T Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
             if (deserialize == null) throw new InvalidOperationException(this.GetType().Name + " does not support Deserialize.");
             return deserialize(deserializeCustomFormatters, bytes, offset, formatterResolver, out readSize);

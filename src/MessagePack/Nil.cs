@@ -39,7 +39,7 @@ namespace MessagePack.Formatters
 
         }
 
-        public int Serialize(ref byte[] bytes, int offset, Nil value, IFormatterResolver typeResolver)
+        public void Serialize(IBufferWriter<byte> writer, Nil value, IFormatterResolver typeResolver)
         {
             return MessagePackBinary.WriteNil(ref bytes, offset);
         }
@@ -60,7 +60,7 @@ namespace MessagePack.Formatters
 
         }
 
-        public int Serialize(ref byte[] bytes, int offset, Nil? value, IFormatterResolver typeResolver)
+        public void Serialize(IBufferWriter<byte> writer, Nil? value, IFormatterResolver typeResolver)
         {
             return MessagePackBinary.WriteNil(ref bytes, offset);
         }

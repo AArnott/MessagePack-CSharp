@@ -6,6 +6,7 @@
 <#@ output extension=".cs" #>
 #if NETSTANDARD || NETFRAMEWORK
 using System;
+using System.Buffers;
 
 namespace MessagePack.Formatters
 {
@@ -18,37 +19,30 @@ namespace MessagePack.Formatters
 
     public sealed class ValueTupleFormatter<<#= ts #>> : IMessagePackFormatter<<#= t #>><#= (t.Contains("TRest") ? " where TRest : struct" : "") #>
     {
-        public int Serialize(ref byte[] bytes, int offset, <#= t #> value, IFormatterResolver formatterResolver)
+        public void Serialize(IBufferWriter<byte> writer, <#= t #> value, IFormatterResolver formatterResolver)
         {
-            var startOffset = offset;
-            offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, <#= i #>);
+            MessagePackBinary.WriteArrayHeader(writer, <#= i #>);
 
 <# for(var j = 1; j <= i; j++) { #>
-            offset += formatterResolver.GetFormatterWithVerify<<#= toT(j) #>>().Serialize(ref bytes, offset, value.<#= toItem(j) #>, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<<#= toT(j) #>>().Serialize(writer, value.<#= toItem(j) #>, formatterResolver);
 <# } #>
-
-            return offset - startOffset;
         }
 
-        public <#= t #> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public <#= t #> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
+            if (MessagePackBinary.IsNil(byteSequence))
             {
                 throw new InvalidOperationException("Data is Nil, ValueTuple can not be null.");
             }
             else
             {
-                var startOffset = offset;
-                var count = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+                var count = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 if (count != <#= i #>) throw new InvalidOperationException("Invalid ValueTuple count");
-                offset += readSize;
 
 <# for(var j = 1; j <= i; j++) { #>
-                var item<#= j #> = formatterResolver.GetFormatterWithVerify<<#= toT(j) #>>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
+                var item<#= j #> = formatterResolver.GetFormatterWithVerify<<#= toT(j) #>>().Deserialize(ref byteSequence, formatterResolver);
 <# } #>
             
-                readSize = offset - startOffset;
                 return new ValueTuple<<#= ts #>>(<#= string.Join(", ", Enumerable.Range(1, i).Select(x => "item" + x)) #>);
             }
         }
