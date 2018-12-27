@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 
 namespace MessagePack
 {
@@ -41,12 +42,12 @@ namespace MessagePack.Formatters
 
         public void Serialize(IBufferWriter<byte> writer, Nil value, IFormatterResolver typeResolver)
         {
-            return MessagePackBinary.WriteNil(ref bytes, offset);
+            MessagePackBinary.WriteNil(writer);
         }
 
-        public Nil Deserialize(byte[] bytes, int offset, IFormatterResolver typeResolver, out int readSize)
+        public Nil Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver typeResolver)
         {
-            return MessagePackBinary.ReadNil(bytes, offset, out readSize);
+            return MessagePackBinary.ReadNil(ref byteSequence);
         }
     }
 
@@ -62,12 +63,12 @@ namespace MessagePack.Formatters
 
         public void Serialize(IBufferWriter<byte> writer, Nil? value, IFormatterResolver typeResolver)
         {
-            return MessagePackBinary.WriteNil(ref bytes, offset);
+            MessagePackBinary.WriteNil(writer);
         }
 
-        public Nil? Deserialize(byte[] bytes, int offset, IFormatterResolver typeResolver, out int readSize)
+        public Nil? Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver typeResolver)
         {
-            return MessagePackBinary.ReadNil(bytes, offset, out readSize);
+            return MessagePackBinary.ReadNil(ref byteSequence);
         }
     }
 }

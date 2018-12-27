@@ -290,83 +290,83 @@ namespace MessagePack.Internal
         }
 
         // 4(x2) - 2(x2) - 2(x2) - 2(x2) - 6(x2)
-        public void Write(byte[] buffer, int offset)
+        public void Write(Span<byte> buffer)
         {
             if (BitConverter.IsLittleEndian)
             {
                 // int(_a)
-                buffer[offset + 6] = byteToHexStringHigh[Byte0];
-                buffer[offset + 7] = byteToHexStringLow[Byte0];
-                buffer[offset + 4] = byteToHexStringHigh[Byte1];
-                buffer[offset + 5] = byteToHexStringLow[Byte1];
-                buffer[offset + 2] = byteToHexStringHigh[Byte2];
-                buffer[offset + 3] = byteToHexStringLow[Byte2];
-                buffer[offset + 0] = byteToHexStringHigh[Byte3];
-                buffer[offset + 1] = byteToHexStringLow[Byte3];
+                buffer[6] = byteToHexStringHigh[Byte0];
+                buffer[7] = byteToHexStringLow[Byte0];
+                buffer[4] = byteToHexStringHigh[Byte1];
+                buffer[5] = byteToHexStringLow[Byte1];
+                buffer[2] = byteToHexStringHigh[Byte2];
+                buffer[3] = byteToHexStringLow[Byte2];
+                buffer[0] = byteToHexStringHigh[Byte3];
+                buffer[1] = byteToHexStringLow[Byte3];
 
-                buffer[offset + 8] = (byte)'-';
+                buffer[8] = (byte)'-';
 
                 // short(_b)
-                buffer[offset + 11] = byteToHexStringHigh[Byte4];
-                buffer[offset + 12] = byteToHexStringLow[Byte4];
-                buffer[offset + 9] = byteToHexStringHigh[Byte5];
-                buffer[offset + 10] = byteToHexStringLow[Byte5];
+                buffer[11] = byteToHexStringHigh[Byte4];
+                buffer[12] = byteToHexStringLow[Byte4];
+                buffer[9] = byteToHexStringHigh[Byte5];
+                buffer[10] = byteToHexStringLow[Byte5];
 
-                buffer[offset + 13] = (byte)'-';
+                buffer[13] = (byte)'-';
 
                 // short(_c)
-                buffer[offset + 16] = byteToHexStringHigh[Byte6];
-                buffer[offset + 17] = byteToHexStringLow[Byte6];
-                buffer[offset + 14] = byteToHexStringHigh[Byte7];
-                buffer[offset + 15] = byteToHexStringLow[Byte7];
+                buffer[16] = byteToHexStringHigh[Byte6];
+                buffer[17] = byteToHexStringLow[Byte6];
+                buffer[14] = byteToHexStringHigh[Byte7];
+                buffer[15] = byteToHexStringLow[Byte7];
             }
             else
             {
-                buffer[offset + 0] = byteToHexStringHigh[Byte0];
-                buffer[offset + 1] = byteToHexStringLow[Byte0];
-                buffer[offset + 2] = byteToHexStringHigh[Byte1];
-                buffer[offset + 3] = byteToHexStringLow[Byte1];
-                buffer[offset + 4] = byteToHexStringHigh[Byte2];
-                buffer[offset + 5] = byteToHexStringLow[Byte2];
-                buffer[offset + 6] = byteToHexStringHigh[Byte3];
-                buffer[offset + 7] = byteToHexStringLow[Byte3];
+                buffer[0] = byteToHexStringHigh[Byte0];
+                buffer[1] = byteToHexStringLow[Byte0];
+                buffer[2] = byteToHexStringHigh[Byte1];
+                buffer[3] = byteToHexStringLow[Byte1];
+                buffer[4] = byteToHexStringHigh[Byte2];
+                buffer[5] = byteToHexStringLow[Byte2];
+                buffer[6] = byteToHexStringHigh[Byte3];
+                buffer[7] = byteToHexStringLow[Byte3];
 
-                buffer[offset + 8] = (byte)'-';
+                buffer[8] = (byte)'-';
 
-                buffer[offset + 9] = byteToHexStringHigh[Byte4];
-                buffer[offset + 10] = byteToHexStringLow[Byte4];
-                buffer[offset + 11] = byteToHexStringHigh[Byte5];
-                buffer[offset + 12] = byteToHexStringLow[Byte5];
+                buffer[9] = byteToHexStringHigh[Byte4];
+                buffer[10] = byteToHexStringLow[Byte4];
+                buffer[11] = byteToHexStringHigh[Byte5];
+                buffer[12] = byteToHexStringLow[Byte5];
 
-                buffer[offset + 13] = (byte)'-';
+                buffer[13] = (byte)'-';
 
-                buffer[offset + 14] = byteToHexStringHigh[Byte6];
-                buffer[offset + 15] = byteToHexStringLow[Byte6];
-                buffer[offset + 16] = byteToHexStringHigh[Byte7];
-                buffer[offset + 17] = byteToHexStringLow[Byte7];
+                buffer[14] = byteToHexStringHigh[Byte6];
+                buffer[15] = byteToHexStringLow[Byte6];
+                buffer[16] = byteToHexStringHigh[Byte7];
+                buffer[17] = byteToHexStringLow[Byte7];
             }
 
-            buffer[offset + 18] = (byte)'-';
+            buffer[18] = (byte)'-';
 
-            buffer[offset + 19] = byteToHexStringHigh[Byte8];
-            buffer[offset + 20] = byteToHexStringLow[Byte8];
-            buffer[offset + 21] = byteToHexStringHigh[Byte9];
-            buffer[offset + 22] = byteToHexStringLow[Byte9];
+            buffer[19] = byteToHexStringHigh[Byte8];
+            buffer[20] = byteToHexStringLow[Byte8];
+            buffer[21] = byteToHexStringHigh[Byte9];
+            buffer[22] = byteToHexStringLow[Byte9];
 
-            buffer[offset + 23] = (byte)'-';
+            buffer[23] = (byte)'-';
 
-            buffer[offset + 24] = byteToHexStringHigh[Byte10];
-            buffer[offset + 25] = byteToHexStringLow[Byte10];
-            buffer[offset + 26] = byteToHexStringHigh[Byte11];
-            buffer[offset + 27] = byteToHexStringLow[Byte11];
-            buffer[offset + 28] = byteToHexStringHigh[Byte12];
-            buffer[offset + 29] = byteToHexStringLow[Byte12];
-            buffer[offset + 30] = byteToHexStringHigh[Byte13];
-            buffer[offset + 31] = byteToHexStringLow[Byte13];
-            buffer[offset + 32] = byteToHexStringHigh[Byte14];
-            buffer[offset + 33] = byteToHexStringLow[Byte14];
-            buffer[offset + 34] = byteToHexStringHigh[Byte15];
-            buffer[offset + 35] = byteToHexStringLow[Byte15];
+            buffer[24] = byteToHexStringHigh[Byte10];
+            buffer[25] = byteToHexStringLow[Byte10];
+            buffer[26] = byteToHexStringHigh[Byte11];
+            buffer[27] = byteToHexStringLow[Byte11];
+            buffer[28] = byteToHexStringHigh[Byte12];
+            buffer[29] = byteToHexStringLow[Byte12];
+            buffer[30] = byteToHexStringHigh[Byte13];
+            buffer[31] = byteToHexStringLow[Byte13];
+            buffer[32] = byteToHexStringHigh[Byte14];
+            buffer[33] = byteToHexStringLow[Byte14];
+            buffer[34] = byteToHexStringHigh[Byte15];
+            buffer[35] = byteToHexStringLow[Byte15];
         }
     }
 }

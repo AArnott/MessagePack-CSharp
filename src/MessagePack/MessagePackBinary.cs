@@ -253,10 +253,12 @@ namespace MessagePack
 #if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static MessagePackType GetMessagePackType(ReadOnlySequence<byte> byteSequence)
-        {
-            return MessagePackCode.ToMessagePackType(byteSequence.First.Span[0]);
-        }
+        public static MessagePackType GetMessagePackType(ReadOnlySpan<byte> span) => MessagePackCode.ToMessagePackType(span[0]);
+
+#if NETSTANDARD || NETFRAMEWORK
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
+        public static MessagePackType GetMessagePackType(ReadOnlySequence<byte> byteSequence) => GetMessagePackType(byteSequence.First.Span);
 
 #if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
@@ -426,6 +428,18 @@ namespace MessagePack
         public static void WriteMapHeaderForceMap32Block(IBufferWriter<byte> writer, uint count)
         {
             var span = writer.GetSpan(5);
+            WriteMapHeaderForceMap32Block(span, count);
+            writer.Advance(5);
+        }
+
+        /// <summary>
+        /// Write map format header, always use map32 format(length is fixed, 5).
+        /// </summary>
+#if NETSTANDARD || NETFRAMEWORK
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
+        public static void WriteMapHeaderForceMap32Block(Span<byte> span, uint count)
+        {
             unchecked
             {
                 span[0] = MessagePackCode.Map32;
@@ -434,7 +448,6 @@ namespace MessagePack
                 span[3] = (byte)(count >> 8);
                 span[4] = (byte)(count);
             }
-            writer.Advance(5);
         }
 
         /// <summary>
@@ -555,9 +568,20 @@ namespace MessagePack
 #if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static int WriteArrayHeaderForceArray32Block(IBufferWriter<byte> writer, uint count)
+        public static void WriteArrayHeaderForceArray32Block(IBufferWriter<byte> writer, uint count)
         {
             var span = writer.GetSpan(5);
+            WriteArrayHeaderForceArray32Block(span, count);
+        }
+
+        /// <summary>
+        /// Write array format header, always use array32 format(length is fixed, 5).
+        /// </summary>
+#if NETSTANDARD || NETFRAMEWORK
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
+        public static void WriteArrayHeaderForceArray32Block(Span<byte> span, uint count)
+        {
             unchecked
             {
                 span[0] = MessagePackCode.Array32;
@@ -566,7 +590,6 @@ namespace MessagePack
                 span[3] = (byte)(count >> 8);
                 span[4] = (byte)(count);
             }
-            return 5;
         }
 
         /// <summary>
@@ -2054,9 +2077,9 @@ namespace MessagePack
     public struct ExtensionResult
     {
         public sbyte TypeCode { get; private set; }
-        public ReadOnlyMemory<byte> Data { get; private set; }
+        public byte[] Data { get; private set; }
 
-        public ExtensionResult(sbyte typeCode, ReadOnlyMemory<byte> data)
+        public ExtensionResult(sbyte typeCode, byte[] data)
         {
             TypeCode = typeCode;
             Data = data;

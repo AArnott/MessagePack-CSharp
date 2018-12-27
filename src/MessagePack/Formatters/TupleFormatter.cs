@@ -1,6 +1,7 @@
 ﻿#if NETSTANDARD || NETFRAMEWORK
 
 using System;
+using System.Buffers;
 
 namespace MessagePack.Formatters
 {
@@ -11,37 +12,30 @@ namespace MessagePack.Formatters
         {
             if (value == null)
             {
-                return MessagePackBinary.WriteNil(ref bytes, offset);
+                MessagePackBinary.WriteNil(writer);
             }
             else
             {
-                var startOffset = offset;
-                offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, 1);
+                MessagePackBinary.WriteArrayHeader(writer, 1);
 
-                offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
-
-                return offset - startOffset;
+                formatterResolver.GetFormatterWithVerify<T1>().Serialize(writer, value.Item1, formatterResolver);
             }
         }
 
         public Tuple<T1> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
+            if (MessagePackBinary.IsNil(byteSequence))
             {
-                readSize = 1;
+                byteSequence = byteSequence.Slice(1);
                 return null;
             }
             else
             {
-                var startOffset = offset;
-                var count = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+                var count = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 if (count != 1) throw new InvalidOperationException("Invalid Tuple count");
-                offset += readSize;
 
-                var item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-            
-                readSize = offset - startOffset;
+                var item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(ref byteSequence, formatterResolver);
+
                 return new Tuple<T1>(item1);
             }
         }
@@ -54,40 +48,32 @@ namespace MessagePack.Formatters
         {
             if (value == null)
             {
-                return MessagePackBinary.WriteNil(ref bytes, offset);
+                MessagePackBinary.WriteNil(writer);
             }
             else
             {
-                var startOffset = offset;
-                offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, 2);
+                MessagePackBinary.WriteArrayHeader(writer, 2);
 
-                offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
-
-                return offset - startOffset;
+                formatterResolver.GetFormatterWithVerify<T1>().Serialize(writer, value.Item1, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T2>().Serialize(writer, value.Item2, formatterResolver);
             }
         }
 
         public Tuple<T1, T2> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
+            if (MessagePackBinary.IsNil(byteSequence))
             {
-                readSize = 1;
+                byteSequence = byteSequence.Slice(1);
                 return null;
             }
             else
             {
-                var startOffset = offset;
-                var count = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+                var count = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 if (count != 2) throw new InvalidOperationException("Invalid Tuple count");
-                offset += readSize;
 
-                var item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-            
-                readSize = offset - startOffset;
+                var item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(ref byteSequence, formatterResolver);
+                var item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(ref byteSequence, formatterResolver);
+
                 return new Tuple<T1, T2>(item1, item2);
             }
         }
@@ -100,43 +86,34 @@ namespace MessagePack.Formatters
         {
             if (value == null)
             {
-                return MessagePackBinary.WriteNil(ref bytes, offset);
+                MessagePackBinary.WriteNil(writer);
             }
             else
             {
-                var startOffset = offset;
-                offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, 3);
+                MessagePackBinary.WriteArrayHeader(writer, 3);
 
-                offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
-
-                return offset - startOffset;
+                formatterResolver.GetFormatterWithVerify<T1>().Serialize(writer, value.Item1, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T2>().Serialize(writer, value.Item2, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T3>().Serialize(writer, value.Item3, formatterResolver);
             }
         }
 
         public Tuple<T1, T2, T3> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
+            if (MessagePackBinary.IsNil(byteSequence))
             {
-                readSize = 1;
+                byteSequence = byteSequence.Slice(1);
                 return null;
             }
             else
             {
-                var startOffset = offset;
-                var count = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+                var count = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 if (count != 3) throw new InvalidOperationException("Invalid Tuple count");
-                offset += readSize;
 
-                var item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-            
-                readSize = offset - startOffset;
+                var item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(ref byteSequence, formatterResolver);
+                var item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(ref byteSequence, formatterResolver);
+                var item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(ref byteSequence, formatterResolver);
+
                 return new Tuple<T1, T2, T3>(item1, item2, item3);
             }
         }
@@ -149,46 +126,36 @@ namespace MessagePack.Formatters
         {
             if (value == null)
             {
-                return MessagePackBinary.WriteNil(ref bytes, offset);
+                MessagePackBinary.WriteNil(writer);
             }
             else
             {
-                var startOffset = offset;
-                offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, 4);
+                MessagePackBinary.WriteArrayHeader(writer, 4);
 
-                offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
-
-                return offset - startOffset;
+                formatterResolver.GetFormatterWithVerify<T1>().Serialize(writer, value.Item1, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T2>().Serialize(writer, value.Item2, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T3>().Serialize(writer, value.Item3, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T4>().Serialize(writer, value.Item4, formatterResolver);
             }
         }
 
         public Tuple<T1, T2, T3, T4> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
+            if (MessagePackBinary.IsNil(byteSequence))
             {
-                readSize = 1;
+                byteSequence = byteSequence.Slice(1);
                 return null;
             }
             else
             {
-                var startOffset = offset;
-                var count = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+                var count = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 if (count != 4) throw new InvalidOperationException("Invalid Tuple count");
-                offset += readSize;
 
-                var item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-            
-                readSize = offset - startOffset;
+                var item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(ref byteSequence, formatterResolver);
+                var item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(ref byteSequence, formatterResolver);
+                var item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(ref byteSequence, formatterResolver);
+                var item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(ref byteSequence, formatterResolver);
+
                 return new Tuple<T1, T2, T3, T4>(item1, item2, item3, item4);
             }
         }
@@ -201,49 +168,38 @@ namespace MessagePack.Formatters
         {
             if (value == null)
             {
-                return MessagePackBinary.WriteNil(ref bytes, offset);
+                MessagePackBinary.WriteNil(writer);
             }
             else
             {
-                var startOffset = offset;
-                offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, 5);
+                MessagePackBinary.WriteArrayHeader(writer, 5);
 
-                offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref bytes, offset, value.Item5, formatterResolver);
-
-                return offset - startOffset;
+                formatterResolver.GetFormatterWithVerify<T1>().Serialize(writer, value.Item1, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T2>().Serialize(writer, value.Item2, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T3>().Serialize(writer, value.Item3, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T4>().Serialize(writer, value.Item4, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T5>().Serialize(writer, value.Item5, formatterResolver);
             }
         }
 
         public Tuple<T1, T2, T3, T4, T5> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
+            if (MessagePackBinary.IsNil(byteSequence))
             {
-                readSize = 1;
+                byteSequence = byteSequence.Slice(1);
                 return null;
             }
             else
             {
-                var startOffset = offset;
-                var count = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+                var count = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 if (count != 5) throw new InvalidOperationException("Invalid Tuple count");
-                offset += readSize;
 
-                var item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-            
-                readSize = offset - startOffset;
+                var item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(ref byteSequence, formatterResolver);
+                var item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(ref byteSequence, formatterResolver);
+                var item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(ref byteSequence, formatterResolver);
+                var item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(ref byteSequence, formatterResolver);
+                var item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(ref byteSequence, formatterResolver);
+
                 return new Tuple<T1, T2, T3, T4, T5>(item1, item2, item3, item4, item5);
             }
         }
@@ -256,52 +212,40 @@ namespace MessagePack.Formatters
         {
             if (value == null)
             {
-                return MessagePackBinary.WriteNil(ref bytes, offset);
+                MessagePackBinary.WriteNil(writer);
             }
             else
             {
-                var startOffset = offset;
-                offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, 6);
+                MessagePackBinary.WriteArrayHeader(writer, 6);
 
-                offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref bytes, offset, value.Item5, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T6>().Serialize(ref bytes, offset, value.Item6, formatterResolver);
-
-                return offset - startOffset;
+                formatterResolver.GetFormatterWithVerify<T1>().Serialize(writer, value.Item1, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T2>().Serialize(writer, value.Item2, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T3>().Serialize(writer, value.Item3, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T4>().Serialize(writer, value.Item4, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T5>().Serialize(writer, value.Item5, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T6>().Serialize(writer, value.Item6, formatterResolver);
             }
         }
 
         public Tuple<T1, T2, T3, T4, T5, T6> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
+            if (MessagePackBinary.IsNil(byteSequence))
             {
-                readSize = 1;
+                byteSequence = byteSequence.Slice(1);
                 return null;
             }
             else
             {
-                var startOffset = offset;
-                var count = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+                var count = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 if (count != 6) throw new InvalidOperationException("Invalid Tuple count");
-                offset += readSize;
 
-                var item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item6 = formatterResolver.GetFormatterWithVerify<T6>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-            
-                readSize = offset - startOffset;
+                var item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(ref byteSequence, formatterResolver);
+                var item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(ref byteSequence, formatterResolver);
+                var item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(ref byteSequence, formatterResolver);
+                var item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(ref byteSequence, formatterResolver);
+                var item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(ref byteSequence, formatterResolver);
+                var item6 = formatterResolver.GetFormatterWithVerify<T6>().Deserialize(ref byteSequence, formatterResolver);
+
                 return new Tuple<T1, T2, T3, T4, T5, T6>(item1, item2, item3, item4, item5, item6);
             }
         }
@@ -314,55 +258,42 @@ namespace MessagePack.Formatters
         {
             if (value == null)
             {
-                return MessagePackBinary.WriteNil(ref bytes, offset);
+                MessagePackBinary.WriteNil(writer);
             }
             else
             {
-                var startOffset = offset;
-                offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, 7);
+                MessagePackBinary.WriteArrayHeader(writer, 7);
 
-                offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref bytes, offset, value.Item5, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T6>().Serialize(ref bytes, offset, value.Item6, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T7>().Serialize(ref bytes, offset, value.Item7, formatterResolver);
-
-                return offset - startOffset;
+                formatterResolver.GetFormatterWithVerify<T1>().Serialize(writer, value.Item1, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T2>().Serialize(writer, value.Item2, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T3>().Serialize(writer, value.Item3, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T4>().Serialize(writer, value.Item4, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T5>().Serialize(writer, value.Item5, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T6>().Serialize(writer, value.Item6, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T7>().Serialize(writer, value.Item7, formatterResolver);
             }
         }
 
         public Tuple<T1, T2, T3, T4, T5, T6, T7> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
+            if (MessagePackBinary.IsNil(byteSequence))
             {
-                readSize = 1;
+                byteSequence = byteSequence.Slice(1);
                 return null;
             }
             else
             {
-                var startOffset = offset;
-                var count = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+                var count = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 if (count != 7) throw new InvalidOperationException("Invalid Tuple count");
-                offset += readSize;
 
-                var item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item6 = formatterResolver.GetFormatterWithVerify<T6>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item7 = formatterResolver.GetFormatterWithVerify<T7>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-            
-                readSize = offset - startOffset;
+                var item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(ref byteSequence, formatterResolver);
+                var item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(ref byteSequence, formatterResolver);
+                var item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(ref byteSequence, formatterResolver);
+                var item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(ref byteSequence, formatterResolver);
+                var item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(ref byteSequence, formatterResolver);
+                var item6 = formatterResolver.GetFormatterWithVerify<T6>().Deserialize(ref byteSequence, formatterResolver);
+                var item7 = formatterResolver.GetFormatterWithVerify<T7>().Deserialize(ref byteSequence, formatterResolver);
+
                 return new Tuple<T1, T2, T3, T4, T5, T6, T7>(item1, item2, item3, item4, item5, item6, item7);
             }
         }
@@ -375,58 +306,44 @@ namespace MessagePack.Formatters
         {
             if (value == null)
             {
-                return MessagePackBinary.WriteNil(ref bytes, offset);
+                MessagePackBinary.WriteNil(writer);
             }
             else
             {
-                var startOffset = offset;
-                offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, 8);
+                MessagePackBinary.WriteArrayHeader(writer, 8);
 
-                offset += formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref bytes, offset, value.Item1, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref bytes, offset, value.Item2, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref bytes, offset, value.Item3, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref bytes, offset, value.Item4, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref bytes, offset, value.Item5, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T6>().Serialize(ref bytes, offset, value.Item6, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<T7>().Serialize(ref bytes, offset, value.Item7, formatterResolver);
-                offset += formatterResolver.GetFormatterWithVerify<TRest>().Serialize(ref bytes, offset, value.Rest, formatterResolver);
-
-                return offset - startOffset;
+                formatterResolver.GetFormatterWithVerify<T1>().Serialize(writer, value.Item1, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T2>().Serialize(writer, value.Item2, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T3>().Serialize(writer, value.Item3, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T4>().Serialize(writer, value.Item4, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T5>().Serialize(writer, value.Item5, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T6>().Serialize(writer, value.Item6, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<T7>().Serialize(writer, value.Item7, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<TRest>().Serialize(writer, value.Rest, formatterResolver);
             }
         }
 
         public Tuple<T1, T2, T3, T4, T5, T6, T7, TRest> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
+            if (MessagePackBinary.IsNil(byteSequence))
             {
-                readSize = 1;
+                byteSequence = byteSequence.Slice(1);
                 return null;
             }
             else
             {
-                var startOffset = offset;
-                var count = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+                var count = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 if (count != 8) throw new InvalidOperationException("Invalid Tuple count");
-                offset += readSize;
 
-                var item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item6 = formatterResolver.GetFormatterWithVerify<T6>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item7 = formatterResolver.GetFormatterWithVerify<T7>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-                var item8 = formatterResolver.GetFormatterWithVerify<TRest>().Deserialize(bytes, offset, formatterResolver, out readSize);
-                offset += readSize;
-            
-                readSize = offset - startOffset;
+                var item1 = formatterResolver.GetFormatterWithVerify<T1>().Deserialize(ref byteSequence, formatterResolver);
+                var item2 = formatterResolver.GetFormatterWithVerify<T2>().Deserialize(ref byteSequence, formatterResolver);
+                var item3 = formatterResolver.GetFormatterWithVerify<T3>().Deserialize(ref byteSequence, formatterResolver);
+                var item4 = formatterResolver.GetFormatterWithVerify<T4>().Deserialize(ref byteSequence, formatterResolver);
+                var item5 = formatterResolver.GetFormatterWithVerify<T5>().Deserialize(ref byteSequence, formatterResolver);
+                var item6 = formatterResolver.GetFormatterWithVerify<T6>().Deserialize(ref byteSequence, formatterResolver);
+                var item7 = formatterResolver.GetFormatterWithVerify<T7>().Deserialize(ref byteSequence, formatterResolver);
+                var item8 = formatterResolver.GetFormatterWithVerify<TRest>().Deserialize(ref byteSequence, formatterResolver);
+
                 return new Tuple<T1, T2, T3, T4, T5, T6, T7, TRest>(item1, item2, item3, item4, item5, item6, item7, item8);
             }
         }

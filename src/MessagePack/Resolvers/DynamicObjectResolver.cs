@@ -1263,8 +1263,8 @@ typeof(int), typeof(int) });
         }
     }
 
-    internal delegate int AnonymousSerializeFunc<T>(byte[][] stringByteKeysField, object[] customFormatters, ref byte[] bytes, int offset, T value, IFormatterResolver resolver);
-    internal delegate T AnonymousDeserializeFunc<T>(object[] customFormatters, byte[] bytes, int offset, IFormatterResolver resolver, out int readSize);
+    internal delegate int AnonymousSerializeFunc<T>(byte[][] stringByteKeysField, object[] customFormatters, IBufferWriter<byte> writer, T value, IFormatterResolver resolver);
+    internal delegate T AnonymousDeserializeFunc<T>(object[] customFormatters, ref ReadOnlySequence<byte> byteSequence, IFormatterResolver resolver);
 
     internal class AnonymousSerializableFormatter<T> : IMessagePackFormatter<T>
     {
@@ -1286,13 +1286,13 @@ typeof(int), typeof(int) });
         public void Serialize(IBufferWriter<byte> writer, T value, IFormatterResolver formatterResolver)
         {
             if (serialize == null) throw new InvalidOperationException(this.GetType().Name + " does not support Serialize.");
-            return serialize(stringByteKeysField, serializeCustomFormatters, ref bytes, offset, value, formatterResolver);
+            serialize(stringByteKeysField, serializeCustomFormatters, writer, value, formatterResolver);
         }
 
         public T Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
             if (deserialize == null) throw new InvalidOperationException(this.GetType().Name + " does not support Deserialize.");
-            return deserialize(deserializeCustomFormatters, bytes, offset, formatterResolver, out readSize);
+            return deserialize(deserializeCustomFormatters, ref byteSequence, formatterResolver);
         }
     }
 

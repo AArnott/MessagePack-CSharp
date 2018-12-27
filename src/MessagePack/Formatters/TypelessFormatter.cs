@@ -2,6 +2,7 @@
 
 using MessagePack.Internal;
 using System;
+using System.Buffers;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -20,8 +21,8 @@ namespace MessagePack.Formatters
 
         static readonly Regex SubtractFullNameRegex = new Regex(@", Version=\d+.\d+.\d+.\d+, Culture=\w+, PublicKeyToken=\w+", RegexOptions.Compiled);
 
-        delegate int SerializeMethod(object dynamicContractlessFormatter, ref byte[] bytes, int offset, object value, IFormatterResolver formatterResolver);
-        delegate object DeserializeMethod(object dynamicContractlessFormatter, byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize);
+        delegate void SerializeMethod(object dynamicContractlessFormatter, IBufferWriter<byte> writer, object value, IFormatterResolver formatterResolver);
+        delegate object DeserializeMethod(object dynamicContractlessFormatter, ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver);
 
         readonly ThreadsafeTypeKeyHashTable<KeyValuePair<object, SerializeMethod>> serializers = new ThreadsafeTypeKeyHashTable<KeyValuePair<object, SerializeMethod>>();
         readonly ThreadsafeTypeKeyHashTable<KeyValuePair<object, DeserializeMethod>> deserializers = new ThreadsafeTypeKeyHashTable<KeyValuePair<object, DeserializeMethod>>();
@@ -92,12 +93,8 @@ namespace MessagePack.Formatters
 
         public TypelessFormatter()
         {
-            serializers.TryAdd(typeof(object), _ => new KeyValuePair<object, SerializeMethod>(null, (object p1, ref byte[] p2, int p3, object p4, IFormatterResolver p5) => 0));
-            deserializers.TryAdd(typeof(object), _ => new KeyValuePair<object, DeserializeMethod>(null, (object p1, byte[] p2, int p3, IFormatterResolver p4, out int p5) =>
-            {
-                p5 = 0;
-                return new object();
-            }));
+            serializers.TryAdd(typeof(object), _ => new KeyValuePair<object, SerializeMethod>(null, (object p1, IBufferWriter<byte> p2, object p3, IFormatterResolver p4) => { }));
+            deserializers.TryAdd(typeof(object), _ => new KeyValuePair<object, DeserializeMethod>(null, (object p1, ref ReadOnlySequence<byte> p2, IFormatterResolver p3) => new object()));
         }
 
         // see:http://msdn.microsoft.com/en-us/library/w3f99sx1.aspx
@@ -127,7 +124,8 @@ namespace MessagePack.Formatters
         {
             if (value == null)
             {
-                return MessagePackBinary.WriteNil(ref bytes, offset);
+                MessagePackBinary.WriteNil(writer);
+                return;
             }
 
             var type = value.GetType();
@@ -154,7 +152,8 @@ namespace MessagePack.Formatters
 
             if (typeName == null)
             {
-                return Resolvers.TypelessFormatterFallbackResolver.Instance.GetFormatter<object>().Serialize(ref bytes, offset, value, formatterResolver);
+                Resolvers.TypelessFormatterFallbackResolver.Instance.GetFormatter<object>().Serialize(writer, value, formatterResolver);
+                return;
             }
 
             // don't use GetOrAdd for avoid closure capture.
@@ -198,50 +197,47 @@ namespace MessagePack.Formatters
                 }
             }
 
-            // mark as extension with code 100
-            var startOffset = offset;
-            offset += 6; // mark will be written at the end, when size is known
-            offset += MessagePackBinary.WriteStringBytes(ref bytes, offset, typeName);
-            offset += formatterAndDelegate.Value(formatterAndDelegate.Key, ref bytes, offset, value, formatterResolver);
-            MessagePackBinary.WriteExtensionFormatHeaderForceExt32Block(ref bytes, startOffset, (sbyte)TypelessFormatter.ExtensionTypeCode, offset - startOffset - 6);
-            return offset - startOffset;
+            // mark will be written at the end, when size is known
+            using (var sequence = new Nerdbank.Streams.Sequence<byte>())
+            {
+                MessagePackBinary.WriteStringBytes(sequence, typeName);
+                formatterAndDelegate.Value(formatterAndDelegate.Key, sequence, value, formatterResolver);
+
+                // mark as extension with code 100
+                MessagePackBinary.WriteExtensionFormatHeaderForceExt32Block(writer, (sbyte)TypelessFormatter.ExtensionTypeCode, (int)sequence.Length);
+            }
         }
 
         public object Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
+            if (MessagePackBinary.IsNil(byteSequence))
             {
-                readSize = 1;
+                byteSequence = byteSequence.Slice(1);
                 return null;
             }
 
-            int startOffset = offset;
-            var packType = MessagePackBinary.GetMessagePackType(bytes, offset);
+            var packType = MessagePackBinary.GetMessagePackType(byteSequence);
             if (packType == MessagePackType.Extension)
             {
-                var ext = MessagePackBinary.ReadExtensionFormatHeader(bytes, offset, out readSize);
+                var ext = MessagePackBinary.ReadExtensionFormatHeader(ref byteSequence);
                 if (ext.TypeCode == TypelessFormatter.ExtensionTypeCode)
                 {
                     // it has type name serialized
-                    offset += readSize;
-                    var typeName = MessagePackBinary.ReadStringSegment(bytes, offset, out readSize);
-                    offset += readSize;
-                    var result = DeserializeByTypeName(typeName, bytes, offset, formatterResolver, out readSize);
-                    offset += readSize;
-                    readSize = offset - startOffset;
+                    var typeName = MessagePackBinary.ReadStringSegment(ref byteSequence);
+                    var result = DeserializeByTypeName(typeName, ref byteSequence, formatterResolver);
                     return result;
                 }
             }
 
             // fallback
-            return Resolvers.TypelessFormatterFallbackResolver.Instance.GetFormatter<object>().Deserialize(bytes, startOffset, formatterResolver, out readSize);
+            return Resolvers.TypelessFormatterFallbackResolver.Instance.GetFormatter<object>().Deserialize(ref byteSequence, formatterResolver);
         }
 
         /// <summary>
         /// Does not support deserializing of anonymous types
         /// Type should be covered by preceeding resolvers in complex/standard resolver
         /// </summary>
-        private object DeserializeByTypeName(ArraySegment<byte> typeName, byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        private object DeserializeByTypeName(ArraySegment<byte> typeName, ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
             // try get type with assembly name, throw if not found
             Type type;
@@ -314,7 +310,7 @@ namespace MessagePack.Formatters
                 }
             }
 
-            return formatterAndDelegate.Value(formatterAndDelegate.Key, bytes, offset, formatterResolver, out readSize);
+            return formatterAndDelegate.Value(formatterAndDelegate.Key, ref byteSequence, formatterResolver);
         }
     }
 
