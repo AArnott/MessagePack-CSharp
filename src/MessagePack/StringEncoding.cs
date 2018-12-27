@@ -16,6 +16,14 @@ namespace MessagePack
             }
         }
 
+        internal static unsafe string GetString(this Encoding encoding, ReadOnlySpan<byte> bytes)
+        {
+            fixed (byte* pBytes = &bytes[0])
+            {
+                return encoding.GetString(pBytes, bytes.Length);
+            }
+        }
+
         internal static unsafe int GetBytes(this Encoding encoding, string chars, Span<byte> bytes) => GetBytes(encoding, chars.AsSpan(), bytes);
     }
 }

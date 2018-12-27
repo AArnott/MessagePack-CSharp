@@ -36,42 +36,35 @@ namespace MessagePack.Formatters
         {
             if (value == null)
             {
-                return MessagePackBinary.WriteNil(ref bytes, offset);
+                MessagePackBinary.WriteNil(writer);
             }
             else
             {
-                var startOffset = offset;
-                offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, value.Length);
+                MessagePackBinary.WriteArrayHeader(writer, value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    offset += MessagePackBinary.WriteInt64(ref bytes, offset, value[i].ToBinary());
+                    MessagePackBinary.WriteInt64(writer, value[i].ToBinary());
                 }
-
-                return offset - startOffset;
             }
         }
 
         public DateTime[] Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
+            if (MessagePackBinary.IsNil(byteSequence))
             {
-                readSize = 1;
+                byteSequence = byteSequence.Slice(1);
                 return null;
             }
             else
             {
-                var startOffset = offset;
-
-                var len = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
-                offset += readSize;
+                var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 var array = new DateTime[len];
                 for (int i = 0; i < array.Length; i++)
                 {
-                    var dateData = MessagePackBinary.ReadInt64(bytes, offset, out readSize);
+                    var dateData = MessagePackBinary.ReadInt64(ref byteSequence);
                     array[i] = DateTime.FromBinary(dateData);
-                    offset += readSize;
                 }
-                readSize = offset - startOffset;
+
                 return array;
             }
         }
@@ -92,69 +85,47 @@ namespace MessagePack.Formatters
         // Old spec does not exists str 8 format.
         public void Serialize(IBufferWriter<byte> writer, string value, IFormatterResolver formatterResolver)
         {
-            if (value == null) return MessagePackBinary.WriteNil(ref bytes, offset);
-
-            MessagePackBinary.EnsureCapacity(ref bytes, offset, StringEncoding.UTF8.GetMaxByteCount(value.Length) + 5);
-
-            int useOffset;
-            if (value.Length <= MessagePackRange.MaxFixStringLength)
+            if (value == null)
             {
-                useOffset = 1;
-            }
-            else if (value.Length <= ushort.MaxValue)
-            {
-                useOffset = 3;
-            }
-            else
-            {
-                useOffset = 5;
+                MessagePackBinary.WriteNil(writer);
+                return;
             }
 
-            // skip length area
-            var writeBeginOffset = offset + useOffset;
-            var byteCount = StringEncoding.UTF8.GetBytes(value, 0, value.Length, bytes, writeBeginOffset);
-
-            // move body and write prefix
+            int byteCount = StringEncoding.UTF8.GetByteCount(value);
+            int headerLength;
+            Span<byte> span;
             if (byteCount <= MessagePackRange.MaxFixStringLength)
             {
-                if (useOffset != 1)
-                {
-                    Buffer.BlockCopy(bytes, writeBeginOffset, bytes, offset + 1, byteCount);
-                }
-                bytes[offset] = (byte)(MessagePackCode.MinFixStr | byteCount);
-                return byteCount + 1;
+                headerLength = 1;
+                span = writer.GetSpan(headerLength + byteCount);
+                span[0] = (byte)(MessagePackCode.MinFixStr | byteCount);
             }
             else if (byteCount <= ushort.MaxValue)
             {
-                if (useOffset != 3)
-                {
-                    Buffer.BlockCopy(bytes, writeBeginOffset, bytes, offset + 3, byteCount);
-                }
-
-                bytes[offset] = MessagePackCode.Str16;
-                bytes[offset + 1] = unchecked((byte)(byteCount >> 8));
-                bytes[offset + 2] = unchecked((byte)byteCount);
-                return byteCount + 3;
+                headerLength = 3;
+                span = writer.GetSpan(headerLength + byteCount);
+                span[0] = MessagePackCode.Str16;
+                span[1] = unchecked((byte)(byteCount >> 8));
+                span[2] = unchecked((byte)byteCount);
             }
             else
             {
-                if (useOffset != 5)
-                {
-                    Buffer.BlockCopy(bytes, writeBeginOffset, bytes, offset + 5, byteCount);
-                }
-
-                bytes[offset] = MessagePackCode.Str32;
-                bytes[offset + 1] = unchecked((byte)(byteCount >> 24));
-                bytes[offset + 2] = unchecked((byte)(byteCount >> 16));
-                bytes[offset + 3] = unchecked((byte)(byteCount >> 8));
-                bytes[offset + 4] = unchecked((byte)byteCount);
-                return byteCount + 5;
+                headerLength = 5;
+                span = writer.GetSpan(headerLength + byteCount);
+                span[0] = MessagePackCode.Str32;
+                span[1] = unchecked((byte)(byteCount >> 24));
+                span[2] = unchecked((byte)(byteCount >> 16));
+                span[3] = unchecked((byte)(byteCount >> 8));
+                span[4] = unchecked((byte)byteCount);
             }
+
+            StringEncoding.UTF8.GetBytes(value, span.Slice(headerLength));
+            writer.Advance(headerLength + byteCount);
         }
 
         public string Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
-            return MessagePackBinary.ReadString(bytes, offset, out readSize);
+            return MessagePackBinary.ReadString(ref byteSequence);
         }
     }
 
@@ -167,95 +138,85 @@ namespace MessagePack.Formatters
 
         public void Serialize(IBufferWriter<byte> writer, byte[] value, IFormatterResolver formatterResolver)
         {
-            if (value == null) return MessagePackBinary.WriteNil(ref bytes, offset);
+            if (value == null)
+            {
+                 MessagePackBinary.WriteNil(writer);
+                 return;
+            }
 
             var byteCount = value.Length;
 
             if (byteCount <= MessagePackRange.MaxFixStringLength)
             {
-                MessagePackBinary.EnsureCapacity(ref bytes, offset, byteCount + 1);
-
-                bytes[offset] = (byte)(MessagePackCode.MinFixStr | byteCount);
-                Buffer.BlockCopy(value, 0, bytes, offset + 1, byteCount);
-                return byteCount + 1;
+                var span = writer.GetSpan(byteCount + 1);
+                span[0] = (byte)(MessagePackCode.MinFixStr | byteCount);
+                value.CopyTo(span.Slice(1));
             }
             else if (byteCount <= ushort.MaxValue)
             {
-                MessagePackBinary.EnsureCapacity(ref bytes, offset, byteCount + 3);
-
-                bytes[offset] = MessagePackCode.Str16;
-                bytes[offset + 1] = unchecked((byte)(byteCount >> 8));
-                bytes[offset + 2] = unchecked((byte)byteCount);
-                Buffer.BlockCopy(value, 0, bytes, offset + 3, byteCount);
-                return byteCount + 3;
+                var span = writer.GetSpan(byteCount + 3);
+                span[0] = MessagePackCode.Str16;
+                span[0 + 1] = unchecked((byte)(byteCount >> 8));
+                span[0 + 2] = unchecked((byte)byteCount);
+                value.CopyTo(span.Slice(3));
             }
             else
             {
-                MessagePackBinary.EnsureCapacity(ref bytes, offset, byteCount + 5);
-
-                bytes[offset] = MessagePackCode.Str32;
-                bytes[offset + 1] = unchecked((byte)(byteCount >> 24));
-                bytes[offset + 2] = unchecked((byte)(byteCount >> 16));
-                bytes[offset + 3] = unchecked((byte)(byteCount >> 8));
-                bytes[offset + 4] = unchecked((byte)byteCount);
-                Buffer.BlockCopy(value, 0, bytes, offset + 5, byteCount);
-                return byteCount + 5;
+                var span = writer.GetSpan(byteCount + 3);
+                span[0] = MessagePackCode.Str32;
+                span[0 + 1] = unchecked((byte)(byteCount >> 24));
+                span[0 + 2] = unchecked((byte)(byteCount >> 16));
+                span[0 + 3] = unchecked((byte)(byteCount >> 8));
+                span[0 + 4] = unchecked((byte)byteCount);
+                value.CopyTo(span.Slice(5));
             }
         }
 
         public byte[] Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
-            var type = MessagePackBinary.GetMessagePackType(bytes, offset);
+            var type = MessagePackBinary.GetMessagePackType(byteSequence);
             if (type == MessagePackType.Nil)
             {
-                readSize = 1;
+                byteSequence = byteSequence.Slice(1);
                 return null;
             }
             else if (type == MessagePackType.Binary)
             {
-                return MessagePackBinary.ReadBytes(bytes, offset, out readSize);
+                return MessagePackBinary.ReadBytes(ref byteSequence);
             }
             else if (type == MessagePackType.String)
             {
-                var code = bytes[offset];
+                var code = byteSequence.First.Span[0];
                 unchecked
                 {
                     if (MessagePackCode.MinFixStr <= code && code <= MessagePackCode.MaxFixStr)
                     {
-                        var length = bytes[offset] & 0x1F;
-                        readSize = length + 1;
-                        var result = new byte[length];
-                        Buffer.BlockCopy(bytes, offset + 1, result, 0, result.Length);
-                        return result;
+                        return MessagePackBinary.Parse(ref byteSequence, 1, lengthSpan => lengthSpan[0] & 0x1F, span => span.ToArray());
                     }
                     else if (code == MessagePackCode.Str8)
                     {
-                        var length = (int)bytes[offset + 1];
-                        readSize = length + 2;
-                        var result = new byte[length];
-                        Buffer.BlockCopy(bytes, offset + 2, result, 0, result.Length);
-                        return result;
+                        return MessagePackBinary.Parse(ref byteSequence, 2, lengthSpan => lengthSpan[1], span => span.ToArray());
                     }
                     else if (code == MessagePackCode.Str16)
                     {
-                        var length = (bytes[offset + 1] << 8) + (bytes[offset + 2]);
-                        readSize = length + 3;
-                        var result = new byte[length];
-                        Buffer.BlockCopy(bytes, offset + 3, result, 0, result.Length);
-                        return result;
+                        return MessagePackBinary.Parse(
+                            ref byteSequence,
+                            3,
+                            lengthSpan => (lengthSpan[0 + 1] << 8) + (lengthSpan[0 + 2]),
+                            span => span.ToArray());
                     }
                     else if (code == MessagePackCode.Str32)
                     {
-                        var length = (int)((uint)(bytes[offset + 1] << 24) | (uint)(bytes[offset + 2] << 16) | (uint)(bytes[offset + 3] << 8) | (uint)bytes[offset + 4]);
-                        readSize = length + 5;
-                        var result = new byte[length];
-                        Buffer.BlockCopy(bytes, offset + 5, result, 0, result.Length);
-                        return result;
+                        return MessagePackBinary.Parse(
+                            ref byteSequence,
+                            5,
+                            lengthSpan => (int)((uint)(lengthSpan[0 + 1] << 24) | (uint)(lengthSpan[0 + 2] << 16) | (uint)(lengthSpan[0 + 3] << 8) | (uint)lengthSpan[0 + 4]),
+                            span => span.ToArray());
                     }
                 }
             }
 
-            throw new InvalidOperationException(string.Format("code is invalid. code:{0} format:{1}", bytes[offset], MessagePackCode.ToFormatName(bytes[offset])));
+            throw new InvalidOperationException(string.Format("code is invalid. code:{0} format:{1}", byteSequence.First.Span[0], MessagePackCode.ToFormatName(byteSequence.First.Span[0])));
         }
     }
 }

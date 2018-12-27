@@ -13,7 +13,7 @@ namespace MessagePack.Formatters
 
         public void Serialize(IBufferWriter<byte> writer, Int16 value, IFormatterResolver formatterResolver)
         {
-            return MessagePackBinary.WriteInt16ForceInt16Block(writer, value);
+            MessagePackBinary.WriteInt16ForceInt16Block(writer, value);
         }
 
         public Int16 Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -111,7 +111,7 @@ namespace MessagePack.Formatters
 
         public void Serialize(IBufferWriter<byte> writer, Int32 value, IFormatterResolver formatterResolver)
         {
-            return MessagePackBinary.WriteInt32ForceInt32Block(writer, value);
+            MessagePackBinary.WriteInt32ForceInt32Block(writer, value);
         }
 
         public Int32 Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -209,7 +209,7 @@ namespace MessagePack.Formatters
 
         public void Serialize(IBufferWriter<byte> writer, Int64 value, IFormatterResolver formatterResolver)
         {
-            return MessagePackBinary.WriteInt64ForceInt64Block(writer, value);
+            MessagePackBinary.WriteInt64ForceInt64Block(writer, value);
         }
 
         public Int64 Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -307,7 +307,7 @@ namespace MessagePack.Formatters
 
         public void Serialize(IBufferWriter<byte> writer, UInt16 value, IFormatterResolver formatterResolver)
         {
-            return MessagePackBinary.WriteUInt16ForceUInt16Block(writer, value);
+            MessagePackBinary.WriteUInt16ForceUInt16Block(writer, value);
         }
 
         public UInt16 Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -405,7 +405,7 @@ namespace MessagePack.Formatters
 
         public void Serialize(IBufferWriter<byte> writer, UInt32 value, IFormatterResolver formatterResolver)
         {
-            return MessagePackBinary.WriteUInt32ForceUInt32Block(writer, value);
+            MessagePackBinary.WriteUInt32ForceUInt32Block(writer, value);
         }
 
         public UInt32 Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -503,7 +503,7 @@ namespace MessagePack.Formatters
 
         public void Serialize(IBufferWriter<byte> writer, UInt64 value, IFormatterResolver formatterResolver)
         {
-            return MessagePackBinary.WriteUInt64ForceUInt64Block(writer, value);
+            MessagePackBinary.WriteUInt64ForceUInt64Block(writer, value);
         }
 
         public UInt64 Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -601,7 +601,7 @@ namespace MessagePack.Formatters
 
         public void Serialize(IBufferWriter<byte> writer, Byte value, IFormatterResolver formatterResolver)
         {
-            return MessagePackBinary.WriteByteForceByteBlock(writer, value);
+            MessagePackBinary.WriteByteForceByteBlock(writer, value);
         }
 
         public Byte Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -655,7 +655,7 @@ namespace MessagePack.Formatters
 
         public void Serialize(IBufferWriter<byte> writer, SByte value, IFormatterResolver formatterResolver)
         {
-            return MessagePackBinary.WriteSByteForceSByteBlock(writer, value);
+            MessagePackBinary.WriteSByteForceSByteBlock(writer, value);
         }
 
         public SByte Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)

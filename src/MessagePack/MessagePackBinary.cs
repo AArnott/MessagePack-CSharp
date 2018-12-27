@@ -1984,7 +1984,7 @@ namespace MessagePack
 
         internal delegate T ContiguousMemoryReader<T>(ReadOnlySpan<byte> span);
 
-        internal static T Read<T>(ref ReadOnlySequence<byte> byteSequence, int length, ContiguousMemoryReader<T> reader)
+        internal static T Parse<T>(ref ReadOnlySequence<byte> byteSequence, int length, ContiguousMemoryReader<T> reader)
         {
             const int StackAllocLimit = 64 * 1024;
             T result;
@@ -2010,14 +2010,53 @@ namespace MessagePack
             byteSequence = byteSequence.Slice(length);
             return result;
         }
+
+        internal static T Parse<T>(ref ReadOnlySequence<byte> byteSequence, int lengthOfLengthHeader, ContiguousMemoryReader<int> readLength, ContiguousMemoryReader<T> reader)
+        {
+            Span<byte> lengthHeaderSpan = stackalloc byte[lengthOfLengthHeader];
+            byteSequence.Slice(0, lengthOfLengthHeader).CopyTo(lengthHeaderSpan);
+            byteSequence = byteSequence.Slice(lengthOfLengthHeader);
+
+            int length = readLength(lengthHeaderSpan);
+            return Parse<T>(ref byteSequence, length, reader);
+        }
+
+        internal static ArraySegment<byte> ReadArraySegment(ref ReadOnlySequence<byte> byteSequence, int length)
+        {
+            ArraySegment<byte> result;
+            if (byteSequence.First.Length >= length && MemoryMarshal.TryGetArray(byteSequence.First, out ArraySegment<byte> segment))
+            {
+                // Everything we need to return happens to already be in a single array. Return a segment into that same array.
+                result = new ArraySegment<byte>(segment.Array, segment.Offset, length);
+            }
+            else
+            {
+                // We need to create a new array in order to return a continguous segment in our result.
+                result = new ArraySegment<byte>(new byte[length]);
+                byteSequence.Slice(0, length).CopyTo(result.Array);
+            }
+
+            byteSequence = byteSequence.Slice(length);
+            return result;
+        }
+
+        internal static ArraySegment<byte> ReadArraySegment(ref ReadOnlySequence<byte> byteSequence, int lengthOfLengthHeader, ContiguousMemoryReader<int> readLength)
+        {
+            Span<byte> lengthHeaderSpan = stackalloc byte[lengthOfLengthHeader];
+            byteSequence.Slice(0, lengthOfLengthHeader).CopyTo(lengthHeaderSpan);
+            byteSequence = byteSequence.Slice(lengthOfLengthHeader);
+
+            int length = readLength(lengthHeaderSpan);
+            return MessagePackBinary.ReadArraySegment(ref byteSequence, length);
+        }
     }
 
     public struct ExtensionResult
     {
         public sbyte TypeCode { get; private set; }
-        public byte[] Data { get; private set; }
+        public ReadOnlyMemory<byte> Data { get; private set; }
 
-        public ExtensionResult(sbyte typeCode, byte[] data)
+        public ExtensionResult(sbyte typeCode, ReadOnlyMemory<byte> data)
         {
             TypeCode = typeCode;
             Data = data;
@@ -2082,7 +2121,7 @@ namespace MessagePack.Decoders
 
         public uint Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return MessagePackBinary.Read(ref byteSequence, 3, span => unchecked((uint)((span[1] << 8) | (span[2]))));
+            return MessagePackBinary.Parse(ref byteSequence, 3, span => unchecked((uint)((span[1] << 8) | (span[2]))));
         }
     }
 
@@ -2097,7 +2136,7 @@ namespace MessagePack.Decoders
 
         public uint Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return MessagePackBinary.Read(ref byteSequence, 5, span => unchecked((uint)((span[1] << 24) | (span[2] << 16) | (span[3] << 8) | span[4])));
+            return MessagePackBinary.Parse(ref byteSequence, 5, span => unchecked((uint)((span[1] << 24) | (span[2] << 16) | (span[3] << 8) | span[4])));
         }
     }
 
@@ -2149,7 +2188,7 @@ namespace MessagePack.Decoders
 
         public uint Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return MessagePackBinary.Read(ref byteSequence, 3, span => unchecked((uint)((span[1] << 8) | (span[2]))));
+            return MessagePackBinary.Parse(ref byteSequence, 3, span => unchecked((uint)((span[1] << 8) | (span[2]))));
         }
     }
 
@@ -2164,7 +2203,7 @@ namespace MessagePack.Decoders
 
         public uint Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return MessagePackBinary.Read(ref byteSequence, 5, span => unchecked((uint)((span[1] << 24) | (span[2] << 16) | (span[3] << 8) | span[4])));
+            return MessagePackBinary.Parse(ref byteSequence, 5, span => unchecked((uint)((span[1] << 24) | (span[2] << 16) | (span[3] << 8) | span[4])));
         }
     }
 
@@ -2257,7 +2296,7 @@ namespace MessagePack.Decoders
 
         public byte Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return MessagePackBinary.Read(ref byteSequence, 2, span => span[1]);
+            return MessagePackBinary.Parse(ref byteSequence, 2, span => span[1]);
         }
     }
 
@@ -2308,7 +2347,7 @@ namespace MessagePack.Decoders
 
         public byte[] Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            var length = MessagePackBinary.Read(ref byteSequence, 2, span => span[1]);
+            var length = MessagePackBinary.Parse(ref byteSequence, 2, span => span[1]);
             var newBytes = new byte[length];
             byteSequence.Slice(0, length).CopyTo(newBytes);
             byteSequence = byteSequence.Slice(length);
@@ -2327,7 +2366,7 @@ namespace MessagePack.Decoders
 
         public byte[] Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            var length = MessagePackBinary.Read(ref byteSequence, 3, span => (span[1] << 8) + (span[2]));
+            var length = MessagePackBinary.Parse(ref byteSequence, 3, span => (span[1] << 8) + (span[2]));
             var newBytes = new byte[length];
             byteSequence.Slice(0, length).CopyTo(newBytes);
             byteSequence = byteSequence.Slice(length);
@@ -2346,7 +2385,7 @@ namespace MessagePack.Decoders
 
         public byte[] Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            var length = MessagePackBinary.Read(ref byteSequence, 5, span => (span[1] << 24) | (span[2] << 16) | (span[3] << 8) | (span[4]));
+            var length = MessagePackBinary.Parse(ref byteSequence, 5, span => (span[1] << 24) | (span[2] << 16) | (span[3] << 8) | (span[4]));
             var newBytes = new byte[length];
             byteSequence.Slice(0, length).CopyTo(newBytes);
             byteSequence = byteSequence.Slice(length);
@@ -2401,33 +2440,7 @@ namespace MessagePack.Decoders
 
         public ArraySegment<byte> Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return Read(ref byteSequence, 2, span => span[1]);
-        }
-
-        internal delegate int SegmentLengthReader(ReadOnlySpan<byte> span);
-
-        internal static ArraySegment<byte> Read(ref ReadOnlySequence<byte> byteSequence, int lengthOfLengthHeader, SegmentLengthReader readLength)
-        {
-            Span<byte> lengthHeaderSpan = stackalloc byte[lengthOfLengthHeader];
-            byteSequence.Slice(0, lengthOfLengthHeader).CopyTo(lengthHeaderSpan);
-            byteSequence = byteSequence.Slice(lengthOfLengthHeader);
-
-            int length = readLength(lengthHeaderSpan);
-            ArraySegment<byte> result;
-            if (byteSequence.First.Length >= length && MemoryMarshal.TryGetArray(byteSequence.First, out ArraySegment<byte> segment))
-            {
-                // Everything we need to return happens to already be in a single array. Return a segment into that same array.
-                result = new ArraySegment<byte>(segment.Array, segment.Offset, length);
-            }
-            else
-            {
-                // We need to create a new array in order to return a continguous segment in our result.
-                result = new ArraySegment<byte>(new byte[length]);
-                byteSequence.Slice(0, length).CopyTo(result.Array);
-            }
-
-            byteSequence = byteSequence.Slice(length);
-            return result;
+            return MessagePackBinary.ReadArraySegment(ref byteSequence, 2, span => span[1]);
         }
     }
 
@@ -2442,7 +2455,7 @@ namespace MessagePack.Decoders
 
         public ArraySegment<byte> Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return Bin8BytesSegment.Read(ref byteSequence, 3, span => (span[1] << 8) + (span[2]));
+            return MessagePackBinary.ReadArraySegment(ref byteSequence, 3, span => (span[1] << 8) + (span[2]));
         }
 
     }
@@ -2458,7 +2471,7 @@ namespace MessagePack.Decoders
 
         public ArraySegment<byte> Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return Bin8BytesSegment.Read(ref byteSequence, 5, span => (span[1] << 24) | (span[2] << 16) | (span[3] << 8) | (span[4]));
+            return MessagePackBinary.ReadArraySegment(ref byteSequence, 5, span => (span[1] << 24) | (span[2] << 16) | (span[3] << 8) | (span[4]));
         }
     }
 
@@ -2510,7 +2523,7 @@ namespace MessagePack.Decoders
 
         public sbyte Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return MessagePackBinary.Read(ref byteSequence, 2, span => (sbyte)span[1]);
+            return MessagePackBinary.Parse(ref byteSequence, 2, span => (sbyte)span[1]);
         }
     }
 
@@ -2696,7 +2709,7 @@ namespace MessagePack.Decoders
 
         public Single Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return MessagePackBinary.Read(ref byteSequence, 5, span => new Float32Bits(span.Slice(1)).Value);
+            return MessagePackBinary.Parse(ref byteSequence, 5, span => new Float32Bits(span.Slice(1)).Value);
         }
     }
 
@@ -2882,7 +2895,7 @@ namespace MessagePack.Decoders
 
         public Double Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return MessagePackBinary.Read(ref byteSequence, 5, span => new Float32Bits(span.Slice(1)).Value);
+            return MessagePackBinary.Parse(ref byteSequence, 5, span => new Float32Bits(span.Slice(1)).Value);
         }
     }
 
@@ -2897,7 +2910,7 @@ namespace MessagePack.Decoders
 
         public Double Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return MessagePackBinary.Read(ref byteSequence, 9, span => new Float64Bits(span.Slice(1)).Value);
+            return MessagePackBinary.Parse(ref byteSequence, 9, span => new Float64Bits(span.Slice(1)).Value);
         }
     }
 
@@ -2966,7 +2979,7 @@ namespace MessagePack.Decoders
 
         public Int16 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return MessagePackBinary.Read(ref byteSequence, 2, span => unchecked(span[1]));
+            return MessagePackBinary.Parse(ref byteSequence, 2, span => unchecked(span[1]));
         }
     }
 
@@ -2981,7 +2994,7 @@ namespace MessagePack.Decoders
 
         public Int16 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return MessagePackBinary.Read(ref byteSequence, 5, span => checked((Int16)((span[1] << 8) + (span[2]))));
+            return MessagePackBinary.Parse(ref byteSequence, 5, span => checked((Int16)((span[1] << 8) + (span[2]))));
         }
     }
 
@@ -2996,7 +3009,7 @@ namespace MessagePack.Decoders
 
         public Int16 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return MessagePackBinary.Read(ref byteSequence, 2, span => unchecked((sbyte)(span[1])));
+            return MessagePackBinary.Parse(ref byteSequence, 2, span => unchecked((sbyte)(span[1])));
         }
     }
 
@@ -3011,7 +3024,7 @@ namespace MessagePack.Decoders
 
         public Int16 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return MessagePackBinary.Read(ref byteSequence, 3, span => unchecked((short)((span[1] << 8) | (span[2]))));
+            return MessagePackBinary.Parse(ref byteSequence, 3, span => unchecked((short)((span[1] << 8) | (span[2]))));
         }
     }
 
@@ -3080,7 +3093,7 @@ namespace MessagePack.Decoders
 
         public Int32 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return MessagePackBinary.Read(ref byteSequence, 2, span => unchecked(span[1]));
+            return MessagePackBinary.Parse(ref byteSequence, 2, span => unchecked(span[1]));
         }
     }
     internal sealed class UInt16Int32 : IInt32Decoder
@@ -3094,7 +3107,7 @@ namespace MessagePack.Decoders
 
         public Int32 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return MessagePackBinary.Read(ref byteSequence, 3, span => (span[1] << 8) | (span[2]));
+            return MessagePackBinary.Parse(ref byteSequence, 3, span => (span[1] << 8) | (span[2]));
         }
     }
 
@@ -3109,7 +3122,7 @@ namespace MessagePack.Decoders
 
         public Int32 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return MessagePackBinary.Read(ref byteSequence, 5, span => checked((Int32)((UInt32)(span[1] << 24) | (UInt32)(span[2] << 16) | (UInt32)(span[3] << 8) | span[4])));
+            return MessagePackBinary.Parse(ref byteSequence, 5, span => checked((Int32)((UInt32)(span[1] << 24) | (UInt32)(span[2] << 16) | (UInt32)(span[3] << 8) | span[4])));
         }
     }
 
@@ -3124,7 +3137,7 @@ namespace MessagePack.Decoders
 
         public Int32 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return MessagePackBinary.Read(ref byteSequence, 2, span => unchecked((sbyte)(span[1])));
+            return MessagePackBinary.Parse(ref byteSequence, 2, span => unchecked((sbyte)(span[1])));
         }
     }
 
@@ -3139,7 +3152,7 @@ namespace MessagePack.Decoders
 
         public Int32 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return MessagePackBinary.Read(ref byteSequence, 3, span => unchecked((short)((span[1] << 8) | (span[2]))));
+            return MessagePackBinary.Parse(ref byteSequence, 3, span => unchecked((short)((span[1] << 8) | (span[2]))));
         }
     }
 
@@ -3154,7 +3167,7 @@ namespace MessagePack.Decoders
 
         public Int32 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return MessagePackBinary.Read(ref byteSequence, 5, span => unchecked((span[1] << 24) | (span[2] << 16) | (span[3] << 8) | span[4]));
+            return MessagePackBinary.Parse(ref byteSequence, 5, span => unchecked((span[1] << 24) | (span[2] << 16) | (span[3] << 8) | span[4]));
         }
     }
 
@@ -3222,8 +3235,7 @@ namespace MessagePack.Decoders
 
         public Int64 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 2;
-            return unchecked(span[1]);
+            return MessagePackBinary.Parse(ref byteSequence, 2, span => unchecked(span[1]));
         }
     }
     internal sealed class UInt16Int64 : IInt64Decoder
@@ -3237,8 +3249,7 @@ namespace MessagePack.Decoders
 
         public Int64 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 3;
-            return (span[1] << 8) | (span[2]);
+            return MessagePackBinary.Parse(ref byteSequence, 3, span => (span[1] << 8) | (span[2]));
         }
     }
 
@@ -3253,8 +3264,7 @@ namespace MessagePack.Decoders
 
         public Int64 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 5;
-            return unchecked((uint)(span[1] << 24) | ((uint)span[2] << 16) | ((uint)span[3] << 8) | span[4]);
+            return MessagePackBinary.Parse(ref byteSequence, 5, span => unchecked((uint)(span[1] << 24) | ((uint)span[2] << 16) | ((uint)span[3] << 8) | span[4]));
         }
     }
 
@@ -3269,12 +3279,9 @@ namespace MessagePack.Decoders
 
         public Int64 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 9;
-            checked
-            {
-                return (Int64)span[1] << 56 | (Int64)span[2] << 48 | (Int64)span[3] << 40 | (Int64)span[4] << 32
-                     | (Int64)span[5] << 24 | (Int64)span[6] << 16 | (Int64)span[7] << 8 | span[8];
-            }
+            return MessagePackBinary.Parse(ref byteSequence, 9, span => checked(
+                (Int64)span[1] << 56 | (Int64)span[2] << 48 | (Int64)span[3] << 40 | (Int64)span[4] << 32
+                | (Int64)span[5] << 24 | (Int64)span[6] << 16 | (Int64)span[7] << 8 | span[8]));
         }
     }
 
@@ -3290,8 +3297,7 @@ namespace MessagePack.Decoders
 
         public Int64 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 2;
-            return unchecked((sbyte)(span[1]));
+            return MessagePackBinary.Parse(ref byteSequence, 2, span => unchecked((sbyte)(span[1])));
         }
     }
 
@@ -3306,11 +3312,7 @@ namespace MessagePack.Decoders
 
         public Int64 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 3;
-            unchecked
-            {
-                return (short)((span[1] << 8) | (span[2]));
-            }
+            return MessagePackBinary.Parse(ref byteSequence, 3, span => unchecked((short)((span[1] << 8) | (span[2]))));
         }
     }
 
@@ -3325,11 +3327,7 @@ namespace MessagePack.Decoders
 
         public Int64 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 5;
-            unchecked
-            {
-                return (span[1] << 24) + (long)(span[2] << 16) + (span[3] << 8) + span[4];
-            }
+            return MessagePackBinary.Parse(ref byteSequence, 5, span => unchecked((span[1] << 24) + (long)(span[2] << 16) + (span[3] << 8) + span[4]));
         }
     }
 
@@ -3344,12 +3342,9 @@ namespace MessagePack.Decoders
 
         public Int64 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 9;
-            unchecked
-            {
-                return (long)span[1] << 56 | (long)span[2] << 48 | (long)span[3] << 40 | (long)span[4] << 32
-                     | (long)span[5] << 24 | (long)span[6] << 16 | (long)span[7] << 8 | span[8];
-            }
+                return MessagePackBinary.Parse(ref byteSequence, 9, span => unchecked(
+                    (long)span[1] << 56 | (long)span[2] << 48 | (long)span[3] << 40 | (long)span[4] << 32 |
+                    (long)span[5] << 24 | (long)span[6] << 16 | (long)span[7] << 8 | span[8]));
         }
     }
 
@@ -3401,8 +3396,7 @@ namespace MessagePack.Decoders
 
         public UInt16 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 2;
-            return unchecked(span[1]);
+            return MessagePackBinary.Parse(ref byteSequence, 2, span => unchecked(span[1]));
         }
     }
 
@@ -3417,11 +3411,7 @@ namespace MessagePack.Decoders
 
         public UInt16 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 3;
-            unchecked
-            {
-                return (UInt16)((span[1] << 8) | (span[2]));
-            }
+            return MessagePackBinary.Parse(ref byteSequence, 3, span => unchecked((UInt16)((span[1] << 8) | (span[2]))));
         }
     }
 
@@ -3473,8 +3463,7 @@ namespace MessagePack.Decoders
 
         public UInt32 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 2;
-            return unchecked(span[1]);
+            return MessagePackBinary.Parse(ref byteSequence, 2, span => unchecked(span[1]));
         }
     }
 
@@ -3489,11 +3478,7 @@ namespace MessagePack.Decoders
 
         public UInt32 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 3;
-            unchecked
-            {
-                return (UInt32)((span[1] << 8) | (span[2]));
-            }
+            return MessagePackBinary.Parse(ref byteSequence, 3, span => unchecked((UInt32)((span[1] << 8) | (span[2]))));
         }
     }
 
@@ -3508,11 +3493,7 @@ namespace MessagePack.Decoders
 
         public UInt32 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 5;
-            unchecked
-            {
-                return (UInt32)(span[1] << 24) | (UInt32)(span[2] << 16) | (UInt32)(span[3] << 8) | span[4];
-            }
+            return MessagePackBinary.Parse(ref byteSequence, 5, span => unchecked((UInt32)(span[1] << 24) | (UInt32)(span[2] << 16) | (UInt32)(span[3] << 8) | span[4]));
         }
     }
 
@@ -3564,8 +3545,7 @@ namespace MessagePack.Decoders
 
         public UInt64 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 2;
-            return unchecked(span[1]);
+            return MessagePackBinary.Parse(ref byteSequence, 2, span => unchecked(span[1]));
         }
     }
 
@@ -3580,11 +3560,7 @@ namespace MessagePack.Decoders
 
         public UInt64 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 3;
-            unchecked
-            {
-                return (UInt64)((span[1] << 8) | (span[2]));
-            }
+            return MessagePackBinary.Parse(ref byteSequence, 3, span => unchecked((UInt64)((span[1] << 8) | (span[2]))));
         }
     }
 
@@ -3599,11 +3575,7 @@ namespace MessagePack.Decoders
 
         public UInt64 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 5;
-            unchecked
-            {
-                return ((UInt64)span[1] << 24) + (ulong)(span[2] << 16) + (UInt64)(span[3] << 8) + span[4];
-            }
+            return MessagePackBinary.Parse(ref byteSequence, 5, span => unchecked(((UInt64)span[1] << 24) + (ulong)(span[2] << 16) + (UInt64)(span[3] << 8) + span[4]));
         }
     }
 
@@ -3618,12 +3590,9 @@ namespace MessagePack.Decoders
 
         public UInt64 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 9;
-            unchecked
-            {
-                return (UInt64)span[1] << 56 | (UInt64)span[2] << 48 | (UInt64)span[3] << 40 | (UInt64)span[4] << 32
-                     | (UInt64)span[5] << 24 | (UInt64)span[6] << 16 | (UInt64)span[7] << 8 | span[8];
-            }
+            return MessagePackBinary.Parse(ref byteSequence, 9, span => unchecked(
+                (UInt64)span[1] << 56 | (UInt64)span[2] << 48 | (UInt64)span[3] << 40 | (UInt64)span[4] << 32 |
+                (UInt64)span[5] << 24 | (UInt64)span[6] << 16 | (UInt64)span[7] << 8 | span[8]));
         }
     }
 
@@ -3658,7 +3627,7 @@ namespace MessagePack.Decoders
 
         public String Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 1;
+            byteSequence = byteSequence.Slice(1);
             return null;
         }
     }
@@ -3674,9 +3643,9 @@ namespace MessagePack.Decoders
 
         public String Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            var length = span[0] & 0x1F;
-            readSize = length + 1;
-            return StringEncoding.UTF8.GetString(bytes, offset + 1, length);
+            var length = byteSequence.First.Span[0] & 0x1F;
+            byteSequence = byteSequence.Slice(length + 1);
+            return MessagePackBinary.Parse(ref byteSequence, length, StringEncoding.UTF8.GetString);
         }
     }
 
@@ -3691,9 +3660,8 @@ namespace MessagePack.Decoders
 
         public String Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            var length = (int)span[1];
-            readSize = length + 2;
-            return StringEncoding.UTF8.GetString(bytes, offset + 2, length);
+            int length = MessagePackBinary.Parse(ref byteSequence, 2, span => (int)span[1]);
+            return MessagePackBinary.Parse(ref byteSequence, length, StringEncoding.UTF8.GetString);
         }
     }
 
@@ -3708,12 +3676,8 @@ namespace MessagePack.Decoders
 
         public String Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            unchecked
-            {
-                var length = (span[1] << 8) + (span[2]);
-                readSize = length + 3;
-                return StringEncoding.UTF8.GetString(bytes, offset + 3, length);
-            }
+            int length = MessagePackBinary.Parse(ref byteSequence, 3, span => unchecked((span[1] << 8) + (span[2])));
+            return MessagePackBinary.Parse(ref byteSequence, length, StringEncoding.UTF8.GetString);
         }
     }
 
@@ -3728,12 +3692,8 @@ namespace MessagePack.Decoders
 
         public String Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            unchecked
-            {
-                var length = (int)((uint)(span[1] << 24) | (uint)(span[2] << 16) | (uint)(span[3] << 8) | span[4]);
-                readSize = length + 5;
-                return StringEncoding.UTF8.GetString(bytes, offset + 5, length);
-            }
+            int length = MessagePackBinary.Parse(ref byteSequence, 5, span => unchecked((int)((uint)(span[1] << 24) | (uint)(span[2] << 16) | (uint)(span[3] << 8) | span[4])));
+            return MessagePackBinary.Parse(ref byteSequence, length, StringEncoding.UTF8.GetString);
         }
     }
 
@@ -3768,8 +3728,7 @@ namespace MessagePack.Decoders
 
         public ArraySegment<byte> Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 1;
-            return new ArraySegment<byte>(bytes, offset, 1);
+            return MessagePackBinary.ReadArraySegment(ref byteSequence, 1);
         }
     }
 
@@ -3784,9 +3743,9 @@ namespace MessagePack.Decoders
 
         public ArraySegment<byte> Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            var length = span[0] & 0x1F;
-            readSize = length + 1;
-            return new ArraySegment<byte>(bytes, offset + 1, length);
+            var length = byteSequence.First.Span[0] & 0x1F;
+            byteSequence = byteSequence.Slice(1);
+            return MessagePackBinary.ReadArraySegment(ref byteSequence, length);
         }
     }
 
@@ -3801,9 +3760,8 @@ namespace MessagePack.Decoders
 
         public ArraySegment<byte> Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            var length = (int)span[1];
-            readSize = length + 2;
-            return new ArraySegment<byte>(bytes, offset + 2, length);
+            var length = MessagePackBinary.Parse(ref byteSequence, 2, span => (int)span[1]);
+            return MessagePackBinary.ReadArraySegment(ref byteSequence, length);
         }
     }
 
@@ -3818,12 +3776,8 @@ namespace MessagePack.Decoders
 
         public ArraySegment<byte> Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            unchecked
-            {
-                var length = (span[1] << 8) + (span[2]);
-                readSize = length + 3;
-                return new ArraySegment<byte>(bytes, offset + 3, length);
-            }
+            var length = MessagePackBinary.Parse(ref byteSequence, 3, span => unchecked((span[1] << 8) + (span[2])));
+            return MessagePackBinary.ReadArraySegment(ref byteSequence, length);
         }
     }
 
@@ -3838,12 +3792,8 @@ namespace MessagePack.Decoders
 
         public ArraySegment<byte> Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            unchecked
-            {
-                var length = (int)((uint)(span[1] << 24) | (uint)(span[2] << 16) | (uint)(span[3] << 8) | span[4]);
-                readSize = length + 5;
-                return new ArraySegment<byte>(bytes, offset + 5, length);
-            }
+            var length = MessagePackBinary.Parse(ref byteSequence, 5, span => unchecked((int)((uint)(span[1] << 24) | (uint)(span[2] << 16) | (uint)(span[3] << 8) | span[4])));
+            return MessagePackBinary.ReadArraySegment(ref byteSequence, length);
         }
     }
 
@@ -3878,9 +3828,9 @@ namespace MessagePack.Decoders
 
         public ExtensionResult Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 3;
-            var typeCode = unchecked((sbyte)span[1]);
-            var body = new byte[1] { span[2] }; // make new bytes is overhead?
+            var typeCode = MessagePackBinary.Parse(ref byteSequence, 2, span => unchecked((sbyte)span[1]));
+            var body = new byte[1] { byteSequence.First.Span[0] }; // make new bytes is overhead?
+            byteSequence = byteSequence.Slice(1);
             return new ExtensionResult(typeCode, body);
         }
     }
@@ -3896,13 +3846,8 @@ namespace MessagePack.Decoders
 
         public ExtensionResult Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 4;
-            var typeCode = unchecked((sbyte)span[1]);
-            var body = new byte[2]
-            {
-                span[2],
-                span[3],
-            };
+            var typeCode = MessagePackBinary.Parse(ref byteSequence, 2, span => unchecked((sbyte)span[1]));
+            var body = MessagePackBinary.Parse(ref byteSequence, 2, span => span.ToArray());
             return new ExtensionResult(typeCode, body);
         }
     }
@@ -3918,15 +3863,8 @@ namespace MessagePack.Decoders
 
         public ExtensionResult Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 6;
-            var typeCode = unchecked((sbyte)span[1]);
-            var body = new byte[4]
-            {
-                span[2],
-                span[3],
-                span[4],
-                span[5],
-            };
+            var typeCode = MessagePackBinary.Parse(ref byteSequence, 2, span => unchecked((sbyte)span[1]));
+            var body = MessagePackBinary.Parse(ref byteSequence, 4, span => span.ToArray());
             return new ExtensionResult(typeCode, body);
         }
     }
@@ -3942,19 +3880,8 @@ namespace MessagePack.Decoders
 
         public ExtensionResult Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 10;
-            var typeCode = unchecked((sbyte)span[1]);
-            var body = new byte[8]
-            {
-                span[2],
-                span[3],
-                span[4],
-                span[5],
-                span[6],
-                span[7],
-                span[8],
-                span[9],
-            };
+            var typeCode = MessagePackBinary.Parse(ref byteSequence, 2, span => unchecked((sbyte)span[1]));
+            var body = MessagePackBinary.Parse(ref byteSequence, 8, span => span.ToArray());
             return new ExtensionResult(typeCode, body);
         }
     }
@@ -3970,27 +3897,8 @@ namespace MessagePack.Decoders
 
         public ExtensionResult Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 18;
-            var typeCode = unchecked((sbyte)span[1]);
-            var body = new byte[16]
-            {
-                span[2],
-                span[3],
-                span[4],
-                span[5],
-                span[6],
-                span[7],
-                span[8],
-                span[9],
-                span[10],
-                span[11],
-                span[12],
-                span[13],
-                span[14],
-                span[15],
-                span[16],
-                span[17]
-            };
+            var typeCode = MessagePackBinary.Parse(ref byteSequence, 2, span => unchecked((sbyte)span[1]));
+            var body = MessagePackBinary.Parse(ref byteSequence, 16, span => span.ToArray());
             return new ExtensionResult(typeCode, body);
         }
     }
@@ -4006,16 +3914,11 @@ namespace MessagePack.Decoders
 
         public ExtensionResult Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            unchecked
-            {
-                var length = span[1];
-                var typeCode = unchecked((sbyte)span[2]);
-
-                var body = new byte[length];
-                readSize = length + 3;
-                Buffer.BlockCopy(bytes, offset + 3, body, 0, length);
-                return new ExtensionResult(typeCode, body);
-            }
+            return MessagePackBinary.Parse(
+                ref byteSequence,
+                2,
+                lengthSpan => lengthSpan[1] + 1,
+                span => new ExtensionResult(typeCode: unchecked((sbyte)span[0]), span.Slice(1).ToArray()));
         }
     }
 
@@ -4030,16 +3933,11 @@ namespace MessagePack.Decoders
 
         public ExtensionResult Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            unchecked
-            {
-                var length = (UInt16)(span[1] << 8) | span[2];
-                var typeCode = unchecked((sbyte)span[3]);
-
-                var body = new byte[length];
-                readSize = length + 4;
-                Buffer.BlockCopy(bytes, offset + 4, body, 0, length);
-                return new ExtensionResult(typeCode, body);
-            }
+            return MessagePackBinary.Parse(
+                ref byteSequence,
+                3,
+                lengthSpan => unchecked((UInt16)(lengthSpan[1] << 8) | lengthSpan[2]),
+                span => new ExtensionResult(typeCode: unchecked((sbyte)span[0]), span.Slice(1).ToArray()));
         }
     }
 
@@ -4054,19 +3952,11 @@ namespace MessagePack.Decoders
 
         public ExtensionResult Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            unchecked
-            {
-                var length = (UInt32)(span[1] << 24) | (UInt32)(span[2] << 16) | (UInt32)(span[3] << 8) | span[4];
-                var typeCode = unchecked((sbyte)span[5]);
-
-                var body = new byte[length];
-                checked
-                {
-                    readSize = (int)length + 6;
-                    Buffer.BlockCopy(bytes, offset + 6, body, 0, (int)length);
-                }
-                return new ExtensionResult(typeCode, body);
-            }
+            return MessagePackBinary.Parse(
+                ref byteSequence,
+                5,
+                lengthSpan => unchecked((int)(lengthSpan[1] << 24) | (int)(lengthSpan[2] << 16) | (int)(lengthSpan[3] << 8) | lengthSpan[4]),
+                span => new ExtensionResult(typeCode: unchecked((sbyte)span[0]), span.Slice(1).ToArray()));
         }
     }
 
@@ -4106,9 +3996,7 @@ namespace MessagePack.Decoders
 
         public ExtensionHeader Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 2;
-            var typeCode = unchecked((sbyte)span[1]);
-            return new ExtensionHeader(typeCode, 1);
+            return MessagePackBinary.Parse(ref byteSequence, 2, span => new ExtensionHeader(typeCode: unchecked((sbyte)span[1]), 1));
         }
     }
 
@@ -4123,9 +4011,7 @@ namespace MessagePack.Decoders
 
         public ExtensionHeader Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 2;
-            var typeCode = unchecked((sbyte)span[1]);
-            return new ExtensionHeader(typeCode, 2);
+            return MessagePackBinary.Parse(ref byteSequence, 2, span => new ExtensionHeader(typeCode: unchecked((sbyte)span[1]), 2));
         }
     }
 
@@ -4140,9 +4026,7 @@ namespace MessagePack.Decoders
 
         public ExtensionHeader Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 2;
-            var typeCode = unchecked((sbyte)span[1]);
-            return new ExtensionHeader(typeCode, 4);
+            return MessagePackBinary.Parse(ref byteSequence, 2, span => new ExtensionHeader(typeCode: unchecked((sbyte)span[1]), 4));
         }
     }
 
@@ -4157,9 +4041,7 @@ namespace MessagePack.Decoders
 
         public ExtensionHeader Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 2;
-            var typeCode = unchecked((sbyte)span[1]);
-            return new ExtensionHeader(typeCode, 8);
+            return MessagePackBinary.Parse(ref byteSequence, 2, span => new ExtensionHeader(typeCode: unchecked((sbyte)span[1]), 8));
         }
     }
 
@@ -4174,9 +4056,7 @@ namespace MessagePack.Decoders
 
         public ExtensionHeader Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            readSize = 2;
-            var typeCode = unchecked((sbyte)span[1]);
-            return new ExtensionHeader(typeCode, 16);
+            return MessagePackBinary.Parse(ref byteSequence, 2, span => new ExtensionHeader(typeCode: unchecked((sbyte)span[1]), 16));
         }
     }
 
@@ -4191,14 +4071,7 @@ namespace MessagePack.Decoders
 
         public ExtensionHeader Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            unchecked
-            {
-                var length = span[1];
-                var typeCode = unchecked((sbyte)span[2]);
-
-                readSize = 3;
-                return new ExtensionHeader(typeCode, length);
-            }
+            return MessagePackBinary.Parse(ref byteSequence, 3, span => new ExtensionHeader(typeCode: unchecked((sbyte)span[2]), length: span[1]));
         }
     }
 
@@ -4213,14 +4086,12 @@ namespace MessagePack.Decoders
 
         public ExtensionHeader Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            unchecked
-            {
-                var length = (UInt32)((UInt16)(span[1] << 8) | span[2]);
-                var typeCode = unchecked((sbyte)span[3]);
-
-                readSize = 4;
-                return new ExtensionHeader(typeCode, length);
-            }
+            return MessagePackBinary.Parse(
+                ref byteSequence,
+                4,
+                span => new ExtensionHeader(
+                    typeCode: unchecked((sbyte)span[3]),
+                    length: (UInt32)((UInt16)(span[1] << 8) | span[2])));
         }
     }
 
@@ -4235,14 +4106,12 @@ namespace MessagePack.Decoders
 
         public ExtensionHeader Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            unchecked
-            {
-                var length = (UInt32)(span[1] << 24) | (UInt32)(span[2] << 16) | (UInt32)(span[3] << 8) | span[4];
-                var typeCode = unchecked((sbyte)span[5]);
-
-                readSize = 6;
-                return new ExtensionHeader(typeCode, length);
-            }
+            return MessagePackBinary.Parse(
+                ref byteSequence,
+                6,
+                span => new ExtensionHeader(
+                    typeCode: unchecked((sbyte)span[5]),
+                    length: unchecked((UInt32)(span[1] << 24) | (UInt32)(span[2] << 16) | (UInt32)(span[3] << 8) | span[4])));
         }
     }
 
@@ -4277,19 +4146,22 @@ namespace MessagePack.Decoders
 
         public DateTime Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            var typeCode = unchecked((sbyte)span[1]);
-            if (typeCode != ReservedMessagePackExtensionTypeCode.DateTime)
-            {
-                throw new InvalidOperationException(string.Format("typeCode is invalid. typeCode:{0}", typeCode));
-            }
+            return MessagePackBinary.Parse(
+                ref byteSequence,
+                6,
+                span => {
+                    var typeCode = unchecked((sbyte)span[1]);
+                    if (typeCode != ReservedMessagePackExtensionTypeCode.DateTime)
+                    {
+                        throw new InvalidOperationException(string.Format("typeCode is invalid. typeCode:{0}", typeCode));
+                    }
 
-            unchecked
-            {
-                var seconds = (UInt32)(span[2] << 24) | (UInt32)(span[3] << 16) | (UInt32)(span[4] << 8) | span[5];
-
-                readSize = 6;
-                return DateTimeConstants.UnixEpoch.AddSeconds(seconds);
-            }
+                    unchecked
+                    {
+                        var seconds = (UInt32)(span[2] << 24) | (UInt32)(span[3] << 16) | (UInt32)(span[4] << 8) | span[5];
+                        return DateTimeConstants.UnixEpoch.AddSeconds(seconds);
+                    }
+                });
         }
     }
 
@@ -4304,20 +4176,24 @@ namespace MessagePack.Decoders
 
         public DateTime Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            var typeCode = unchecked((sbyte)span[1]);
-            if (typeCode != ReservedMessagePackExtensionTypeCode.DateTime)
-            {
-                throw new InvalidOperationException(string.Format("typeCode is invalid. typeCode:{0}", typeCode));
-            }
+            return MessagePackBinary.Parse(
+                ref byteSequence,
+                10,
+                span => {
+                    var typeCode = unchecked((sbyte)span[1]);
+                    if (typeCode != ReservedMessagePackExtensionTypeCode.DateTime)
+                    {
+                        throw new InvalidOperationException(string.Format("typeCode is invalid. typeCode:{0}", typeCode));
+                    }
 
-            var data64 = (UInt64)span[2] << 56 | (UInt64)span[3] << 48 | (UInt64)span[4] << 40 | (UInt64)span[5] << 32
-                       | (UInt64)span[6] << 24 | (UInt64)span[7] << 16 | (UInt64)span[8] << 8 | span[9];
+                    var data64 = (UInt64)span[2] << 56 | (UInt64)span[3] << 48 | (UInt64)span[4] << 40 | (UInt64)span[5] << 32
+                            | (UInt64)span[6] << 24 | (UInt64)span[7] << 16 | (UInt64)span[8] << 8 | span[9];
 
-            var nanoseconds = (long)(data64 >> 34);
-            var seconds = data64 & 0x00000003ffffffffL;
+                    var nanoseconds = (long)(data64 >> 34);
+                    var seconds = data64 & 0x00000003ffffffffL;
 
-            readSize = 10;
-            return DateTimeConstants.UnixEpoch.AddSeconds(seconds).AddTicks(nanoseconds / DateTimeConstants.NanosecondsPerTick);
+                    return DateTimeConstants.UnixEpoch.AddSeconds(seconds).AddTicks(nanoseconds / DateTimeConstants.NanosecondsPerTick);
+                });
         }
     }
 
@@ -4332,22 +4208,26 @@ namespace MessagePack.Decoders
 
         public DateTime Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            var length = checked(span[1]);
-            var typeCode = unchecked((sbyte)span[2]);
-            if (length != 12 || typeCode != ReservedMessagePackExtensionTypeCode.DateTime)
-            {
-                throw new InvalidOperationException(string.Format("typeCode is invalid. typeCode:{0}", typeCode));
-            }
+            return MessagePackBinary.Parse(
+                ref byteSequence,
+                15,
+                span => {
+                    var length = checked(span[1]);
+                    var typeCode = unchecked((sbyte)span[2]);
+                    if (length != 12 || typeCode != ReservedMessagePackExtensionTypeCode.DateTime)
+                    {
+                        throw new InvalidOperationException(string.Format("typeCode is invalid. typeCode:{0}", typeCode));
+                    }
 
-            var nanoseconds = (UInt32)(span[3] << 24) | (UInt32)(span[4] << 16) | (UInt32)(span[5] << 8) | span[6];
-            unchecked
-            {
-                var seconds = (long)span[7] << 56 | (long)span[8] << 48 | (long)span[9] << 40 | (long)span[10] << 32
-                            | (long)span[11] << 24 | (long)span[12] << 16 | (long)span[13] << 8 | span[14];
+                    var nanoseconds = (UInt32)(span[3] << 24) | (UInt32)(span[4] << 16) | (UInt32)(span[5] << 8) | span[6];
+                    unchecked
+                    {
+                        var seconds = (long)span[7] << 56 | (long)span[8] << 48 | (long)span[9] << 40 | (long)span[10] << 32
+                                    | (long)span[11] << 24 | (long)span[12] << 16 | (long)span[13] << 8 | span[14];
 
-                readSize = 15;
-                return DateTimeConstants.UnixEpoch.AddSeconds(seconds).AddTicks(nanoseconds / DateTimeConstants.NanosecondsPerTick);
-            }
+                        return DateTimeConstants.UnixEpoch.AddSeconds(seconds).AddTicks(nanoseconds / DateTimeConstants.NanosecondsPerTick);
+                    }
+                });
         }
     }
 
@@ -4379,7 +4259,8 @@ namespace MessagePack.Decoders
         {
 
         }
-        public int Read(byte[] bytes, int offset) { return 1; }
+
+        public void Read(ref ReadOnlySequence<byte> byteSequence) { byteSequence = byteSequence.Slice(1); }
     }
 
     internal sealed class ReadNext2 : IReadNextDecoder
@@ -4390,7 +4271,7 @@ namespace MessagePack.Decoders
         {
 
         }
-        public int Read(byte[] bytes, int offset) { return 2; }
+        public void Read(ref ReadOnlySequence<byte> byteSequence) { byteSequence = byteSequence.Slice(2); }
 
     }
     internal sealed class ReadNext3 : IReadNextDecoder
@@ -4401,7 +4282,7 @@ namespace MessagePack.Decoders
         {
 
         }
-        public int Read(byte[] bytes, int offset) { return 3; }
+        public void Read(ref ReadOnlySequence<byte> byteSequence) { byteSequence = byteSequence.Slice(3); }
     }
     internal sealed class ReadNext4 : IReadNextDecoder
     {
@@ -4411,7 +4292,7 @@ namespace MessagePack.Decoders
         {
 
         }
-        public int Read(byte[] bytes, int offset) { return 4; }
+        public void Read(ref ReadOnlySequence<byte> byteSequence) { byteSequence = byteSequence.Slice(4); }
     }
     internal sealed class ReadNext5 : IReadNextDecoder
     {
@@ -4421,7 +4302,7 @@ namespace MessagePack.Decoders
         {
 
         }
-        public int Read(byte[] bytes, int offset) { return 5; }
+        public void Read(ref ReadOnlySequence<byte> byteSequence) { byteSequence = byteSequence.Slice(5); }
     }
     internal sealed class ReadNext6 : IReadNextDecoder
     {
@@ -4431,7 +4312,7 @@ namespace MessagePack.Decoders
         {
 
         }
-        public int Read(byte[] bytes, int offset) { return 6; }
+        public void Read(ref ReadOnlySequence<byte> byteSequence) { byteSequence = byteSequence.Slice(6); }
     }
 
     internal sealed class ReadNext9 : IReadNextDecoder
@@ -4442,7 +4323,7 @@ namespace MessagePack.Decoders
         {
 
         }
-        public int Read(byte[] bytes, int offset) { return 9; }
+        public void Read(ref ReadOnlySequence<byte> byteSequence) { byteSequence = byteSequence.Slice(9); }
     }
     internal sealed class ReadNext10 : IReadNextDecoder
     {
@@ -4452,7 +4333,7 @@ namespace MessagePack.Decoders
         {
 
         }
-        public int Read(byte[] bytes, int offset) { return 10; }
+        public void Read(ref ReadOnlySequence<byte> byteSequence) { byteSequence = byteSequence.Slice(10); }
     }
     internal sealed class ReadNext18 : IReadNextDecoder
     {
@@ -4462,7 +4343,7 @@ namespace MessagePack.Decoders
         {
 
         }
-        public int Read(byte[] bytes, int offset) { return 18; }
+        public void Read(ref ReadOnlySequence<byte> byteSequence) { byteSequence = byteSequence.Slice(18); }
     }
 
     internal sealed class ReadNextMap : IReadNextDecoder
@@ -4473,18 +4354,14 @@ namespace MessagePack.Decoders
         {
 
         }
-        public int Read(byte[] bytes, int offset)
+        public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            var startOffset = offset;
-            int readSize;
             var length = MessagePackBinary.ReadMapHeader(ref byteSequence);
-            offset += readSize;
             for (int i = 0; i < length; i++)
             {
-                offset += MessagePackBinary.ReadNext(bytes, offset); // key
-                offset += MessagePackBinary.ReadNext(bytes, offset); // value
+                MessagePackBinary.ReadNext(ref byteSequence); // key
+                MessagePackBinary.ReadNext(ref byteSequence); // value
             }
-            return offset - startOffset;
         }
     }
 
@@ -4496,17 +4373,13 @@ namespace MessagePack.Decoders
         {
 
         }
-        public int Read(byte[] bytes, int offset)
+        public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            var startOffset = offset;
-            int readSize;
             var length = MessagePackBinary.ReadArrayHeader(ref byteSequence);
-            offset += readSize;
             for (int i = 0; i < length; i++)
             {
-                offset += MessagePackBinary.ReadNext(bytes, offset);
+                MessagePackBinary.ReadNext(ref byteSequence);
             }
-            return offset - startOffset;
         }
     }
 
@@ -4518,10 +4391,10 @@ namespace MessagePack.Decoders
         {
 
         }
-        public int Read(byte[] bytes, int offset)
+        public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            var length = span[0] & 0x1F;
-            return length + 1;
+            var length = byteSequence.First.Span[0] & 0x1F;
+            byteSequence = byteSequence.Slice(length + 1);
         }
     }
 
@@ -4533,10 +4406,10 @@ namespace MessagePack.Decoders
         {
 
         }
-        public int Read(byte[] bytes, int offset)
+        public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            var length = (int)span[1];
-            return length + 2;
+            var length = MessagePackBinary.Parse(ref byteSequence, 2, span => (int)span[1]);
+            byteSequence = byteSequence.Slice(length);
         }
     }
 
@@ -4548,11 +4421,10 @@ namespace MessagePack.Decoders
         {
 
         }
-        public int Read(byte[] bytes, int offset)
+        public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
-
-            var length = (span[1] << 8) | (span[2]);
-            return length + 3;
+            var length = MessagePackBinary.Parse(ref byteSequence, 3, span => (span[1] << 8) | (span[2]));
+            byteSequence = byteSequence.Slice(length);
         }
     }
 
@@ -4564,10 +4436,10 @@ namespace MessagePack.Decoders
         {
 
         }
-        public int Read(byte[] bytes, int offset)
+        public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            var length = (int)((uint)(span[1] << 24) | (uint)(span[2] << 16) | (uint)(span[3] << 8) | span[4]);
-            return length + 5;
+            var length = MessagePackBinary.Parse(ref byteSequence, 5, span => (int)((uint)(span[1] << 24) | (uint)(span[2] << 16) | (uint)(span[3] << 8) | span[4]));
+            byteSequence = byteSequence.Slice(length);
         }
     }
 
@@ -4579,10 +4451,10 @@ namespace MessagePack.Decoders
         {
 
         }
-        public int Read(byte[] bytes, int offset)
+        public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            var length = span[1];
-            return length + 2;
+            var length = MessagePackBinary.Parse(ref byteSequence, 2, span => span[1]);
+            byteSequence = byteSequence.Slice(length);
         }
     }
 
@@ -4594,11 +4466,10 @@ namespace MessagePack.Decoders
         {
 
         }
-        public int Read(byte[] bytes, int offset)
+        public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
-
-            var length = (span[1] << 8) | (span[2]);
-            return length + 3;
+            var length = MessagePackBinary.Parse(ref byteSequence, 3, span => (span[1] << 8) | (span[2]));
+            byteSequence = byteSequence.Slice(length);
         }
     }
 
@@ -4610,10 +4481,10 @@ namespace MessagePack.Decoders
         {
 
         }
-        public int Read(byte[] bytes, int offset)
+        public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            var length = (span[1] << 24) | (span[2] << 16) | (span[3] << 8) | (span[4]);
-            return length + 5;
+            var length = MessagePackBinary.Parse(ref byteSequence, 5, span => (int)((uint)(span[1] << 24) | (uint)(span[2] << 16) | (uint)(span[3] << 8) | span[4]));
+            byteSequence = byteSequence.Slice(length);
         }
     }
 
@@ -4625,10 +4496,10 @@ namespace MessagePack.Decoders
         {
 
         }
-        public int Read(byte[] bytes, int offset)
+        public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            var length = span[1];
-            return length + 3;
+            var length = MessagePackBinary.Parse(ref byteSequence, 2, span => span[1]);
+            byteSequence = byteSequence.Slice(length + 1);
         }
     }
 
@@ -4640,10 +4511,10 @@ namespace MessagePack.Decoders
         {
 
         }
-        public int Read(byte[] bytes, int offset)
+        public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            var length = (UInt16)(span[1] << 8) | span[2];
-            return length + 4;
+            var length = MessagePackBinary.Parse(ref byteSequence, 3, span => (span[1] << 8) | (span[2]));
+            byteSequence = byteSequence.Slice(length + 1);
         }
     }
 
@@ -4655,10 +4526,10 @@ namespace MessagePack.Decoders
         {
 
         }
-        public int Read(byte[] bytes, int offset)
+        public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            var length = (UInt32)(span[1] << 24) | (UInt32)(span[2] << 16) | (UInt32)(span[3] << 8) | span[4];
-            return (int)length + 6;
+            var length = MessagePackBinary.Parse(ref byteSequence, 5, span => (int)((uint)(span[1] << 24) | (uint)(span[2] << 16) | (uint)(span[3] << 8) | span[4]));
+            byteSequence = byteSequence.Slice(length + 1);
         }
     }
 }

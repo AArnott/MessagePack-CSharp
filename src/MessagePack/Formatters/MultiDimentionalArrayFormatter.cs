@@ -53,7 +53,7 @@ namespace MessagePack.Formatters
                 var iLength = MessagePackBinary.ReadInt32(ref byteSequence);
                 var jLength = MessagePackBinary.ReadInt32(ref byteSequence);
                 var maxLen = MessagePackBinary.ReadArrayHeader(ref byteSequence);
-                
+
                 var array = new T[iLength, jLength];
 
                 var i = 0;
@@ -70,11 +70,9 @@ namespace MessagePack.Formatters
                         i++;
                     }
 
-                    array[i, j] = formatter.Deserialize(bytes, offset, formatterResolver, out readSize);
-                    offset += readSize;
+                    array[i, j] = formatter.Deserialize(ref byteSequence, formatterResolver);
                 }
 
-                readSize = offset - startOffset;
                 return array;
             }
         }
@@ -88,7 +86,7 @@ namespace MessagePack.Formatters
         {
             if (value == null)
             {
-                return MessagePackBinary.WriteNil(ref bytes, offset);
+                MessagePackBinary.WriteNil(writer);
             }
             else
             {
@@ -96,51 +94,39 @@ namespace MessagePack.Formatters
                 var j = value.GetLength(1);
                 var k = value.GetLength(2);
 
-                var startOffset = offset;
                 var formatter = formatterResolver.GetFormatterWithVerify<T>();
 
-                offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, ArrayLength);
-                offset += MessagePackBinary.WriteInt32(ref bytes, offset, i);
-                offset += MessagePackBinary.WriteInt32(ref bytes, offset, j);
-                offset += MessagePackBinary.WriteInt32(ref bytes, offset, k);
+                MessagePackBinary.WriteArrayHeader(writer, ArrayLength);
+                MessagePackBinary.WriteInt32(writer, i);
+                MessagePackBinary.WriteInt32(writer, j);
+                MessagePackBinary.WriteInt32(writer, k);
 
-                offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, value.Length);
+                MessagePackBinary.WriteArrayHeader(writer, value.Length);
                 foreach (var item in value)
                 {
-                    offset += formatter.Serialize(ref bytes, offset, item, formatterResolver);
+                    formatter.Serialize(writer, item, formatterResolver);
                 }
-
-                return offset - startOffset;
             }
         }
 
         public T[,,] Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
+            if (MessagePackBinary.IsNil(byteSequence))
             {
-                readSize = 1;
+                byteSequence = byteSequence.Slice(1);
                 return null;
             }
             else
             {
-                var startOffset = offset;
                 var formatter = formatterResolver.GetFormatterWithVerify<T>();
 
-                var len = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
-                offset += readSize;
+                var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 if (len != ArrayLength) throw new InvalidOperationException("Invalid T[,,] format");
 
-                var iLength = MessagePackBinary.ReadInt32(bytes, offset, out readSize);
-                offset += readSize;
-
-                var jLength = MessagePackBinary.ReadInt32(bytes, offset, out readSize);
-                offset += readSize;
-
-                var kLength = MessagePackBinary.ReadInt32(bytes, offset, out readSize);
-                offset += readSize;
-
-                var maxLen = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
-                offset += readSize;
+                var iLength = MessagePackBinary.ReadInt32(ref byteSequence);
+                var jLength = MessagePackBinary.ReadInt32(ref byteSequence);
+                var kLength = MessagePackBinary.ReadInt32(ref byteSequence);
+                var maxLen = MessagePackBinary.ReadArrayHeader(ref byteSequence);
 
                 var array = new T[iLength, jLength, kLength];
 
@@ -165,11 +151,9 @@ namespace MessagePack.Formatters
                         i++;
                     }
 
-                    array[i, j, k] = formatter.Deserialize(bytes, offset, formatterResolver, out readSize);
-                    offset += readSize;
+                    array[i, j, k] = formatter.Deserialize(ref byteSequence, formatterResolver);
                 }
 
-                readSize = offset - startOffset;
                 return array;
             }
         }
@@ -183,7 +167,7 @@ namespace MessagePack.Formatters
         {
             if (value == null)
             {
-                return MessagePackBinary.WriteNil(ref bytes, offset);
+                MessagePackBinary.WriteNil(writer);
             }
             else
             {
@@ -192,56 +176,40 @@ namespace MessagePack.Formatters
                 var k = value.GetLength(2);
                 var l = value.GetLength(3);
 
-                var startOffset = offset;
                 var formatter = formatterResolver.GetFormatterWithVerify<T>();
 
-                offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, ArrayLength);
-                offset += MessagePackBinary.WriteInt32(ref bytes, offset, i);
-                offset += MessagePackBinary.WriteInt32(ref bytes, offset, j);
-                offset += MessagePackBinary.WriteInt32(ref bytes, offset, k);
-                offset += MessagePackBinary.WriteInt32(ref bytes, offset, l);
+                MessagePackBinary.WriteArrayHeader(writer, ArrayLength);
+                MessagePackBinary.WriteInt32(writer, i);
+                MessagePackBinary.WriteInt32(writer, j);
+                MessagePackBinary.WriteInt32(writer, k);
+                MessagePackBinary.WriteInt32(writer, l);
 
-                offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, value.Length);
+                MessagePackBinary.WriteArrayHeader(writer, value.Length);
                 foreach (var item in value)
                 {
-                    offset += formatter.Serialize(ref bytes, offset, item, formatterResolver);
+                    formatter.Serialize(writer, item, formatterResolver);
                 }
-
-                return offset - startOffset;
             }
         }
 
         public T[,,,] Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
+            if (MessagePackBinary.IsNil(byteSequence))
             {
-                readSize = 1;
+                byteSequence = byteSequence.Slice(1);
                 return null;
             }
             else
             {
-                var startOffset = offset;
                 var formatter = formatterResolver.GetFormatterWithVerify<T>();
 
-                var len = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
-                offset += readSize;
+                var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 if (len != ArrayLength) throw new InvalidOperationException("Invalid T[,,,] format");
-
-                var iLength = MessagePackBinary.ReadInt32(bytes, offset, out readSize);
-                offset += readSize;
-
-                var jLength = MessagePackBinary.ReadInt32(bytes, offset, out readSize);
-                offset += readSize;
-
-                var kLength = MessagePackBinary.ReadInt32(bytes, offset, out readSize);
-                offset += readSize;
-
-                var lLength = MessagePackBinary.ReadInt32(bytes, offset, out readSize);
-                offset += readSize;
-
-                var maxLen = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
-                offset += readSize;
-
+                var iLength = MessagePackBinary.ReadInt32(ref byteSequence);
+                var jLength = MessagePackBinary.ReadInt32(ref byteSequence);
+                var kLength = MessagePackBinary.ReadInt32(ref byteSequence);
+                var lLength = MessagePackBinary.ReadInt32(ref byteSequence);
+                var maxLen = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 var array = new T[iLength, jLength, kLength, lLength];
 
                 var i = 0;
@@ -273,11 +241,9 @@ namespace MessagePack.Formatters
                         i++;
                     }
 
-                    array[i, j, k, l] = formatter.Deserialize(bytes, offset, formatterResolver, out readSize);
-                    offset += readSize;
+                    array[i, j, k, l] = formatter.Deserialize(ref byteSequence, formatterResolver);
                 }
 
-                readSize = offset - startOffset;
                 return array;
             }
         }

@@ -80,7 +80,9 @@ namespace MessagePack
                 resolver = this.DefaultResolver;
             }
 
-            return resolver.GetFormatterWithVerify<T>().Deserialize(byteSequence, resolver, out endPosition);
+            T result = resolver.GetFormatterWithVerify<T>().Deserialize(ref byteSequence, resolver);
+            endPosition = byteSequence.Start;
+            return result;
         }
 
         /// <summary>
