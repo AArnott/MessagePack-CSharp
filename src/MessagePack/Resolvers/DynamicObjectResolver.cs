@@ -684,11 +684,11 @@ namespace MessagePack.Internal
                         {
                             if (UnsafeMemory.Is32Bit)
                             {
-                                il.EmitCall(typeof(UnsafeMemory32).GetRuntimeMethod("WriteRaw" + valueLen, new[] { refByte, typeof(int), typeof(byte[]) }));
+                                il.EmitCall(typeof(UnsafeMemory32).GetRuntimeMethod("WriteRaw" + valueLen, new[] { typeof(IBufferWriter<byte>), typeof(ReadOnlySpan<byte>) }));
                             }
                             else
                             {
-                                il.EmitCall(typeof(UnsafeMemory64).GetRuntimeMethod("WriteRaw" + valueLen, new[] { refByte, typeof(int), typeof(byte[]) }));
+                                il.EmitCall(typeof(UnsafeMemory64).GetRuntimeMethod("WriteRaw" + valueLen, new[] { typeof(IBufferWriter<byte>), typeof(ReadOnlySpan<byte>) }));
                             }
                         }
                         else
