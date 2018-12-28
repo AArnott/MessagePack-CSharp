@@ -358,11 +358,11 @@ namespace MessagePack
 #if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static int WriteFixedMapHeaderUnsafe(IBufferWriter<byte> writer, int count)
+        public static void WriteFixedMapHeaderUnsafe(IBufferWriter<byte> writer, int count)
         {
             var span = writer.GetSpan(1);
             span[0] = (byte)(MessagePackCode.MinFixMap | count);
-            return 1;
+            writer.Advance(1);
         }
 
         /// <summary>
@@ -620,12 +620,11 @@ namespace MessagePack
 #if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static int WriteBoolean(IBufferWriter<byte> writer, bool value)
+        public static void WriteBoolean(IBufferWriter<byte> writer, bool value)
         {
             var span = writer.GetSpan(1);
-
             span[0] = (value ? MessagePackCode.True : MessagePackCode.False);
-            return 1;
+            writer.Advance(1);
         }
 
 #if NETSTANDARD || NETFRAMEWORK
@@ -641,32 +640,32 @@ namespace MessagePack
 #if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static int WriteByte(IBufferWriter<byte> writer, byte value)
+        public static void WriteByte(IBufferWriter<byte> writer, byte value)
         {
             if (value <= MessagePackCode.MaxFixInt)
             {
                 var span = writer.GetSpan(1);
                 span[0] = value;
-                return 1;
+                writer.Advance(1);
             }
             else
             {
                 var span = writer.GetSpan(2);
                 span[0] = MessagePackCode.UInt8;
                 span[1] = value;
-                return 2;
+                writer.Advance(2);
             }
         }
 
 #if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static int WriteByteForceByteBlock(IBufferWriter<byte> writer, byte value)
+        public static void WriteByteForceByteBlock(IBufferWriter<byte> writer, byte value)
         {
             var span = writer.GetSpan(2);
             span[0] = MessagePackCode.UInt8;
             span[1] = value;
-            return 2;
+            writer.Advance(2);
         }
 
 #if NETSTANDARD || NETFRAMEWORK
@@ -751,32 +750,32 @@ namespace MessagePack
 #if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static int WriteSByte(IBufferWriter<byte> writer, sbyte value)
+        public static void WriteSByte(IBufferWriter<byte> writer, sbyte value)
         {
             if (value < MessagePackRange.MinFixNegativeInt)
             {
                 var span = writer.GetSpan(2);
                 span[0] = MessagePackCode.Int8;
                 span[1] = unchecked((byte)(value));
-                return 2;
+                writer.Advance(2);
             }
             else
             {
                 var span = writer.GetSpan(1);
                 span[0] = unchecked((byte)value);
-                return 1;
+                writer.Advance(1);
             }
         }
 
 #if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static int WriteSByteForceSByteBlock(IBufferWriter<byte> writer, sbyte value)
+        public static void WriteSByteForceSByteBlock(IBufferWriter<byte> writer, sbyte value)
         {
             var span = writer.GetSpan(2);
             span[0] = MessagePackCode.Int8;
             span[1] = unchecked((byte)(value));
-            return 2;
+            writer.Advance(2);
         }
 
 #if NETSTANDARD || NETFRAMEWORK
@@ -790,7 +789,7 @@ namespace MessagePack
 #if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static int WriteSingle(IBufferWriter<byte> writer, float value)
+        public static void WriteSingle(IBufferWriter<byte> writer, float value)
         {
             var span = writer.GetSpan(5);
 
@@ -812,7 +811,7 @@ namespace MessagePack
                 span[4] = num.Byte3;
             }
 
-            return 5;
+            writer.Advance(5);
         }
 
 #if NETSTANDARD || NETFRAMEWORK
@@ -826,7 +825,7 @@ namespace MessagePack
 #if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static int WriteDouble(IBufferWriter<byte> writer, double value)
+        public static void WriteDouble(IBufferWriter<byte> writer, double value)
         {
             var span = writer.GetSpan(9);
 
@@ -856,7 +855,7 @@ namespace MessagePack
                 span[8] = num.Byte7;
             }
 
-            return 9;
+            writer.Advance(9);
         }
 
 #if NETSTANDARD || NETFRAMEWORK
@@ -870,7 +869,7 @@ namespace MessagePack
 #if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static int WriteInt16(IBufferWriter<byte> writer, short value)
+        public static void WriteInt16(IBufferWriter<byte> writer, short value)
         {
             if (value >= 0)
             {
@@ -879,14 +878,14 @@ namespace MessagePack
                 {
                     var span = writer.GetSpan(1);
                     span[0] = unchecked((byte)value);
-                    return 1;
+                    writer.Advance(1);
                 }
                 else if (value <= byte.MaxValue)
                 {
                     var span = writer.GetSpan(2);
                     span[0] = MessagePackCode.UInt8;
                     span[1] = unchecked((byte)value);
-                    return 2;
+                    writer.Advance(2);
                 }
                 else
                 {
@@ -894,7 +893,7 @@ namespace MessagePack
                     span[0] = MessagePackCode.UInt16;
                     span[1] = unchecked((byte)(value >> 8));
                     span[2] = unchecked((byte)value);
-                    return 3;
+                    writer.Advance(3);
                 }
             }
             else
@@ -904,14 +903,14 @@ namespace MessagePack
                 {
                     var span = writer.GetSpan(1);
                     span[0] = unchecked((byte)value);
-                    return 1;
+                    writer.Advance(1);
                 }
                 else if (sbyte.MinValue <= value)
                 {
                     var span = writer.GetSpan(2);
                     span[0] = MessagePackCode.Int8;
                     span[1] = unchecked((byte)value);
-                    return 2;
+                    writer.Advance(2);
                 }
                 else
                 {
@@ -919,7 +918,7 @@ namespace MessagePack
                     span[0] = MessagePackCode.Int16;
                     span[1] = unchecked((byte)(value >> 8));
                     span[2] = unchecked((byte)value);
-                    return 3;
+                    writer.Advance(3);
                 }
             }
         }
@@ -927,13 +926,13 @@ namespace MessagePack
 #if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static int WriteInt16ForceInt16Block(IBufferWriter<byte> writer, short value)
+        public static void WriteInt16ForceInt16Block(IBufferWriter<byte> writer, short value)
         {
             var span = writer.GetSpan(3);
             span[0] = MessagePackCode.Int16;
             span[1] = unchecked((byte)(value >> 8));
             span[2] = unchecked((byte)value);
-            return 3;
+            writer.Advance(3);
         }
 
 #if NETSTANDARD || NETFRAMEWORK
@@ -950,11 +949,11 @@ namespace MessagePack
 #if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static int WritePositiveFixedIntUnsafe(IBufferWriter<byte> writer, int value)
+        public static void WritePositiveFixedIntUnsafe(IBufferWriter<byte> writer, int value)
         {
             var span = writer.GetSpan(1);
             span[0] = (byte)value;
-            return 1;
+            writer.Advance(1);
         }
 
 #if NETSTANDARD || NETFRAMEWORK
@@ -1040,15 +1039,26 @@ namespace MessagePack
 #if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static int WriteInt32ForceInt32Block(IBufferWriter<byte> writer, int value)
+        public static void WriteInt32ForceInt32Block(Span<byte> span, int value)
         {
-            var span = writer.GetSpan(5);
             span[0] = MessagePackCode.Int32;
             span[1] = unchecked((byte)(value >> 24));
             span[2] = unchecked((byte)(value >> 16));
             span[3] = unchecked((byte)(value >> 8));
             span[4] = unchecked((byte)value);
-            return 5;
+        }
+
+        /// <summary>
+        /// Acquire static message block(always 5 bytes).
+        /// </summary>
+#if NETSTANDARD || NETFRAMEWORK
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
+        public static void WriteInt32ForceInt32Block(IBufferWriter<byte> writer, int value)
+        {
+            var span = writer.GetSpan(5);
+            WriteInt32ForceInt32Block(span, value);
+            writer.Advance(5);
         }
 
 #if NETSTANDARD || NETFRAMEWORK
@@ -1241,20 +1251,20 @@ namespace MessagePack
 #if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static int WriteUInt32(IBufferWriter<byte> writer, uint value)
+        public static void WriteUInt32(IBufferWriter<byte> writer, uint value)
         {
             if (value <= MessagePackRange.MaxFixPositiveInt)
             {
                 var span = writer.GetSpan(1);
                 span[0] = unchecked((byte)value);
-                return 1;
+                writer.Advance(1);
             }
             else if (value <= byte.MaxValue)
             {
                 var span = writer.GetSpan(2);
                 span[0] = MessagePackCode.UInt8;
                 span[1] = unchecked((byte)value);
-                return 2;
+                writer.Advance(2);
             }
             else if (value <= ushort.MaxValue)
             {
@@ -1262,7 +1272,7 @@ namespace MessagePack
                 span[0] = MessagePackCode.UInt16;
                 span[1] = unchecked((byte)(value >> 8));
                 span[2] = unchecked((byte)value);
-                return 3;
+                writer.Advance(3);
             }
             else
             {
@@ -1272,14 +1282,14 @@ namespace MessagePack
                 span[2] = unchecked((byte)(value >> 16));
                 span[3] = unchecked((byte)(value >> 8));
                 span[4] = unchecked((byte)value);
-                return 5;
+                writer.Advance(5);
             }
         }
 
 #if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static int WriteUInt32ForceUInt32Block(IBufferWriter<byte> writer, uint value)
+        public static void WriteUInt32ForceUInt32Block(IBufferWriter<byte> writer, uint value)
         {
             var span = writer.GetSpan(5);
             span[0] = MessagePackCode.UInt32;
@@ -1287,7 +1297,7 @@ namespace MessagePack
             span[2] = unchecked((byte)(value >> 16));
             span[3] = unchecked((byte)(value >> 8));
             span[4] = unchecked((byte)value);
-            return 5;
+            writer.Advance(5);
         }
 
 #if NETSTANDARD || NETFRAMEWORK
@@ -1411,14 +1421,14 @@ namespace MessagePack
 #if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static int WriteStringUnsafe(IBufferWriter<byte> writer, string value, int byteCount)
+        public static void WriteStringUnsafe(IBufferWriter<byte> writer, string value, int byteCount)
         {
             if (byteCount <= MessagePackRange.MaxFixStringLength)
             {
                 var span = writer.GetSpan(byteCount + 1);
                 span[0] = (byte)(MessagePackCode.MinFixStr | byteCount);
                 StringEncoding.UTF8.GetBytes(value, span.Slice(1));
-                return byteCount + 1;
+                writer.Advance(byteCount + 1);
             }
             else if (byteCount <= byte.MaxValue)
             {
@@ -1426,7 +1436,7 @@ namespace MessagePack
                 span[0] = MessagePackCode.Str8;
                 span[1] = unchecked((byte)byteCount);
                 StringEncoding.UTF8.GetBytes(value, span.Slice(2));
-                return byteCount + 2;
+                writer.Advance(byteCount + 2);
             }
             else if (byteCount <= ushort.MaxValue)
             {
@@ -1435,7 +1445,7 @@ namespace MessagePack
                 span[1] = unchecked((byte)(byteCount >> 8));
                 span[2] = unchecked((byte)byteCount);
                 StringEncoding.UTF8.GetBytes(value, span.Slice(3));
-                return byteCount + 3;
+                writer.Advance(byteCount + 3);
             }
             else
             {
@@ -1446,7 +1456,7 @@ namespace MessagePack
                 span[3] = unchecked((byte)(byteCount >> 8));
                 span[4] = unchecked((byte)byteCount);
                 StringEncoding.UTF8.GetBytes(value, span.Slice(5));
-                return byteCount + 5;
+                writer.Advance(byteCount + 5);
             }
         }
 
@@ -1656,35 +1666,40 @@ namespace MessagePack
 #if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static int WriteExtensionFormatHeader(IBufferWriter<byte> writer, sbyte typeCode, int dataLength)
+        public static void WriteExtensionFormatHeader(IBufferWriter<byte> writer, sbyte typeCode, int dataLength)
         {
             switch (dataLength)
             {
                 case 1:
-                    var span = writer.GetSpan(3);
+                    var span = writer.GetSpan(2);
                     span[0] = MessagePackCode.FixExt1;
                     span[1] = unchecked((byte)typeCode);
-                    return 2;
+                    writer.Advance(2);
+                    return;
                 case 2:
-                    span = writer.GetSpan(4);
+                    span = writer.GetSpan(2);
                     span[0] = MessagePackCode.FixExt2;
                     span[1] = unchecked((byte)typeCode);
-                    return 2;
+                    writer.Advance(2);
+                    return;
                 case 4:
-                    span = writer.GetSpan(6);
+                    span = writer.GetSpan(2);
                     span[0] = MessagePackCode.FixExt4;
                     span[1] = unchecked((byte)typeCode);
-                    return 2;
+                    writer.Advance(2);
+                    return;
                 case 8:
-                    span = writer.GetSpan(10);
+                    span = writer.GetSpan(2);
                     span[0] = MessagePackCode.FixExt8;
                     span[1] = unchecked((byte)typeCode);
-                    return 2;
+                    writer.Advance(2);
+                    return;
                 case 16:
-                    span = writer.GetSpan(18);
+                    span = writer.GetSpan(2);
                     span[0] = MessagePackCode.FixExt16;
                     span[1] = unchecked((byte)typeCode);
-                    return 2;
+                    writer.Advance(2);
+                    return;
                 default:
                     unchecked
                     {
@@ -1694,7 +1709,7 @@ namespace MessagePack
                             span[0] = MessagePackCode.Ext8;
                             span[1] = unchecked((byte)(dataLength));
                             span[2] = unchecked((byte)typeCode);
-                            return 3;
+                            writer.Advance(3);
                         }
                         else if (dataLength <= UInt16.MaxValue)
                         {
@@ -1703,7 +1718,7 @@ namespace MessagePack
                             span[1] = unchecked((byte)(dataLength >> 8));
                             span[2] = unchecked((byte)(dataLength));
                             span[3] = unchecked((byte)typeCode);
-                            return 4;
+                            writer.Advance(4);
                         }
                         else
                         {
@@ -1714,9 +1729,11 @@ namespace MessagePack
                             span[3] = unchecked((byte)(dataLength >> 8));
                             span[4] = unchecked((byte)dataLength);
                             span[5] = unchecked((byte)typeCode);
-                            return 6;
+                            writer.Advance(6);
                         }
                     }
+
+                    break;
             }
         }
 
@@ -1726,16 +1743,27 @@ namespace MessagePack
 #if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static int WriteExtensionFormatHeaderForceExt32Block(IBufferWriter<byte> writer, sbyte typeCode, int dataLength)
+        public static void WriteExtensionFormatHeaderForceExt32Block(Span<byte> span, sbyte typeCode, int dataLength)
         {
-            var span = writer.GetSpan(dataLength + 6);
             span[0] = MessagePackCode.Ext32;
             span[1] = unchecked((byte)(dataLength >> 24));
             span[2] = unchecked((byte)(dataLength >> 16));
             span[3] = unchecked((byte)(dataLength >> 8));
             span[4] = unchecked((byte)dataLength);
             span[5] = unchecked((byte)typeCode);
-            return 6;
+        }
+
+        /// <summary>
+        /// Write extension format header, always use ext32 format(length is fixed, 6).
+        /// </summary>
+#if NETSTANDARD || NETFRAMEWORK
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
+        public static void WriteExtensionFormatHeaderForceExt32Block(IBufferWriter<byte> writer, sbyte typeCode, int dataLength)
+        {
+            var span = writer.GetSpan(6);
+            WriteExtensionFormatHeaderForceExt32Block(span, typeCode, dataLength);
+            writer.Advance(6);
         }
 
 #if NETSTANDARD || NETFRAMEWORK
@@ -1905,7 +1933,7 @@ namespace MessagePack
 #if NETSTANDARD || NETFRAMEWORK
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static int WriteDateTime(IBufferWriter<byte> writer, DateTime dateTime)
+        public static void WriteDateTime(IBufferWriter<byte> writer, DateTime dateTime)
         {
             dateTime = dateTime.ToUniversalTime();
 
@@ -1955,7 +1983,7 @@ namespace MessagePack
                     span[3] = unchecked((byte)(data32 >> 16));
                     span[4] = unchecked((byte)(data32 >> 8));
                     span[5] = unchecked((byte)data32);
-                    return 6;
+                    writer.Advance(6);
                 }
                 else
                 {
@@ -1971,7 +1999,7 @@ namespace MessagePack
                     span[7] = unchecked((byte)(data64 >> 16));
                     span[8] = unchecked((byte)(data64 >> 8));
                     span[9] = unchecked((byte)data64);
-                    return 10;
+                    writer.Advance(10);
                 }
             }
             else
@@ -1993,7 +2021,7 @@ namespace MessagePack
                 span[12] = unchecked((byte)(seconds >> 16));
                 span[13] = unchecked((byte)(seconds >> 8));
                 span[14] = unchecked((byte)seconds);
-                return 15;
+                writer.Advance(15);
             }
         }
 
@@ -2054,7 +2082,7 @@ namespace MessagePack
             }
             else
             {
-                // We need to create a new array in order to return a continguous segment in our result.
+                // We need to create a new array in order to return a contiguous segment in our result.
                 result = new ArraySegment<byte>(new byte[length]);
                 byteSequence.Slice(0, length).CopyTo(result.Array);
             }
