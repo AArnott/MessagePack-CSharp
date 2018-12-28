@@ -2033,9 +2033,9 @@ namespace MessagePack
             return dateTimeDecoders[byteSequence.First.Span[0]].Read(ref byteSequence);
         }
 
-        internal delegate T ContiguousMemoryReader<T>(ReadOnlySpan<byte> span);
+        public delegate T ContiguousMemoryReader<T>(ReadOnlySpan<byte> span);
 
-        internal static T Parse<T>(ref ReadOnlySequence<byte> byteSequence, int length, ContiguousMemoryReader<T> reader)
+        public static T Parse<T>(ref ReadOnlySequence<byte> byteSequence, int length, ContiguousMemoryReader<T> reader)
         {
             const int StackAllocLimit = 64 * 1024;
             T result;

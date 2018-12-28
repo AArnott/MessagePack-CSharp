@@ -1,56 +1,50 @@
-﻿using MessagePack.Formatters;
+﻿using System;
+using System.Buffers;
 using System.Collections.Immutable;
-using System;
+using MessagePack.Formatters;
 
 namespace MessagePack.ImmutableCollection
 {
     // Immutablearray<T>.Enumerator is 'not' IEnumerator<T>, can't use abstraction layer.
     public class ImmutableArrayFormatter<T> : IMessagePackFormatter<ImmutableArray<T>>
     {
-        public int Serialize(ref byte[] bytes, int offset, ImmutableArray<T> value, IFormatterResolver formatterResolver)
+        public void Serialize(IBufferWriter<byte> writer, ImmutableArray<T> value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                return MessagePackBinary.WriteNil(ref bytes, offset);
+                MessagePackBinary.WriteNil(writer);
             }
             else
             {
-                var startOffset = offset;
                 var formatter = formatterResolver.GetFormatterWithVerify<T>();
 
-                offset += MessagePackBinary.WriteArrayHeader(ref bytes, offset, value.Length);
+                MessagePackBinary.WriteArrayHeader(writer, value.Length);
 
                 foreach (var item in value)
                 {
-                    offset += formatter.Serialize(ref bytes, offset, item, formatterResolver);
+                    formatter.Serialize(writer, item, formatterResolver);
                 }
-
-                return offset - startOffset;
             }
         }
 
-        public ImmutableArray<T> Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public ImmutableArray<T> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
+            if (MessagePackBinary.IsNil(byteSequence))
             {
-                readSize = 1;
+                byteSequence = byteSequence.Slice(1);
                 return ImmutableArray<T>.Empty;
             }
             else
             {
-                var startOffset = offset;
                 var formatter = formatterResolver.GetFormatterWithVerify<T>();
 
-                var len = MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
-                offset += readSize;
+                var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
 
                 var builder = ImmutableArray.CreateBuilder<T>(len);
                 for (int i = 0; i < len; i++)
                 {
-                    builder.Add(formatter.Deserialize(bytes, offset, formatterResolver, out readSize));
-                    offset += readSize;
+                    builder.Add(formatter.Deserialize(ref byteSequence, formatterResolver));
                 }
-                readSize = offset - startOffset;
 
                 return builder.ToImmutable();
             }

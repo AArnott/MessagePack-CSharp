@@ -2,28 +2,14 @@
 
 using MessagePack.Formatters;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 using UnityEngine;
 
 namespace MessagePack.Unity.Extension
 {
-    internal static class MemoryUtil
-    {
-        // If you use memcpy or check alignment and word copy, can more improve performance
-        public static unsafe void SimpleMemoryCopy(void* dest, void* src, int byteCount)
-        {
-            var pDest = (byte*)dest;
-            var pSrc = (byte*)src;
-            for (int i = 0; i < byteCount; i++)
-            {
-                *pDest = *pSrc;
-                pDest++;
-                pSrc++;
-            }
-        }
-    }
-
     public static class ReservedUnityExtensionTypeCode
     {
         public const sbyte Vector2 = 30;
@@ -38,7 +24,7 @@ namespace MessagePack.Unity.Extension
         public const sbyte Double = 39;
     }
 
-    // use ext instead of ArrayFormatter for extremely boostup performance.
+    // use ext instead of ArrayFormatter to extremely boost up performance.
     // Layout: [extHeader, byteSize(integer), isLittlEendian(bool), bytes()]
 
     // Used Ext:30~36
@@ -47,60 +33,58 @@ namespace MessagePack.Unity.Extension
         where T : struct
     {
         protected abstract sbyte TypeCode { get; }
-        protected abstract int StructLength { get; }
-        protected abstract void CopySerializeUnsafe(ref T[] src, ref byte[] dest, int destOffset, int byteLength);
-        protected abstract void CopyDeserializeUnsafe(ref byte[] src, int srcOffset, ref T[] dest, int byteLength);
+        protected void CopyDeserializeUnsafe(ReadOnlySpan<byte> src, Span<T> dest) => src.CopyTo(MemoryMarshal.Cast<T, byte>(dest));
 
-        public unsafe int Serialize(ref byte[] bytes, int offset, T[] value, IFormatterResolver formatterResolver)
+        public void Serialize(IBufferWriter<byte> writer, T[] value, IFormatterResolver formatterResolver)
         {
-            if (value == null) return MessagePackBinary.WriteNil(ref bytes, offset);
+            if (value == null)
+            {
+                MessagePackBinary.WriteNil(writer);
+                return;
+            }
 
-            var startOffset = offset;
+            var byteLen = value.Length * Marshal.SizeOf<T>();
 
-            var byteLen = value.Length * StructLength;
+            MessagePackBinary.WriteExtensionFormatHeader(writer, TypeCode, byteLen);
+            MessagePackBinary.WriteInt32(writer, byteLen); // write original header(not array header)
+            MessagePackBinary.WriteBoolean(writer, BitConverter.IsLittleEndian);
 
-            offset += MessagePackBinary.WriteExtensionFormatHeader(ref bytes, offset, TypeCode, byteLen);
-            offset += MessagePackBinary.WriteInt32(ref bytes, offset, byteLen); // write original header(not array header)
-            offset += MessagePackBinary.WriteBoolean(ref bytes, offset, BitConverter.IsLittleEndian);
-
-            MessagePackBinary.EnsureCapacity(ref bytes, offset, byteLen);
-            CopySerializeUnsafe(ref value, ref bytes, offset, byteLen);
-
-            offset += byteLen;
-            return offset - startOffset;
+            var span = writer.GetSpan(byteLen);
+            MemoryMarshal.Cast<T, byte>(value).CopyTo(span);
+            writer.Advance(byteLen);
         }
 
-        public unsafe T[] Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public T[] Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
+            if (MessagePackBinary.IsNil(byteSequence))
             {
-                readSize = 1;
+                byteSequence = byteSequence.Slice(1);
                 return null;
             }
 
-            var startOffset = offset;
-            var header = MessagePackBinary.ReadExtensionFormatHeader(bytes, offset, out readSize);
-            offset += readSize;
-
+            var header = MessagePackBinary.ReadExtensionFormatHeader(ref byteSequence);
             if (header.TypeCode != TypeCode) throw new InvalidOperationException("Invalid typeCode.");
 
-            var byteLength = MessagePackBinary.ReadInt32(bytes, offset, out readSize);
-            offset += readSize;
+            var byteLength = MessagePackBinary.ReadInt32(ref byteSequence);
+            var isLittleEndian = MessagePackBinary.ReadBoolean(ref byteSequence);
 
-            var isLittleEndian = MessagePackBinary.ReadBoolean(bytes, offset, out readSize);
-            offset += readSize;
-
-            if (isLittleEndian != BitConverter.IsLittleEndian)
+            return MessagePackBinary.Parse(ref byteSequence, byteLength, span =>
             {
-                Array.Reverse(bytes, offset, byteLength);
-            }
+                if (isLittleEndian != BitConverter.IsLittleEndian)
+                {
+                    var span2 = new byte[span.Length];
+                    for (int i = 0; i < span.Length; i++)
+                    {
+                        span2[span.Length - i - 1] = span[i];
+                    }
 
-            var result = new T[byteLength / StructLength];
-            CopyDeserializeUnsafe(ref bytes, offset, ref result, byteLength);
-            offset += byteLength;
+                    span = span2;
+                }
 
-            readSize = offset - startOffset;
-            return result;
+                var result = new T[byteLength / Marshal.SizeOf<T>()];
+                MemoryMarshal.Cast<byte, T>(span).CopyTo(result);
+                return result;
+            });
         }
     }
 
@@ -111,32 +95,6 @@ namespace MessagePack.Unity.Extension
             get
             {
                 return ReservedUnityExtensionTypeCode.Vector2;
-            }
-        }
-
-        protected override int StructLength
-        {
-            get
-            {
-                return 8;
-            }
-        }
-
-        protected override unsafe void CopySerializeUnsafe(ref Vector2[] src, ref byte[] dest, int destOffset, int byteLength)
-        {
-            fixed (void* pSrc = src)
-            fixed (void* pDest = &dest[destOffset])
-            {
-                MemoryUtil.SimpleMemoryCopy(pDest, pSrc, byteLength);
-            }
-        }
-
-        protected override unsafe void CopyDeserializeUnsafe(ref byte[] src, int srcOffset, ref Vector2[] dest, int byteLength)
-        {
-            fixed (void* pSrc = &src[srcOffset])
-            fixed (void* pDest = dest)
-            {
-                MemoryUtil.SimpleMemoryCopy(pDest, pSrc, byteLength);
             }
         }
     }
@@ -150,32 +108,6 @@ namespace MessagePack.Unity.Extension
                 return ReservedUnityExtensionTypeCode.Vector3;
             }
         }
-
-        protected override int StructLength
-        {
-            get
-            {
-                return 12;
-            }
-        }
-
-        protected override unsafe void CopySerializeUnsafe(ref Vector3[] src, ref byte[] dest, int destOffset, int byteLength)
-        {
-            fixed (void* pSrc = src)
-            fixed (void* pDest = &dest[destOffset])
-            {
-                MemoryUtil.SimpleMemoryCopy(pDest, pSrc, byteLength);
-            }
-        }
-
-        protected override unsafe void CopyDeserializeUnsafe(ref byte[] src, int srcOffset, ref Vector3[] dest, int byteLength)
-        {
-            fixed (void* pSrc = &src[srcOffset])
-            fixed (void* pDest = dest)
-            {
-                MemoryUtil.SimpleMemoryCopy(pDest, pSrc, byteLength);
-            }
-        }
     }
 
     public class Vector4ArrayBlitFormatter : UnsafeBlitFormatterBase<Vector4>
@@ -185,32 +117,6 @@ namespace MessagePack.Unity.Extension
             get
             {
                 return ReservedUnityExtensionTypeCode.Vector4;
-            }
-        }
-
-        protected override int StructLength
-        {
-            get
-            {
-                return 16;
-            }
-        }
-
-        protected override unsafe void CopySerializeUnsafe(ref Vector4[] src, ref byte[] dest, int destOffset, int byteLength)
-        {
-            fixed (void* pSrc = src)
-            fixed (void* pDest = &dest[destOffset])
-            {
-                MemoryUtil.SimpleMemoryCopy(pDest, pSrc, byteLength);
-            }
-        }
-
-        protected override unsafe void CopyDeserializeUnsafe(ref byte[] src, int srcOffset, ref Vector4[] dest, int byteLength)
-        {
-            fixed (void* pSrc = &src[srcOffset])
-            fixed (void* pDest = dest)
-            {
-                MemoryUtil.SimpleMemoryCopy(pDest, pSrc, byteLength);
             }
         }
     }
@@ -224,32 +130,6 @@ namespace MessagePack.Unity.Extension
                 return ReservedUnityExtensionTypeCode.Quaternion;
             }
         }
-
-        protected override int StructLength
-        {
-            get
-            {
-                return 16;
-            }
-        }
-
-        protected override unsafe void CopySerializeUnsafe(ref Quaternion[] src, ref byte[] dest, int destOffset, int byteLength)
-        {
-            fixed (void* pSrc = src)
-            fixed (void* pDest = &dest[destOffset])
-            {
-                MemoryUtil.SimpleMemoryCopy(pDest, pSrc, byteLength);
-            }
-        }
-
-        protected override unsafe void CopyDeserializeUnsafe(ref byte[] src, int srcOffset, ref Quaternion[] dest, int byteLength)
-        {
-            fixed (void* pSrc = &src[srcOffset])
-            fixed (void* pDest = dest)
-            {
-                MemoryUtil.SimpleMemoryCopy(pDest, pSrc, byteLength);
-            }
-        }
     }
 
     public class ColorArrayBlitFormatter : UnsafeBlitFormatterBase<Color>
@@ -259,32 +139,6 @@ namespace MessagePack.Unity.Extension
             get
             {
                 return ReservedUnityExtensionTypeCode.Color;
-            }
-        }
-
-        protected override int StructLength
-        {
-            get
-            {
-                return 16;
-            }
-        }
-
-        protected override unsafe void CopySerializeUnsafe(ref Color[] src, ref byte[] dest, int destOffset, int byteLength)
-        {
-            fixed (void* pSrc = src)
-            fixed (void* pDest = &dest[destOffset])
-            {
-                MemoryUtil.SimpleMemoryCopy(pDest, pSrc, byteLength);
-            }
-        }
-
-        protected override unsafe void CopyDeserializeUnsafe(ref byte[] src, int srcOffset, ref Color[] dest, int byteLength)
-        {
-            fixed (void* pSrc = &src[srcOffset])
-            fixed (void* pDest = dest)
-            {
-                MemoryUtil.SimpleMemoryCopy(pDest, pSrc, byteLength);
             }
         }
     }
@@ -298,32 +152,6 @@ namespace MessagePack.Unity.Extension
                 return ReservedUnityExtensionTypeCode.Bounds;
             }
         }
-
-        protected override int StructLength
-        {
-            get
-            {
-                return 24;
-            }
-        }
-
-        protected override unsafe void CopySerializeUnsafe(ref Bounds[] src, ref byte[] dest, int destOffset, int byteLength)
-        {
-            fixed (void* pSrc = src)
-            fixed (void* pDest = &dest[destOffset])
-            {
-                MemoryUtil.SimpleMemoryCopy(pDest, pSrc, byteLength);
-            }
-        }
-
-        protected override unsafe void CopyDeserializeUnsafe(ref byte[] src, int srcOffset, ref Bounds[] dest, int byteLength)
-        {
-            fixed (void* pSrc = &src[srcOffset])
-            fixed (void* pDest = dest)
-            {
-                MemoryUtil.SimpleMemoryCopy(pDest, pSrc, byteLength);
-            }
-        }
     }
 
     public class RectArrayBlitFormatter : UnsafeBlitFormatterBase<Rect>
@@ -335,83 +163,21 @@ namespace MessagePack.Unity.Extension
                 return ReservedUnityExtensionTypeCode.Rect;
             }
         }
-
-        protected override int StructLength
-        {
-            get
-            {
-                return 16;
-            }
-        }
-
-        protected override unsafe void CopySerializeUnsafe(ref Rect[] src, ref byte[] dest, int destOffset, int byteLength)
-        {
-            fixed (void* pSrc = src)
-            fixed (void* pDest = &dest[destOffset])
-            {
-                MemoryUtil.SimpleMemoryCopy(pDest, pSrc, byteLength);
-            }
-        }
-
-        protected override unsafe void CopyDeserializeUnsafe(ref byte[] src, int srcOffset, ref Rect[] dest, int byteLength)
-        {
-            fixed (void* pSrc = &src[srcOffset])
-            fixed (void* pDest = dest)
-            {
-                MemoryUtil.SimpleMemoryCopy(pDest, pSrc, byteLength);
-            }
-        }
     }
 
     public class IntArrayBlitFormatter : UnsafeBlitFormatterBase<int>
     {
         protected override sbyte TypeCode { get { return ReservedUnityExtensionTypeCode.Int; } }
-
-        protected override int StructLength { get { return 4; } }
-
-        protected override void CopyDeserializeUnsafe(ref byte[] src, int srcOffset, ref int[] dest, int byteLength)
-        {
-            Buffer.BlockCopy(src, srcOffset, dest, 0, byteLength);
-        }
-
-        protected override void CopySerializeUnsafe(ref int[] src, ref byte[] dest, int destOffset, int byteLength)
-        {
-            Buffer.BlockCopy(src, 0, dest, destOffset, byteLength);
-        }
     }
 
     public class FloatArrayBlitFormatter : UnsafeBlitFormatterBase<float>
     {
         protected override sbyte TypeCode { get { return ReservedUnityExtensionTypeCode.Float; } }
-
-        protected override int StructLength { get { return 4; } }
-
-        protected override void CopyDeserializeUnsafe(ref byte[] src, int srcOffset, ref float[] dest, int byteLength)
-        {
-            Buffer.BlockCopy(src, srcOffset, dest, 0, byteLength);
-        }
-
-        protected override void CopySerializeUnsafe(ref float[] src, ref byte[] dest, int destOffset, int byteLength)
-        {
-            Buffer.BlockCopy(src, 0, dest, destOffset, byteLength);
-        }
     }
 
     public class DoubleArrayBlitFormatter : UnsafeBlitFormatterBase<double>
     {
         protected override sbyte TypeCode { get { return ReservedUnityExtensionTypeCode.Double; } }
-
-        protected override int StructLength { get { return 8; } }
-
-        protected override void CopyDeserializeUnsafe(ref byte[] src, int srcOffset, ref double[] dest, int byteLength)
-        {
-            Buffer.BlockCopy(src, srcOffset, dest, 0, byteLength);
-        }
-
-        protected override void CopySerializeUnsafe(ref double[] src, ref byte[] dest, int destOffset, int byteLength)
-        {
-            Buffer.BlockCopy(src, 0, dest, destOffset, byteLength);
-        }
     }
 }
 
