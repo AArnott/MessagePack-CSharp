@@ -1,4 +1,5 @@
 ﻿using MessagePack.Formatters;
+using Nerdbank.Streams;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,12 +43,13 @@ namespace MessagePack.Tests
         {
             {
                 var original = Guid.NewGuid();
-                byte[] bytes = null;
-                GuidFormatter.Instance.Serialize(ref bytes, 0, original, null).Is(38);
+                var sequence = new Sequence<byte>();
+                GuidFormatter.Instance.Serialize(sequence, original, null);
+                sequence.Length.Is(38);
 
-                int readSize;
-                GuidFormatter.Instance.Deserialize(bytes, 0, null, out readSize).Is(original);
-                readSize.Is(38);
+                var sequenceReader = sequence.AsReadOnlySequence;
+                GuidFormatter.Instance.Deserialize(ref sequenceReader, null).Is(original);
+                (sequence.Length - sequenceReader.Length).Is(38);
             }
             {
                 var c = new InClass() { MyProperty = 3414141, Guid = Guid.NewGuid() };

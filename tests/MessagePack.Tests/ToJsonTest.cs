@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Nerdbank.Streams;
 using Xunit;
 
 namespace MessagePack.Tests
@@ -14,12 +15,16 @@ namespace MessagePack.Tests
 
         string JsonConvert(string json)
         {
-            return serializer.ToJson(serializer.FromJson(json));
+            var sequence = new Sequence<byte>();
+            serializer.FromJson(json, sequence);
+            return serializer.ToJson(sequence.AsReadOnlySequence);
         }
 
         string JsonConvertLZ4(string json)
         {
-            return lz4Serializer.ToJson(lz4Serializer.FromJson(json));
+            var sequence = new Sequence<byte>();
+            lz4Serializer.FromJson(json, sequence);
+            return lz4Serializer.ToJson(sequence.AsReadOnlySequence);
         }
 
         [Theory]

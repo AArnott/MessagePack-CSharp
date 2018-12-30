@@ -1,4 +1,5 @@
-﻿using SharedData;
+﻿using Nerdbank.Streams;
+using SharedData;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -210,23 +211,30 @@ namespace MessagePack.Tests
             var c = new String('あ', 130);
             var d = new String('あ', 40000);
 
-            byte[] bytesA = null;
-            MessagePackBinary.WriteString(ref bytesA, 0, a).Is(Encoding.UTF8.GetByteCount(a) + 1);
+            var sequenceA = new Sequence<byte>();
+            MessagePackBinary.WriteString(sequenceA, a);
+            sequenceA.Length.Is(Encoding.UTF8.GetByteCount(a) + 1);
 
-            byte[] bytesB = null;
-            MessagePackBinary.WriteString(ref bytesB, 0, b).Is(Encoding.UTF8.GetByteCount(b) + 2);
+            var sequenceB = new Sequence<byte>();
+            MessagePackBinary.WriteString(sequenceB, b);
+            sequenceB.Length.Is(Encoding.UTF8.GetByteCount(b) + 2);
 
-            byte[] bytesC = null;
-            MessagePackBinary.WriteString(ref bytesC, 0, c).Is(Encoding.UTF8.GetByteCount(c) + 3);
+            var sequenceC = new Sequence<byte>();
+            MessagePackBinary.WriteString(sequenceC, c);
+            sequenceC.Length.Is(Encoding.UTF8.GetByteCount(c) + 3);
 
-            byte[] bytesD = null;
-            MessagePackBinary.WriteString(ref bytesD, 0, d).Is(Encoding.UTF8.GetByteCount(d) + 5);
+            var sequenceD = new Sequence<byte>();
+            MessagePackBinary.WriteString(sequenceD, d);
+            sequenceD.Length.Is(Encoding.UTF8.GetByteCount(d) + 5);
 
-            int readSize = 0;
-            MessagePackBinary.ReadString(bytesA, 0, out readSize).Is(a);
-            MessagePackBinary.ReadString(bytesB, 0, out readSize).Is(b);
-            MessagePackBinary.ReadString(bytesC, 0, out readSize).Is(c);
-            MessagePackBinary.ReadString(bytesD, 0, out readSize).Is(d);
+            var bytesA = sequenceA.AsReadOnlySequence;
+            var bytesB = sequenceB.AsReadOnlySequence;
+            var bytesC = sequenceC.AsReadOnlySequence;
+            var bytesD = sequenceD.AsReadOnlySequence;
+            MessagePackBinary.ReadString(ref bytesA).Is(a);
+            MessagePackBinary.ReadString(ref bytesB).Is(b);
+            MessagePackBinary.ReadString(ref bytesC).Is(c);
+            MessagePackBinary.ReadString(ref bytesD).Is(d);
         }
 
         // https://github.com/neuecc/MessagePack-CSharp/issues/22

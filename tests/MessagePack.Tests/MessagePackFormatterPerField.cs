@@ -1,6 +1,7 @@
 ﻿using MessagePack.Formatters;
 using MessagePack.Resolvers;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -45,28 +46,28 @@ namespace MessagePack.Tests
 
         public class Int_x10Formatter : IMessagePackFormatter<int>
         {
-            public int Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+            public int Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
             {
-                return MessagePackBinary.ReadInt32(bytes, offset, out readSize) * 10;
+                return MessagePackBinary.ReadInt32(ref byteSequence) * 10;
             }
 
-            public int Serialize(ref byte[] bytes, int offset, int value, IFormatterResolver formatterResolver)
+            public void Serialize(IBufferWriter<byte> writer, int value, IFormatterResolver formatterResolver)
             {
-                return MessagePackBinary.WriteInt32(ref bytes, offset, value * 10);
+                MessagePackBinary.WriteInt32(writer, value * 10);
             }
         }
 
         public class String_x2Formatter : IMessagePackFormatter<string>
         {
-            public string Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+            public string Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
             {
-                var s = MessagePackBinary.ReadString(bytes, offset, out readSize);
+                var s = MessagePackBinary.ReadString(ref byteSequence);
                 return s + s;
             }
 
-            public int Serialize(ref byte[] bytes, int offset, string value, IFormatterResolver formatterResolver)
+            public void Serialize(IBufferWriter<byte> writer, string value, IFormatterResolver formatterResolver)
             {
-                return MessagePackBinary.WriteString(ref bytes, offset, value + value);
+                MessagePackBinary.WriteString(writer, value + value);
             }
         }
 

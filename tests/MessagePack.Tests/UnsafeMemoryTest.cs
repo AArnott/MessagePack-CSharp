@@ -1,5 +1,7 @@
 ﻿using MessagePack.Internal;
+using Nerdbank.Streams;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -13,7 +15,7 @@ namespace MessagePack.Tests
     {
         private MessagePackSerializer serializer = new MessagePackSerializer();
 
-        delegate int WriteDelegate(ref byte[] xs, int offset, byte[] ys);
+        delegate int WriteDelegate(IBufferWriter<byte> writer, byte[] ys);
 
         [Theory]
         [InlineData('a', 1)]
@@ -27,12 +29,11 @@ namespace MessagePack.Tests
             var s = new string(c, count);
             var bin1 = MessagePackBinary.GetEncodedStringBytes(s);
             var bin2 = serializer.Serialize(s);
-            byte[] bin3 = null;
-            var size = MessagePackBinary.WriteRaw(ref bin3, 0, bin1);
-            MessagePackBinary.FastResize(ref bin3, size);
+            var bin3 = new Sequence<byte>();
+            MessagePackBinary.WriteRaw(bin3, bin1);
 
             MessagePack.Internal.ByteArrayComparer.Equals(bin1, 0, bin1.Length, bin2).IsTrue();
-            MessagePack.Internal.ByteArrayComparer.Equals(bin1, 0, bin1.Length, bin3).IsTrue();
+            MessagePack.Internal.ByteArrayComparer.Equals(bin1, 0, bin1.Length, bin3.AsReadOnlySequence.ToArray()).IsTrue();
         }
 
         [Fact]
@@ -42,41 +43,19 @@ namespace MessagePack.Tests
             for (int i = 1; i <= MessagePackRange.MaxFixStringLength; i++)
             {
                 var src = Enumerable.Range(0, i).Select(x => (byte)x).ToArray();
-                byte[] dst = null;
-                var len = ((typeof(UnsafeMemory32).GetMethod("WriteRaw" + i)).CreateDelegate(typeof(WriteDelegate)) as WriteDelegate).Invoke(ref dst, 0, src);
+                var dst = new Sequence<byte>();
+                var len = ((typeof(UnsafeMemory32).GetMethod("WriteRaw" + i)).CreateDelegate(typeof(WriteDelegate)) as WriteDelegate).Invoke(dst, src);
                 len.Is(i);
-                MessagePackBinary.FastResize(ref dst, len);
-                MessagePack.Internal.ByteArrayComparer.Equals(src, 0, src.Length, dst).IsTrue();
+                MessagePack.Internal.ByteArrayComparer.Equals(src, 0, src.Length, dst.AsReadOnlySequence.ToArray()).IsTrue();
             }
             // x64
             for (int i = 1; i <= MessagePackRange.MaxFixStringLength; i++)
             {
                 var src = Enumerable.Range(0, i).Select(x => (byte)x).ToArray();
-                byte[] dst = null;
-                var len = ((typeof(UnsafeMemory64).GetMethod("WriteRaw" + i)).CreateDelegate(typeof(WriteDelegate)) as WriteDelegate).Invoke(ref dst, 0, src);
+                var dst = new Sequence<byte>();
+                var len = ((typeof(UnsafeMemory64).GetMethod("WriteRaw" + i)).CreateDelegate(typeof(WriteDelegate)) as WriteDelegate).Invoke(dst, src);
                 len.Is(i);
-                MessagePackBinary.FastResize(ref dst, len);
-                MessagePack.Internal.ByteArrayComparer.Equals(src, 0, src.Length, dst).IsTrue();
-            }
-            // x86, offset
-            for (int i = 1; i <= MessagePackRange.MaxFixStringLength; i++)
-            {
-                var src = Enumerable.Range(0, i).Select(x => (byte)x).ToArray();
-                byte[] dst = new byte[3];
-                var len = ((typeof(UnsafeMemory32).GetMethod("WriteRaw" + i)).CreateDelegate(typeof(WriteDelegate)) as WriteDelegate).Invoke(ref dst, 3, src);
-                len.Is(i);
-                dst = dst.Skip(3).Take(len).ToArray();
-                MessagePack.Internal.ByteArrayComparer.Equals(src, 0, src.Length, dst).IsTrue();
-            }
-            // x64, offset
-            for (int i = 1; i <= MessagePackRange.MaxFixStringLength; i++)
-            {
-                var src = Enumerable.Range(0, i).Select(x => (byte)x).ToArray();
-                byte[] dst = new byte[3];
-                var len = ((typeof(UnsafeMemory64).GetMethod("WriteRaw" + i)).CreateDelegate(typeof(WriteDelegate)) as WriteDelegate).Invoke(ref dst, 3, src);
-                len.Is(i);
-                dst = dst.Skip(3).Take(len).ToArray();
-                MessagePack.Internal.ByteArrayComparer.Equals(src, 0, src.Length, dst).IsTrue();
+                MessagePack.Internal.ByteArrayComparer.Equals(src, 0, src.Length, dst.AsReadOnlySequence.ToArray()).IsTrue();
             }
         }
     }

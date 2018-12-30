@@ -1,6 +1,7 @@
 ﻿using MessagePack.Resolvers;
 using SharedData;
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -56,7 +57,7 @@ namespace MessagePack.Tests
         {
             SimpleIntKeyData n = null;
             var bytes = serializer.Serialize(n);
-            MessagePackBinary.IsNil(bytes, 0).IsTrue();
+            MessagePackBinary.IsNil(new ReadOnlySequence<byte>(bytes)).IsTrue();
             bytes.Length.Is(1);
 
             serializer.Deserialize<SimpleIntKeyData>(bytes).IsNull();

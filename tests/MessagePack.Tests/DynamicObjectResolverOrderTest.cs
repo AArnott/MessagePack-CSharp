@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -42,17 +43,14 @@ namespace MessagePack.Tests
     {
         private MessagePackSerializer serializer = new MessagePackSerializer();
 
-        IEnumerable<string> IteratePropertyNames(byte[] bin)
+        IEnumerable<string> IteratePropertyNames(ReadOnlyMemory<byte> bytes)
         {
-            var offset = 0;
-            int readSize = 0;
-            var mapCount = MessagePackBinary.ReadMapHeader(bin, 0, out readSize);
-            offset += readSize;
+            var byteSequence = new ReadOnlySequence<byte>(bytes);
+            var mapCount = MessagePackBinary.ReadMapHeader(ref byteSequence);
             for (int i = 0; i < mapCount; i++)
             {
-                yield return MessagePackBinary.ReadString(bin, offset, out readSize);
-                offset += readSize;
-                offset += MessagePackBinary.ReadNext(bin, offset);
+                yield return MessagePackBinary.ReadString(ref byteSequence);
+                MessagePackBinary.ReadNext(ref byteSequence);
             }
         }
 
