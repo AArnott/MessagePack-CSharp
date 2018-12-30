@@ -5,6 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using MessagePack.Internal;
 using MessagePack.LZ4;
+using Microsoft;
 
 namespace MessagePack
 {
@@ -94,7 +95,7 @@ namespace MessagePack
 
                     var compressedSegment = MessagePackBinary.ReadArraySegment(ref byteSequence, compressedLength);
                     int actualUncompressedLength = LZ4Codec.Decode(compressedSegment.Array, compressedSegment.Offset, compressedSegment.Count, uncompressedSegment.Array, uncompressedSegment.Offset, uncompressedSegment.Count);
-                    Debug.Assert(actualUncompressedLength == uncompressedLength);
+                    Assumes.True(actualUncompressedLength == uncompressedLength);
                     writer.Advance(actualUncompressedLength);
                     return true;
                 }

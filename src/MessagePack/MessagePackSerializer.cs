@@ -3,6 +3,7 @@ using System.Buffers;
 using System.IO;
 using System.Threading.Tasks;
 using MessagePack.Internal;
+using Nerdbank.Streams;
 
 namespace MessagePack
 {
@@ -93,7 +94,11 @@ namespace MessagePack
         /// <returns>A byte array with the serialized value.</returns>
         public byte[] Serialize<T>(T value, IFormatterResolver resolver = null)
         {
-            throw new NotImplementedException();
+            using (var sequence = new Sequence<byte>())
+            {
+                this.Serialize(sequence, value, resolver);
+                return sequence.AsReadOnlySequence.ToArray();
+            }
         }
 
         /// <summary>

@@ -1,10 +1,11 @@
-﻿using MessagePack.Formatters;
-using MessagePack.Internal;
-using System;
+﻿using System;
 using System.Buffers;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using MessagePack.Formatters;
+using MessagePack.Internal;
+using Nerdbank.Streams;
 
 namespace MessagePack
 {
@@ -14,17 +15,13 @@ namespace MessagePack
         /// <summary>
         /// Dump to JSON string.
         /// </summary>
-        public string ToJson<T>(T obj)
+        public string ToJson<T>(T obj, IFormatterResolver resolver = null)
         {
-            return ToJson(Serialize(obj));
-        }
-
-        /// <summary>
-        /// Dump to JSON string.
-        /// </summary>
-        public string ToJson<T>(T obj, IFormatterResolver resolver)
-        {
-            return ToJson(Serialize(obj, resolver));
+            using (var writer = new Sequence<byte>())
+            {
+                Serialize(writer, obj, resolver);
+                return ToJson(writer.AsReadOnlySequence);
+            }
         }
 
         /// <summary>
@@ -32,7 +29,10 @@ namespace MessagePack
         /// </summary>
         public virtual string ToJson(ReadOnlySequence<byte> byteSequence)
         {
-            if (byteSequence.Length == 0) return "";
+            if (byteSequence.Length == 0)
+            {
+                return "";
+            }
 
             var sb = new StringWriter();
             ToJsonCore(ref byteSequence, sb);
@@ -69,7 +69,7 @@ namespace MessagePack
             }
         }
 
-        static uint FromJsonCore(TinyJsonReader jr, IBufferWriter<byte> writer)
+        private static uint FromJsonCore(TinyJsonReader jr, IBufferWriter<byte> writer)
         {
             uint count = 0;
             while (jr.Read())
@@ -144,23 +144,54 @@ namespace MessagePack
             return count;
         }
 
-        static void ToJsonCore(ref ReadOnlySequence<byte> byteSequence, TextWriter writer)
+        private static void ToJsonCore(ref ReadOnlySequence<byte> byteSequence, TextWriter writer)
         {
             var type = MessagePackBinary.GetMessagePackType(byteSequence);
             switch (type)
             {
                 case MessagePackType.Integer:
                     var code = byteSequence.First.Span[0];
-                    if (MessagePackCode.MinNegativeFixInt <= code && code <= MessagePackCode.MaxNegativeFixInt) writer.Write(MessagePackBinary.ReadSByte(ref byteSequence).ToString(System.Globalization.CultureInfo.InvariantCulture));
-                    else if (MessagePackCode.MinFixInt <= code && code <= MessagePackCode.MaxFixInt) writer.Write(MessagePackBinary.ReadByte(ref byteSequence).ToString(System.Globalization.CultureInfo.InvariantCulture));
-                    else if (code == MessagePackCode.Int8) writer.Write(MessagePackBinary.ReadSByte(ref byteSequence).ToString(System.Globalization.CultureInfo.InvariantCulture));
-                    else if (code == MessagePackCode.Int16) writer.Write(MessagePackBinary.ReadInt16(ref byteSequence).ToString(System.Globalization.CultureInfo.InvariantCulture));
-                    else if (code == MessagePackCode.Int32) writer.Write(MessagePackBinary.ReadInt32(ref byteSequence).ToString(System.Globalization.CultureInfo.InvariantCulture));
-                    else if (code == MessagePackCode.Int64) writer.Write(MessagePackBinary.ReadInt64(ref byteSequence).ToString(System.Globalization.CultureInfo.InvariantCulture));
-                    else if (code == MessagePackCode.UInt8) writer.Write(MessagePackBinary.ReadByte(ref byteSequence).ToString(System.Globalization.CultureInfo.InvariantCulture));
-                    else if (code == MessagePackCode.UInt16) writer.Write(MessagePackBinary.ReadUInt16(ref byteSequence).ToString(System.Globalization.CultureInfo.InvariantCulture));
-                    else if (code == MessagePackCode.UInt32) writer.Write(MessagePackBinary.ReadUInt32(ref byteSequence).ToString(System.Globalization.CultureInfo.InvariantCulture));
-                    else if (code == MessagePackCode.UInt64) writer.Write(MessagePackBinary.ReadUInt64(ref byteSequence).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                    if (MessagePackCode.MinNegativeFixInt <= code && code <= MessagePackCode.MaxNegativeFixInt)
+                    {
+                        writer.Write(MessagePackBinary.ReadSByte(ref byteSequence).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                    }
+                    else if (MessagePackCode.MinFixInt <= code && code <= MessagePackCode.MaxFixInt)
+                    {
+                        writer.Write(MessagePackBinary.ReadByte(ref byteSequence).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                    }
+                    else if (code == MessagePackCode.Int8)
+                    {
+                        writer.Write(MessagePackBinary.ReadSByte(ref byteSequence).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                    }
+                    else if (code == MessagePackCode.Int16)
+                    {
+                        writer.Write(MessagePackBinary.ReadInt16(ref byteSequence).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                    }
+                    else if (code == MessagePackCode.Int32)
+                    {
+                        writer.Write(MessagePackBinary.ReadInt32(ref byteSequence).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                    }
+                    else if (code == MessagePackCode.Int64)
+                    {
+                        writer.Write(MessagePackBinary.ReadInt64(ref byteSequence).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                    }
+                    else if (code == MessagePackCode.UInt8)
+                    {
+                        writer.Write(MessagePackBinary.ReadByte(ref byteSequence).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                    }
+                    else if (code == MessagePackCode.UInt16)
+                    {
+                        writer.Write(MessagePackBinary.ReadUInt16(ref byteSequence).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                    }
+                    else if (code == MessagePackCode.UInt32)
+                    {
+                        writer.Write(MessagePackBinary.ReadUInt32(ref byteSequence).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                    }
+                    else if (code == MessagePackCode.UInt64)
+                    {
+                        writer.Write(MessagePackBinary.ReadUInt64(ref byteSequence).ToString(System.Globalization.CultureInfo.InvariantCulture));
+                    }
+
                     break;
                 case MessagePackType.Boolean:
                     writer.Write(MessagePackBinary.ReadBoolean(ref byteSequence) ? "true" : "false");
@@ -258,15 +289,27 @@ namespace MessagePack
                             // object map or array
                             var typeInside = MessagePackBinary.GetMessagePackType(byteSequence);
                             if (typeInside != MessagePackType.Array && typeInside != MessagePackType.Map)
+                            {
                                 privateBuilder.Append("{");
+                            }
+
                             ToJsonCore(ref byteSequence, new StringWriter(privateBuilder));
                             // insert type name token to start of object map or array
                             if (typeInside != MessagePackType.Array)
+                            {
                                 typeNameTokenBuilder.Insert(0, "\"$type\":");
+                            }
+
                             if (typeInside != MessagePackType.Array && typeInside != MessagePackType.Map)
+                            {
                                 privateBuilder.Append("}");
+                            }
+
                             if (privateBuilder.Length > 2)
+                            {
                                 typeNameTokenBuilder.Append(",");
+                            }
+
                             privateBuilder.Insert(1, typeNameTokenBuilder.ToString());
 
                             writer.Write(privateBuilder.ToString());
@@ -299,7 +342,7 @@ namespace MessagePack
         }
 
         // escape string
-        static void WriteJsonString(string value, TextWriter builder)
+        private static void WriteJsonString(string value, TextWriter builder)
         {
             builder.Write('\"');
 
