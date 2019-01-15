@@ -37,7 +37,7 @@ namespace SharedData
         [Key(2)]
         public string Prop3 { get; set; }
         [Key(3)]
-        public SimlpeStringKeyData Prop4 { get; set; }
+        public SimpleStringKeyData Prop4 { get; set; }
         [Key(4)]
         public SimpleStructIntKeyData Prop5 { get; set; }
         [Key(5)]
@@ -82,7 +82,7 @@ namespace SharedData
     }
 
     [MessagePackObject(true)]
-    public class SimlpeStringKeyData
+    public class SimpleStringKeyData
     {
         public int Prop1 { get; set; }
         public ByteEnum Prop2 { get; set; }
