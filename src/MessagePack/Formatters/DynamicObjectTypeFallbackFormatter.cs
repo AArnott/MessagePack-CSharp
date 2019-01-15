@@ -12,7 +12,7 @@ namespace MessagePack.Formatters
 {
     public sealed class DynamicObjectTypeFallbackFormatter : IMessagePackFormatter<object>
     {
-        delegate int SerializeMethod(object dynamicFormatter, IBufferWriter<byte> writer, object value, IFormatterResolver formatterResolver);
+        delegate void SerializeMethod(object dynamicFormatter, IBufferWriter<byte> writer, object value, IFormatterResolver formatterResolver);
 
         readonly MessagePack.Internal.ThreadsafeTypeKeyHashTable<KeyValuePair<object, SerializeMethod>> serializers = new Internal.ThreadsafeTypeKeyHashTable<KeyValuePair<object, SerializeMethod>>();
 
@@ -62,7 +62,7 @@ namespace MessagePack.Formatters
                         {
                             var formatterType = typeof(IMessagePackFormatter<>).MakeGenericType(t);
                             var param0 = Expression.Parameter(typeof(object), "formatter");
-                            var param1 = Expression.Parameter(typeof(IBufferWriter<byte>), "byteSequence");
+                            var param1 = Expression.Parameter(typeof(IBufferWriter<byte>), "writer");
                             var param2 = Expression.Parameter(typeof(object), "value");
                             var param3 = Expression.Parameter(typeof(IFormatterResolver), "formatterResolver");
 
