@@ -2041,7 +2041,7 @@ namespace MessagePack
             T result;
             if (byteSequence.First.Length >= length)
             {
-                result = reader(byteSequence.First.Span);
+                result = reader(byteSequence.First.Span.Slice(0, length));
             }
             else if (length <= StackAllocLimit)
             {

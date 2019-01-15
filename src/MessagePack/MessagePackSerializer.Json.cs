@@ -13,7 +13,7 @@ namespace MessagePack
     public partial class MessagePackSerializer
     {
         /// <summary>
-        /// Dump to JSON string.
+        /// Serialize an object to JSON string.
         /// </summary>
         public string ToJson<T>(T obj, IFormatterResolver resolver = null)
         {
@@ -23,6 +23,16 @@ namespace MessagePack
                 return ToJson(writer.AsReadOnlySequence);
             }
         }
+
+        /// <summary>
+        /// Dump message-pack binary to JSON string.
+        /// </summary>
+        public string ToJson(byte[] bytes) => this.ToJson(new ReadOnlySequence<byte>(bytes));
+
+        /// <summary>
+        /// Dump message-pack binary to JSON string.
+        /// </summary>
+        public string ToJson(ReadOnlyMemory<byte> bytes) => this.ToJson(new ReadOnlySequence<byte>(bytes));
 
         /// <summary>
         /// Dump message-pack binary to JSON string.
