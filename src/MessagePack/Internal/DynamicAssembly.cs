@@ -25,7 +25,7 @@ namespace MessagePack.Internal
 #if NETFRAMEWORK
             this.moduleName = moduleName;
             this.assemblyBuilder = System.AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName(moduleName), AssemblyBuilderAccess.RunAndSave);
-            this.moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName, moduleName + ".dll");
+            this.moduleBuilder = assemblyBuilder.DefineDynamicModule(moduleName, moduleName + ".dll", emitSymbolInfo: true);
 #else
 #if NETSTANDARD || NETFRAMEWORK
             this.assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(moduleName), AssemblyBuilderAccess.Run);

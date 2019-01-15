@@ -3695,7 +3695,7 @@ namespace MessagePack.Decoders
         public String Read(ref ReadOnlySequence<byte> byteSequence)
         {
             var length = byteSequence.First.Span[0] & 0x1F;
-            byteSequence = byteSequence.Slice(length + 1);
+            byteSequence = byteSequence.Slice(1);
             return MessagePackBinary.Parse(ref byteSequence, length, StringEncoding.UTF8.GetString);
         }
     }

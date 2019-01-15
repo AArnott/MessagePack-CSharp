@@ -730,7 +730,8 @@ namespace MessagePack.Internal
 
             // if(MessagePackBinary.IsNil) { byteSequence = byteSequence.Slice(1); return null; }
             var falseLabel = il.DefineLabel();
-            argByteSequence.EmitLoad();
+            argByteSequence.EmitLdarg();
+            il.Emit(OpCodes.Ldobj, typeof(ReadOnlySequence<byte>));
             il.EmitCall(MessagePackBinaryTypeInfo.IsNil);
             il.Emit(OpCodes.Brfalse_S, falseLabel);
             if (type.GetTypeInfo().IsClass)
@@ -749,8 +750,8 @@ namespace MessagePack.Internal
             il.MarkLabel(falseLabel);
 
             // var length = ReadMapHeader(ref byteSequence);
-            var length = il.DeclareLocal(typeof(int)); // [loc:1]
-            argByteSequence.EmitLoad();
+            var length = il.DeclareLocal(typeof(int), "length"); // [loc:1]
+            argByteSequence.EmitLdarg();
 
             if (info.IsIntKey)
             {
@@ -780,7 +781,7 @@ namespace MessagePack.Internal
                             return new DeserializeInfo
                             {
                                 MemberInfo = member,
-                                LocalField = il.DeclareLocal(member.Type),
+                                LocalField = il.DeclareLocal(member.Type, "member"),
                                 SwitchLabel = il.DefineLabel()
                             };
                         }
@@ -807,7 +808,7 @@ namespace MessagePack.Internal
                     .Select(item => new DeserializeInfo
                     {
                         MemberInfo = item,
-                        LocalField = il.DeclareLocal(item.Type),
+                        LocalField = il.DeclareLocal(item.Type, "item"),
                         // SwitchLabel = il.DefineLabel()
                     })
                     .ToArray();
@@ -822,17 +823,8 @@ namespace MessagePack.Internal
                     automata.Add(info.Members[i].StringKey, i);
                 }
 
-                var buffer = il.DeclareLocal(typeof(byte).MakeByRefType(), true);
-                var keyArraySegment = il.DeclareLocal(typeof(ArraySegment<byte>));
-                var longKey = il.DeclareLocal(typeof(ulong));
-                var p = il.DeclareLocal(typeof(byte*));
-                var rest = il.DeclareLocal(typeof(int));
-
-                // fixed (byte* buffer = &bytes[0]) {
-                //argBytes.EmitLoad();
-                il.EmitLdc_I4(0);
-                il.Emit(OpCodes.Ldelema, typeof(byte));
-                il.EmitStloc(buffer);
+                var buffer = il.DeclareLocal(typeof(ReadOnlySpan<byte>), "buffer");
+                var longKey = il.DeclareLocal(typeof(ulong), "longKey");
 
                 // for (int i = 0; i < len; i++)
                 il.EmitIncrementFor(length, forILocal =>
@@ -840,12 +832,13 @@ namespace MessagePack.Internal
                     var readNext = il.DefineLabel();
                     var loopEnd = il.DefineLabel();
 
-                    argByteSequence.EmitLoad();
+                    argByteSequence.EmitLdarg();
                     il.EmitCall(MessagePackBinaryTypeInfo.ReadStringSegment);
-                    il.EmitStloc(keyArraySegment);
+                    il.EmitCall(ReadOnlySpanFromArraySegment);
+                    il.EmitStloc(buffer);
 
                     // gen automata name lookup
-                    automata.EmitMatch(il, p, rest, longKey, x =>
+                    automata.EmitMatch(il, buffer, longKey, x =>
                     {
                         var i = x.Value;
                         if (infoList[i].MemberInfo != null)
@@ -863,64 +856,56 @@ namespace MessagePack.Internal
                     });
 
                     il.MarkLabel(readNext);
-                    argByteSequence.EmitLoad();
+                    argByteSequence.EmitLdarg();
                     il.EmitCall(MessagePackBinaryTypeInfo.ReadNextBlock);
-                    il.Emit(OpCodes.Stind_I4);
 
                     il.MarkLabel(loopEnd);
                 });
-
-                // end fixed
-                il.Emit(OpCodes.Ldc_I4_0);
-                il.Emit(OpCodes.Conv_U);
-                il.EmitStloc(buffer);
             }
             else
             {
-                var key = il.DeclareLocal(typeof(int));
-                var switchDefault = il.DefineLabel();
+                throw new NotImplementedException();
+                ////    var key = il.DeclareLocal(typeof(int), "key");
+                ////    var switchDefault = il.DefineLabel();
 
-                il.EmitIncrementFor(length, forILocal =>
-                {
-                    var loopEnd = il.DefineLabel();
+                ////    il.EmitIncrementFor(length, forILocal =>
+                ////    {
+                ////        var loopEnd = il.DefineLabel();
 
-                    il.EmitLdloc(forILocal);
-                    il.EmitStloc(key);
+                ////        il.EmitLdloc(forILocal);
+                ////        il.EmitStloc(key);
 
-                    // switch... local = Deserialize
-                    il.EmitLdloc(key);
+                ////        // switch... local = Deserialize
+                ////        il.EmitLdloc(key);
 
-                    il.Emit(OpCodes.Switch, infoList.Select(x => x.SwitchLabel).ToArray());
+                ////        il.Emit(OpCodes.Switch, infoList.Select(x => x.SwitchLabel).ToArray());
 
-                    il.MarkLabel(switchDefault);
-                    // default, only read. MessagePackBinary.ReadNextBlock(ref byteSequence);
-                    argByteSequence.EmitLoad();
-                    il.EmitCall(MessagePackBinaryTypeInfo.ReadNextBlock);
-                    il.Emit(OpCodes.Br, loopEnd);
+                ////        il.MarkLabel(switchDefault);
+                ////        // default, only read. MessagePackBinary.ReadNextBlock(ref byteSequence);
+                ////        argByteSequence.EmitLoad();
+                ////        il.EmitCall(MessagePackBinaryTypeInfo.ReadNextBlock);
+                ////        il.Emit(OpCodes.Br, loopEnd);
 
-                    if (gotoDefault != null)
-                    {
-                        il.MarkLabel(gotoDefault.Value);
-                        il.Emit(OpCodes.Br, switchDefault);
-                    }
+                ////        if (gotoDefault != null)
+                ////        {
+                ////            il.MarkLabel(gotoDefault.Value);
+                ////            il.Emit(OpCodes.Br, switchDefault);
+                ////        }
 
-                    var i = 0;
-                    foreach (var item in infoList)
-                    {
-                        if (item.MemberInfo != null)
-                        {
-                            il.MarkLabel(item.SwitchLabel);
-                            EmitDeserializeValue(il, item, i++, tryEmitLoadCustomFormatter, argByteSequence, argResolver);
-                            il.Emit(OpCodes.Br, loopEnd);
-                        }
-                    }
+                ////        var i = 0;
+                ////        foreach (var item in infoList)
+                ////        {
+                ////            if (item.MemberInfo != null)
+                ////            {
+                ////                il.MarkLabel(item.SwitchLabel);
+                ////                EmitDeserializeValue(il, item, i++, tryEmitLoadCustomFormatter, argByteSequence, argResolver);
+                ////                il.Emit(OpCodes.Br, loopEnd);
+                ////            }
+                ////        }
 
-                    il.MarkLabel(loopEnd);
-                });
+                ////        il.MarkLabel(loopEnd);
+                ////    });
             }
-
-            il.Emit(OpCodes.Sub);
-            il.Emit(OpCodes.Stind_I4);
 
             // create result object
             var structLocal = EmitNewObject(il, type, info, infoList);
@@ -975,12 +960,12 @@ namespace MessagePack.Internal
         /// <param name="byteCount">The number of bytes to advance the reader by.</param>
         private static void AdvanceByteSequence(ILGenerator il, ArgumentField argByteSequence, int byteCount = 1)
         {
-            argByteSequence.EmitLoad();
-            argByteSequence.EmitLoad();
+            argByteSequence.EmitLdarg();
+            argByteSequence.EmitLdarg();
             il.EmitLdc_I4(byteCount);
             il.Emit(OpCodes.Conv_I8);
             il.EmitCall(ReadOnlySequenceSlice);
-            il.Emit(OpCodes.Stobj);
+            il.Emit(OpCodes.Stobj, typeof(ReadOnlySequence<byte>));
         }
 
         static void EmitDeserializeValue(ILGenerator il, DeserializeInfo info, int index, Func<int, ObjectSerializationInfo.EmittableMember, Action> tryEmitLoadCustomFormatter, ArgumentField argByteSequence, ArgumentField argResolver)
@@ -991,15 +976,13 @@ namespace MessagePack.Internal
             if (emitter != null)
             {
                 emitter();
-                argByteSequence.EmitLoad();
+                argByteSequence.EmitLdarg();
                 argResolver.EmitLoad();
                 il.EmitCall(typeof(IMessagePackFormatter<>).MakeGenericType(t).GetRuntimeMethod("Deserialize", new[] { refByteSequence, typeof(IFormatterResolver) }));
             }
             else if (IsOptimizeTargetType(t))
             {
-                il.EmitLdarg(1);
-                il.EmitLdarg(2);
-                il.EmitLdarg(4);
+                argByteSequence.EmitLdarg();
                 if (t == typeof(byte[]))
                 {
                     il.EmitCall(MessagePackBinaryTypeInfo.ReadBytes);
@@ -1013,7 +996,7 @@ namespace MessagePack.Internal
             {
                 argResolver.EmitLoad();
                 il.EmitCall(getFormatterWithVerify.MakeGenericMethod(t));
-                argByteSequence.EmitLoad();
+                argByteSequence.EmitLdarg();
                 argResolver.EmitLoad();
                 il.EmitCall(getDeserialize(t));
             }
@@ -1043,7 +1026,7 @@ namespace MessagePack.Internal
             }
             else
             {
-                var result = il.DeclareLocal(type);
+                var result = il.DeclareLocal(type, "result");
                 if (info.BestmatchConstructor == null)
                 {
                     il.Emit(OpCodes.Ldloca, result);
@@ -1102,6 +1085,7 @@ namespace MessagePack.Internal
         static readonly MethodInfo ReadOnlySequenceSlice = typeof(ReadOnlySequence<byte>).GetRuntimeMethod(nameof(ReadOnlySequence<byte>.Slice), new[] { typeof(long) });
 
         static readonly MethodInfo ReadOnlySpanFromByteArray = typeof(ReadOnlySpan<byte>).GetRuntimeMethod("op_Implicit", new[] { typeof(byte[]) });
+        static readonly MethodInfo ReadOnlySpanFromArraySegment = typeof(ReadOnlySpan<byte>).GetRuntimeMethod("op_Implicit", new[] { typeof(ArraySegment<byte>) });
 
         static readonly MethodInfo getFormatterWithVerify = typeof(FormatterResolverExtensions).GetRuntimeMethods().First(x => x.Name == "GetFormatterWithVerify");
         static readonly Func<Type, MethodInfo> getSerialize = t => typeof(IMessagePackFormatter<>).MakeGenericType(t).GetRuntimeMethod("Serialize", new[] { typeof(IBufferWriter<byte>), t, typeof(IFormatterResolver) });
