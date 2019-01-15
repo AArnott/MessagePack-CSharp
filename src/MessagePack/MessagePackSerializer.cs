@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using MessagePack.Internal;
 using Nerdbank.Streams;
@@ -109,7 +110,7 @@ namespace MessagePack
         /// <param name="resolver">The resolver to use during deserialization. Use <c>null</c> to use the <see cref="DefaultResolver"/>.</param>
         public void Serialize<T>(Stream stream, T value, IFormatterResolver resolver = null)
         {
-            throw new NotImplementedException();
+            this.SerializeAsync(stream, value, resolver, CancellationToken.None).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -118,10 +119,13 @@ namespace MessagePack
         /// <param name="stream">The stream to serialize to.</param>
         /// <param name="value">The value to serialize.</param>
         /// <param name="resolver">The resolver to use during deserialization. Use <c>null</c> to use the <see cref="DefaultResolver"/>.</param>
+        /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>A task that completes with the result of the async serialization operation.</returns>
-        public Task SerializeAsync<T>(Stream stream, T value, IFormatterResolver resolver = null)
+        public async ValueTask SerializeAsync<T>(Stream stream, T value, IFormatterResolver resolver = null, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            System.IO.Pipelines.PipeWriter writer = stream.UseStrictPipeWriter();
+            this.Serialize(writer, value, resolver);
+            await writer.FlushAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -183,7 +187,18 @@ namespace MessagePack
         /// <returns>The deserialized value.</returns>
         public T Deserialize<T>(Stream stream, IFormatterResolver resolver = null)
         {
-            throw new NotImplementedException();
+            using (var sequence = new Sequence<byte>())
+            {
+                int bytesRead;
+                do
+                {
+                    var span = sequence.GetSpan(stream.CanSeek ? (int)(stream.Length - stream.Position) : 0);
+                    bytesRead = stream.Read(span);
+                    sequence.Advance(bytesRead);
+                } while (bytesRead > 0);
+
+                return this.Deserialize<T>(sequence.AsReadOnlySequence, resolver, out _);
+            }
         }
 
         /// <summary>
@@ -192,10 +207,22 @@ namespace MessagePack
         /// <typeparam name="T">The type of value to deserialize.</typeparam>
         /// <param name="stream">The stream to deserialize from.</param>
         /// <param name="resolver">The resolver to use during deserialization. Use <c>null</c> to use the <see cref="DefaultResolver"/>.</param>
+        /// <param name="cancellationToken">A cancellation token.</param>
         /// <returns>The deserialized value.</returns>
-        public ValueTask<T> DeserializeAsync<T>(Stream stream, IFormatterResolver resolver = null)
+        public async ValueTask<T> DeserializeAsync<T>(Stream stream, IFormatterResolver resolver = null, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            using (var sequence = new Sequence<byte>())
+            {
+                int bytesRead;
+                do
+                {
+                    var memory = sequence.GetMemory(stream.CanSeek ? (int)(stream.Length - stream.Position) : 0);
+                    bytesRead = await stream.ReadAsync(memory, cancellationToken).ConfigureAwait(false);
+                    sequence.Advance(bytesRead);
+                } while (bytesRead > 0);
+
+                return this.Deserialize<T>(sequence.AsReadOnlySequence, resolver, out _);
+            }
         }
     }
 }
