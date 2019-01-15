@@ -403,9 +403,9 @@ namespace MessagePack.Internal
             var serializationInfo = ObjectSerializationInfo.CreateOrNull(type, forceStringKey, contractless, allowPrivate);
             if (serializationInfo == null) return null;
 
-            // internal delegate int AnonymousSerializeFunc<T>(byte[][] stringByteKeysField, object[] customFormatters, ref byte[] bytes, int offset, T value, IFormatterResolver resolver);
-            // internal delegate T AnonymousDeserializeFunc<T>(object[] customFormatters, byte[] bytes, int offset, IFormatterResolver resolver, out int readSize);
-            var serialize = new DynamicMethod("Serialize", typeof(int), new[] { typeof(byte[][]), typeof(object[]), typeof(IBufferWriter<byte>), type, typeof(IFormatterResolver) }, type, true);
+            // internal delegate void AnonymousSerializeFunc<T>(byte[][] stringByteKeysField, object[] customFormatters, IBufferWriter<byte> writer, T value, IFormatterResolver resolver);
+            // internal delegate T AnonymousDeserializeFunc<T>(object[] customFormatters, ref ReadOnlySequence<byte> byteSequence, IFormatterResolver resolver);
+            var serialize = new DynamicMethod("Serialize", null, new[] { typeof(byte[][]), typeof(object[]), typeof(IBufferWriter<byte>), type, typeof(IFormatterResolver) }, type, true);
             DynamicMethod deserialize = null;
 
             List<byte[]> stringByteKeysField = new List<byte[]>();
@@ -686,7 +686,6 @@ namespace MessagePack.Internal
                         il.EmitCall(MessagePackBinaryTypeInfo.WriteRaw);
                     }
 
-                    // offset += serialzie
                     EmitSerializeValue(il, type.GetTypeInfo(), item, index, tryEmitLoadCustomFormatter, argWriter, argValue, argResolver);
                     index++;
                 }
@@ -1165,7 +1164,7 @@ namespace MessagePack.Internal
         }
     }
 
-    internal delegate int AnonymousSerializeFunc<T>(byte[][] stringByteKeysField, object[] customFormatters, IBufferWriter<byte> writer, T value, IFormatterResolver resolver);
+    internal delegate void AnonymousSerializeFunc<T>(byte[][] stringByteKeysField, object[] customFormatters, IBufferWriter<byte> writer, T value, IFormatterResolver resolver);
     internal delegate T AnonymousDeserializeFunc<T>(object[] customFormatters, ref ReadOnlySequence<byte> byteSequence, IFormatterResolver resolver);
 
     internal class AnonymousSerializableFormatter<T> : IMessagePackFormatter<T>
