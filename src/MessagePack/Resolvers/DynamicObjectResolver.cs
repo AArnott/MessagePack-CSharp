@@ -615,6 +615,18 @@ namespace MessagePack.Internal
                 var maxKey = info.Members.Where(x => x.IsReadable).Select(x => x.IntKey).DefaultIfEmpty(-1).Max();
                 var intKeyMap = info.Members.Where(x => x.IsReadable).ToDictionary(x => x.IntKey);
 
+                var len = maxKey + 1;
+                argWriter.EmitLoad();
+                il.EmitLdc_I4(len);
+                if (len <= MessagePackRange.MaxFixMapCount)
+                {
+                    il.EmitCall(MessagePackBinaryTypeInfo.WriteFixedArrayHeaderUnsafe);
+                }
+                else
+                {
+                    il.EmitCall(MessagePackBinaryTypeInfo.WriteArrayHeader);
+                }
+
                 for (int i = 0; i <= maxKey; i++)
                 {
                     ObjectSerializationInfo.EmittableMember member;
@@ -864,47 +876,46 @@ namespace MessagePack.Internal
             }
             else
             {
-                throw new NotImplementedException();
-                ////    var key = il.DeclareLocal(typeof(int), "key");
-                ////    var switchDefault = il.DefineLabel();
+                var key = il.DeclareLocal(typeof(int), "key");
+                var switchDefault = il.DefineLabel();
 
-                ////    il.EmitIncrementFor(length, forILocal =>
-                ////    {
-                ////        var loopEnd = il.DefineLabel();
+                il.EmitIncrementFor(length, forILocal =>
+                {
+                    var loopEnd = il.DefineLabel();
 
-                ////        il.EmitLdloc(forILocal);
-                ////        il.EmitStloc(key);
+                    il.EmitLdloc(forILocal);
+                    il.EmitStloc(key);
 
-                ////        // switch... local = Deserialize
-                ////        il.EmitLdloc(key);
+                    // switch... local = Deserialize
+                    il.EmitLdloc(key);
 
-                ////        il.Emit(OpCodes.Switch, infoList.Select(x => x.SwitchLabel).ToArray());
+                    il.Emit(OpCodes.Switch, infoList.Select(x => x.SwitchLabel).ToArray());
 
-                ////        il.MarkLabel(switchDefault);
-                ////        // default, only read. MessagePackBinary.ReadNextBlock(ref byteSequence);
-                ////        argByteSequence.EmitLoad();
-                ////        il.EmitCall(MessagePackBinaryTypeInfo.ReadNextBlock);
-                ////        il.Emit(OpCodes.Br, loopEnd);
+                    il.MarkLabel(switchDefault);
+                    // default, only read. MessagePackBinary.ReadNextBlock(ref byteSequence);
+                    argByteSequence.EmitLdarg();
+                    il.EmitCall(MessagePackBinaryTypeInfo.ReadNextBlock);
+                    il.Emit(OpCodes.Br, loopEnd);
 
-                ////        if (gotoDefault != null)
-                ////        {
-                ////            il.MarkLabel(gotoDefault.Value);
-                ////            il.Emit(OpCodes.Br, switchDefault);
-                ////        }
+                    if (gotoDefault != null)
+                    {
+                        il.MarkLabel(gotoDefault.Value);
+                        il.Emit(OpCodes.Br, switchDefault);
+                    }
 
-                ////        var i = 0;
-                ////        foreach (var item in infoList)
-                ////        {
-                ////            if (item.MemberInfo != null)
-                ////            {
-                ////                il.MarkLabel(item.SwitchLabel);
-                ////                EmitDeserializeValue(il, item, i++, tryEmitLoadCustomFormatter, argByteSequence, argResolver);
-                ////                il.Emit(OpCodes.Br, loopEnd);
-                ////            }
-                ////        }
+                    var i = 0;
+                    foreach (var item in infoList)
+                    {
+                        if (item.MemberInfo != null)
+                        {
+                            il.MarkLabel(item.SwitchLabel);
+                            EmitDeserializeValue(il, item, i++, tryEmitLoadCustomFormatter, argByteSequence, argResolver);
+                            il.Emit(OpCodes.Br, loopEnd);
+                        }
+                    }
 
-                ////        il.MarkLabel(loopEnd);
-                ////    });
+                    il.MarkLabel(loopEnd);
+                });
             }
 
             // create result object
