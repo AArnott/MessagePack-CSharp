@@ -62,15 +62,6 @@ namespace MessagePack.Internal
     /// </summary>
     internal static class ILGeneratorExtensions
     {
-        internal static LocalBuilder DeclareLocal(this ILGenerator il, Type type, string name)
-        {
-            var local = il.DeclareLocal(type);
-#if NETFRAMEWORK
-            local.SetLocalSymInfo(name);
-#endif
-            return local;
-        }
-
         /// <summary>
         /// Loads the local variable at a specific index onto the evaluation stack.
         /// </summary>

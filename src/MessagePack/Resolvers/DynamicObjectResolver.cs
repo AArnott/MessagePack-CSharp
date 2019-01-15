@@ -762,7 +762,7 @@ namespace MessagePack.Internal
             il.MarkLabel(falseLabel);
 
             // var length = ReadMapHeader(ref byteSequence);
-            var length = il.DeclareLocal(typeof(int), "length"); // [loc:1]
+            var length = il.DeclareLocal(typeof(int)); // [loc:1]
             argByteSequence.EmitLdarg();
 
             if (info.IsIntKey)
@@ -793,7 +793,7 @@ namespace MessagePack.Internal
                             return new DeserializeInfo
                             {
                                 MemberInfo = member,
-                                LocalField = il.DeclareLocal(member.Type, "member"),
+                                LocalField = il.DeclareLocal(member.Type),
                                 SwitchLabel = il.DefineLabel()
                             };
                         }
@@ -820,7 +820,7 @@ namespace MessagePack.Internal
                     .Select(item => new DeserializeInfo
                     {
                         MemberInfo = item,
-                        LocalField = il.DeclareLocal(item.Type, "item"),
+                        LocalField = il.DeclareLocal(item.Type),
                         // SwitchLabel = il.DefineLabel()
                     })
                     .ToArray();
@@ -835,8 +835,8 @@ namespace MessagePack.Internal
                     automata.Add(info.Members[i].StringKey, i);
                 }
 
-                var buffer = il.DeclareLocal(typeof(ReadOnlySpan<byte>), "buffer");
-                var longKey = il.DeclareLocal(typeof(ulong), "longKey");
+                var buffer = il.DeclareLocal(typeof(ReadOnlySpan<byte>));
+                var longKey = il.DeclareLocal(typeof(ulong));
 
                 // for (int i = 0; i < len; i++)
                 il.EmitIncrementFor(length, forILocal =>
@@ -876,7 +876,7 @@ namespace MessagePack.Internal
             }
             else
             {
-                var key = il.DeclareLocal(typeof(int), "key");
+                var key = il.DeclareLocal(typeof(int));
                 var switchDefault = il.DefineLabel();
 
                 il.EmitIncrementFor(length, forILocal =>
@@ -1037,7 +1037,7 @@ namespace MessagePack.Internal
             }
             else
             {
-                var result = il.DeclareLocal(type, "result");
+                var result = il.DeclareLocal(type);
                 if (info.BestmatchConstructor == null)
                 {
                     il.Emit(OpCodes.Ldloca, result);
