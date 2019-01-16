@@ -119,6 +119,7 @@ namespace MessagePack
                 const int CompressedStreamLengthLength = 5;
                 var headerSpan = writer.GetSpan(ExtensionHeaderLength + CompressedStreamLengthLength);
                 writer.Advance(ExtensionHeaderLength + CompressedStreamLengthLength);
+                headerSpan = headerSpan.Slice(0, ExtensionHeaderLength + CompressedStreamLengthLength); // trim it to just what we promised to use
 
                 // write body
                 ArraySegment<byte> srcArray, dstArray;
