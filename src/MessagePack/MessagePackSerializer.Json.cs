@@ -137,15 +137,19 @@ namespace MessagePack
                         break;
                     case TinyJsonToken.String:
                         MessagePackBinary.WriteString(writer, jr.StringValue);
+                        count++;
                         break;
                     case TinyJsonToken.True:
                         MessagePackBinary.WriteBoolean(writer, true);
+                        count++;
                         break;
                     case TinyJsonToken.False:
                         MessagePackBinary.WriteBoolean(writer, false);
+                        count++;
                         break;
                     case TinyJsonToken.Null:
                         MessagePackBinary.WriteNil(writer);
+                        count++;
                         break;
                     default:
                         break;
