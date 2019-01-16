@@ -142,7 +142,7 @@ namespace MessagePack
                 int lz4Length;
                 try
                 {
-                    lz4Length = LZ4Codec.Encode(srcArray.Array, srcArray.Offset, srcArray.Count, dstArray.Array, dstArray.Offset, dstArray.Count);
+                    lz4Length = LZ4Codec.Encode(srcArray.Array, srcArray.Offset, (int)serializedData.Length, dstArray.Array, dstArray.Offset, dstArray.Count);
                     if (rentedTargetArray)
                     {
                         dstArray.AsSpan(0, lz4Length).CopyTo(compressedMemory.Span);
