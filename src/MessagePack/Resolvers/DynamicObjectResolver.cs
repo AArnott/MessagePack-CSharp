@@ -637,6 +637,7 @@ namespace MessagePack.Internal
                     else
                     {
                         // Write Nil as Blanc
+                        argWriter.EmitLoad();
                         il.EmitCall(MessagePackBinaryTypeInfo.WriteNil);
                     }
                 }

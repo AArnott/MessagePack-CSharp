@@ -118,7 +118,7 @@ namespace MessagePack.Resolvers
             }
 
             {
-                var method = typeBuilder.DefineMethod("Serialize", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                var method = typeBuilder.DefineMethod("Serialize", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual | MethodAttributes.HideBySig | MethodAttributes.NewSlot,
                     null,
                     new Type[] { typeof(IBufferWriter<byte>), type, typeof(IFormatterResolver) });
 
@@ -126,7 +126,7 @@ namespace MessagePack.Resolvers
                 BuildSerialize(type, unionAttrs, method, typeToKeyAndJumpMap, il);
             }
             {
-                var method = typeBuilder.DefineMethod("Deserialize", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
+                var method = typeBuilder.DefineMethod("Deserialize", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual | MethodAttributes.HideBySig | MethodAttributes.NewSlot,
                     type,
                     new Type[] { refReadOnlySequence, typeof(IFormatterResolver) });
 
