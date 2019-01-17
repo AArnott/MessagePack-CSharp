@@ -1471,7 +1471,7 @@ namespace MessagePack
                 var span = writer.GetSpan(byteCount + 1);
                 span[0] = (byte)(MessagePackCode.MinFixStr | byteCount);
                 utf8stringBytes.CopyTo(span.Slice(1));
-                writer.Advance(1);
+                writer.Advance(byteCount + 1);
             }
             else if (byteCount <= byte.MaxValue)
             {
@@ -1479,7 +1479,7 @@ namespace MessagePack
                 span[0] = MessagePackCode.Str8;
                 span[1] = unchecked((byte)byteCount);
                 utf8stringBytes.CopyTo(span.Slice(2));
-                writer.Advance(2);
+                writer.Advance(byteCount + 2);
             }
             else if (byteCount <= ushort.MaxValue)
             {
@@ -1488,7 +1488,7 @@ namespace MessagePack
                 span[1] = unchecked((byte)(byteCount >> 8));
                 span[2] = unchecked((byte)byteCount);
                 utf8stringBytes.CopyTo(span.Slice(3));
-                writer.Advance(3);
+                writer.Advance(byteCount + 3);
             }
             else
             {
@@ -1499,7 +1499,7 @@ namespace MessagePack
                 span[3] = unchecked((byte)(byteCount >> 8));
                 span[4] = unchecked((byte)byteCount);
                 utf8stringBytes.CopyTo(span.Slice(5));
-                writer.Advance(5);
+                writer.Advance(byteCount + 5);
             }
         }
 

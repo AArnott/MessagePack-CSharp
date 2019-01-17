@@ -174,22 +174,20 @@ namespace MessagePack.Formatters
 
                         var formatterType = typeof(IMessagePackFormatter<>).MakeGenericType(type);
                         var param0 = Expression.Parameter(typeof(object), "formatter");
-                        var param1 = Expression.Parameter(typeof(byte[]).MakeByRefType(), "bytes");
-                        var param2 = Expression.Parameter(typeof(int), "offset");
-                        var param3 = Expression.Parameter(typeof(object), "value");
-                        var param4 = Expression.Parameter(typeof(IFormatterResolver), "formatterResolver");
+                        var param1 = Expression.Parameter(typeof(IBufferWriter<byte>), "writer");
+                        var param2 = Expression.Parameter(typeof(object), "value");
+                        var param3 = Expression.Parameter(typeof(IFormatterResolver), "formatterResolver");
 
-                        var serializeMethodInfo = formatterType.GetRuntimeMethod("Serialize", new[] { typeof(byte[]).MakeByRefType(), typeof(int), type, typeof(IFormatterResolver) });
+                        var serializeMethodInfo = formatterType.GetRuntimeMethod("Serialize", new[] { typeof(IBufferWriter<byte>), type, typeof(IFormatterResolver) });
 
                         var body = Expression.Call(
                             Expression.Convert(param0, formatterType),
                             serializeMethodInfo,
                             param1,
-                            param2,
-                            ti.IsValueType ? Expression.Unbox(param3, type) : Expression.Convert(param3, type),
-                            param4);
+                            ti.IsValueType ? Expression.Unbox(param2, type) : Expression.Convert(param2, type),
+                            param3);
 
-                        var lambda = Expression.Lambda<SerializeMethod>(body, param0, param1, param2, param3, param4).Compile();
+                        var lambda = Expression.Lambda<SerializeMethod>(body, param0, param1, param2, param3).Compile();
 
                         formatterAndDelegate = new KeyValuePair<object, SerializeMethod>(formatter, lambda);
                         serializers.TryAdd(type, formatterAndDelegate);
@@ -205,6 +203,9 @@ namespace MessagePack.Formatters
 
                 // mark as extension with code 100
                 MessagePackBinary.WriteExtensionFormatHeaderForceExt32Block(writer, (sbyte)TypelessFormatter.ExtensionTypeCode, (int)sequence.Length);
+                var copySpan = writer.GetSpan((int)sequence.Length);
+                sequence.AsReadOnlySequence.CopyTo(copySpan);
+                writer.Advance((int)sequence.Length);
             }
         }
 
@@ -284,25 +285,21 @@ namespace MessagePack.Formatters
 
                         var formatterType = typeof(IMessagePackFormatter<>).MakeGenericType(type);
                         var param0 = Expression.Parameter(typeof(object), "formatter");
-                        var param1 = Expression.Parameter(typeof(byte[]), "bytes");
-                        var param2 = Expression.Parameter(typeof(int), "offset");
-                        var param3 = Expression.Parameter(typeof(IFormatterResolver), "formatterResolver");
-                        var param4 = Expression.Parameter(typeof(int).MakeByRefType(), "readSize");
+                        var param1 = Expression.Parameter(typeof(ReadOnlySequence<byte>).MakeByRefType(), "byteSequence");
+                        var param2 = Expression.Parameter(typeof(IFormatterResolver), "formatterResolver");
 
-                        var deserializeMethodInfo = formatterType.GetRuntimeMethod("Deserialize", new[] { typeof(byte[]), typeof(int), typeof(IFormatterResolver), typeof(int).MakeByRefType() });
+                        var deserializeMethodInfo = formatterType.GetRuntimeMethod("Deserialize", new[] { typeof(ReadOnlySequence<byte>).MakeByRefType(), typeof(IFormatterResolver) });
 
                         var deserialize = Expression.Call(
                             Expression.Convert(param0, formatterType),
                             deserializeMethodInfo,
                             param1,
-                            param2,
-                            param3,
-                            param4);
+                            param2);
 
                         Expression body = deserialize;
                         if (ti.IsValueType)
                             body = Expression.Convert(deserialize, typeof(object));
-                        var lambda = Expression.Lambda<DeserializeMethod>(body, param0, param1, param2, param3, param4).Compile();
+                        var lambda = Expression.Lambda<DeserializeMethod>(body, param0, param1, param2).Compile();
 
                         formatterAndDelegate = new KeyValuePair<object, DeserializeMethod>(formatter, lambda);
                         deserializers.TryAdd(type, formatterAndDelegate);
