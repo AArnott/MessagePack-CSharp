@@ -3878,7 +3878,7 @@ namespace MessagePack.Decoders
             return MessagePackBinary.Parse(
                 ref byteSequence,
                 3,
-                lengthSpan => unchecked((UInt16)(lengthSpan[1] << 8) | lengthSpan[2]),
+                lengthSpan => 1 + unchecked((UInt16)(lengthSpan[1] << 8) | lengthSpan[2]),
                 span => new ExtensionResult(typeCode: unchecked((sbyte)span[0]), span.Slice(1).ToArray()));
         }
     }
@@ -3896,7 +3896,7 @@ namespace MessagePack.Decoders
             return MessagePackBinary.Parse(
                 ref byteSequence,
                 5,
-                lengthSpan => unchecked((int)(lengthSpan[1] << 24) | (int)(lengthSpan[2] << 16) | (int)(lengthSpan[3] << 8) | lengthSpan[4]),
+                lengthSpan => 1 + unchecked((int)(lengthSpan[1] << 24) | (int)(lengthSpan[2] << 16) | (int)(lengthSpan[3] << 8) | lengthSpan[4]),
                 span => new ExtensionResult(typeCode: unchecked((sbyte)span[0]), span.Slice(1).ToArray()));
         }
     }
