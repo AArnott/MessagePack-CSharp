@@ -2150,7 +2150,6 @@ namespace MessagePack.Decoders
 
         private FixMapHeader()
         {
-
         }
 
         public uint Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2167,7 +2166,6 @@ namespace MessagePack.Decoders
 
         private Map16Header()
         {
-
         }
 
         public uint Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2182,7 +2180,6 @@ namespace MessagePack.Decoders
 
         private Map32Header()
         {
-
         }
 
         public uint Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2197,7 +2194,6 @@ namespace MessagePack.Decoders
 
         private InvalidMapHeader()
         {
-
         }
 
         public uint Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2217,7 +2213,6 @@ namespace MessagePack.Decoders
 
         private FixArrayHeader()
         {
-
         }
 
         public uint Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2234,7 +2229,6 @@ namespace MessagePack.Decoders
 
         private Array16Header()
         {
-
         }
 
         public uint Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2249,7 +2243,6 @@ namespace MessagePack.Decoders
 
         private Array32Header()
         {
-
         }
 
         public uint Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2264,7 +2257,6 @@ namespace MessagePack.Decoders
 
         private InvalidArrayHeader()
         {
-
         }
 
         public uint Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2325,7 +2317,6 @@ namespace MessagePack.Decoders
 
         private FixByte()
         {
-
         }
 
         public byte Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2342,7 +2333,6 @@ namespace MessagePack.Decoders
 
         private UInt8Byte()
         {
-
         }
 
         public byte Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2357,7 +2347,6 @@ namespace MessagePack.Decoders
 
         private InvalidByte()
         {
-
         }
 
         public byte Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2377,7 +2366,6 @@ namespace MessagePack.Decoders
 
         private NilBytes()
         {
-
         }
 
         public byte[] Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2393,7 +2381,6 @@ namespace MessagePack.Decoders
 
         private Bin8Bytes()
         {
-
         }
 
         public byte[] Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2412,7 +2399,6 @@ namespace MessagePack.Decoders
 
         private Bin16Bytes()
         {
-
         }
 
         public byte[] Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2431,7 +2417,6 @@ namespace MessagePack.Decoders
 
         private Bin32Bytes()
         {
-
         }
 
         public byte[] Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2450,7 +2435,6 @@ namespace MessagePack.Decoders
 
         private InvalidBytes()
         {
-
         }
 
         public byte[] Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2470,7 +2454,6 @@ namespace MessagePack.Decoders
 
         private NilBytesSegment()
         {
-
         }
 
         public ArraySegment<byte> Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2486,7 +2469,6 @@ namespace MessagePack.Decoders
 
         private Bin8BytesSegment()
         {
-
         }
 
         public ArraySegment<byte> Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2501,7 +2483,6 @@ namespace MessagePack.Decoders
 
         private Bin16BytesSegment()
         {
-
         }
 
         public ArraySegment<byte> Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2517,7 +2498,6 @@ namespace MessagePack.Decoders
 
         private Bin32BytesSegment()
         {
-
         }
 
         public ArraySegment<byte> Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2532,7 +2512,6 @@ namespace MessagePack.Decoders
 
         private InvalidBytesSegment()
         {
-
         }
 
         public ArraySegment<byte> Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2552,7 +2531,6 @@ namespace MessagePack.Decoders
 
         private FixSByte()
         {
-
         }
 
         public sbyte Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2569,7 +2547,6 @@ namespace MessagePack.Decoders
 
         private Int8SByte()
         {
-
         }
 
         public sbyte Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2584,7 +2561,6 @@ namespace MessagePack.Decoders
 
         private InvalidSByte()
         {
-
         }
 
         public sbyte Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2604,7 +2580,6 @@ namespace MessagePack.Decoders
 
         private FixNegativeFloat()
         {
-
         }
 
         public Single Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2619,7 +2594,6 @@ namespace MessagePack.Decoders
 
         private FixFloat()
         {
-
         }
 
         public Single Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2634,7 +2608,6 @@ namespace MessagePack.Decoders
 
         private Int8Single()
         {
-
         }
 
         public Single Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2649,7 +2622,6 @@ namespace MessagePack.Decoders
 
         private Int16Single()
         {
-
         }
 
         public Single Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2664,7 +2636,6 @@ namespace MessagePack.Decoders
 
         private Int32Single()
         {
-
         }
 
         public Single Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2679,7 +2650,6 @@ namespace MessagePack.Decoders
 
         private Int64Single()
         {
-
         }
 
         public Single Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2695,7 +2665,6 @@ namespace MessagePack.Decoders
 
         private UInt8Single()
         {
-
         }
 
         public Single Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2710,7 +2679,6 @@ namespace MessagePack.Decoders
 
         private UInt16Single()
         {
-
         }
 
         public Single Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2725,7 +2693,6 @@ namespace MessagePack.Decoders
 
         private UInt32Single()
         {
-
         }
 
         public Single Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2740,7 +2707,6 @@ namespace MessagePack.Decoders
 
         private UInt64Single()
         {
-
         }
 
         public Single Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2755,7 +2721,6 @@ namespace MessagePack.Decoders
 
         private Float32Single()
         {
-
         }
 
         public Single Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2770,7 +2735,6 @@ namespace MessagePack.Decoders
 
         private InvalidSingle()
         {
-
         }
 
         public Single Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2790,7 +2754,6 @@ namespace MessagePack.Decoders
 
         private FixNegativeDouble()
         {
-
         }
 
         public Double Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2805,7 +2768,6 @@ namespace MessagePack.Decoders
 
         private FixDouble()
         {
-
         }
 
         public Double Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2820,7 +2782,6 @@ namespace MessagePack.Decoders
 
         private Int8Double()
         {
-
         }
 
         public Double Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2835,7 +2796,6 @@ namespace MessagePack.Decoders
 
         private Int16Double()
         {
-
         }
 
         public Double Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2850,7 +2810,6 @@ namespace MessagePack.Decoders
 
         private Int32Double()
         {
-
         }
 
         public Double Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2865,7 +2824,6 @@ namespace MessagePack.Decoders
 
         private Int64Double()
         {
-
         }
 
         public Double Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2881,7 +2839,6 @@ namespace MessagePack.Decoders
 
         private UInt8Double()
         {
-
         }
 
         public Double Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2896,7 +2853,6 @@ namespace MessagePack.Decoders
 
         private UInt16Double()
         {
-
         }
 
         public Double Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2911,7 +2867,6 @@ namespace MessagePack.Decoders
 
         private UInt32Double()
         {
-
         }
 
         public Double Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2926,7 +2881,6 @@ namespace MessagePack.Decoders
 
         private UInt64Double()
         {
-
         }
 
         public Double Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2941,7 +2895,6 @@ namespace MessagePack.Decoders
 
         private Float32Double()
         {
-
         }
 
         public Double Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2956,7 +2909,6 @@ namespace MessagePack.Decoders
 
         private Float64Double()
         {
-
         }
 
         public Double Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2971,7 +2923,6 @@ namespace MessagePack.Decoders
 
         private InvalidDouble()
         {
-
         }
 
         public Double Read(ref ReadOnlySequence<byte> byteSequence)
@@ -2991,7 +2942,6 @@ namespace MessagePack.Decoders
 
         private FixNegativeInt16()
         {
-
         }
 
         public Int16 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3008,7 +2958,6 @@ namespace MessagePack.Decoders
 
         private FixInt16()
         {
-
         }
 
         public Int16 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3025,7 +2974,6 @@ namespace MessagePack.Decoders
 
         private UInt8Int16()
         {
-
         }
 
         public Int16 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3040,7 +2988,6 @@ namespace MessagePack.Decoders
 
         private UInt16Int16()
         {
-
         }
 
         public Int16 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3055,7 +3002,6 @@ namespace MessagePack.Decoders
 
         private Int8Int16()
         {
-
         }
 
         public Int16 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3070,7 +3016,6 @@ namespace MessagePack.Decoders
 
         private Int16Int16()
         {
-
         }
 
         public Int16 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3085,7 +3030,6 @@ namespace MessagePack.Decoders
 
         private InvalidInt16()
         {
-
         }
 
         public Int16 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3105,7 +3049,6 @@ namespace MessagePack.Decoders
 
         private FixNegativeInt32()
         {
-
         }
 
         public Int32 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3122,7 +3065,6 @@ namespace MessagePack.Decoders
 
         private FixInt32()
         {
-
         }
 
         public Int32 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3139,7 +3081,6 @@ namespace MessagePack.Decoders
 
         private UInt8Int32()
         {
-
         }
 
         public Int32 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3153,7 +3094,6 @@ namespace MessagePack.Decoders
 
         private UInt16Int32()
         {
-
         }
 
         public Int32 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3168,7 +3108,6 @@ namespace MessagePack.Decoders
 
         private UInt32Int32()
         {
-
         }
 
         public Int32 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3183,7 +3122,6 @@ namespace MessagePack.Decoders
 
         private Int8Int32()
         {
-
         }
 
         public Int32 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3198,7 +3136,6 @@ namespace MessagePack.Decoders
 
         private Int16Int32()
         {
-
         }
 
         public Int32 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3213,7 +3150,6 @@ namespace MessagePack.Decoders
 
         private Int32Int32()
         {
-
         }
 
         public Int32 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3247,7 +3183,6 @@ namespace MessagePack.Decoders
 
         private FixNegativeInt64()
         {
-
         }
 
         public Int64 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3264,7 +3199,6 @@ namespace MessagePack.Decoders
 
         private FixInt64()
         {
-
         }
 
         public Int64 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3281,7 +3215,6 @@ namespace MessagePack.Decoders
 
         private UInt8Int64()
         {
-
         }
 
         public Int64 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3295,7 +3228,6 @@ namespace MessagePack.Decoders
 
         private UInt16Int64()
         {
-
         }
 
         public Int64 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3310,7 +3242,6 @@ namespace MessagePack.Decoders
 
         private UInt32Int64()
         {
-
         }
 
         public Int64 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3325,7 +3256,6 @@ namespace MessagePack.Decoders
 
         private UInt64Int64()
         {
-
         }
 
         public Int64 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3343,7 +3273,6 @@ namespace MessagePack.Decoders
 
         private Int8Int64()
         {
-
         }
 
         public Int64 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3358,7 +3287,6 @@ namespace MessagePack.Decoders
 
         private Int16Int64()
         {
-
         }
 
         public Int64 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3373,7 +3301,6 @@ namespace MessagePack.Decoders
 
         private Int32Int64()
         {
-
         }
 
         public Int64 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3388,14 +3315,13 @@ namespace MessagePack.Decoders
 
         private Int64Int64()
         {
-
         }
 
         public Int64 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-                return MessagePackBinary.Parse(ref byteSequence, 9, span => unchecked(
-                    (long)span[1] << 56 | (long)span[2] << 48 | (long)span[3] << 40 | (long)span[4] << 32 |
-                    (long)span[5] << 24 | (long)span[6] << 16 | (long)span[7] << 8 | span[8]));
+            return MessagePackBinary.Parse(ref byteSequence, 9, span => unchecked(
+                (long)span[1] << 56 | (long)span[2] << 48 | (long)span[3] << 40 | (long)span[4] << 32 |
+                (long)span[5] << 24 | (long)span[6] << 16 | (long)span[7] << 8 | span[8]));
         }
     }
 
@@ -3405,7 +3331,6 @@ namespace MessagePack.Decoders
 
         private InvalidInt64()
         {
-
         }
 
         public Int64 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3425,7 +3350,6 @@ namespace MessagePack.Decoders
 
         private FixUInt16()
         {
-
         }
 
         public UInt16 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3442,7 +3366,6 @@ namespace MessagePack.Decoders
 
         private UInt8UInt16()
         {
-
         }
 
         public UInt16 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3457,7 +3380,6 @@ namespace MessagePack.Decoders
 
         private UInt16UInt16()
         {
-
         }
 
         public UInt16 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3472,7 +3394,6 @@ namespace MessagePack.Decoders
 
         private InvalidUInt16()
         {
-
         }
 
         public UInt16 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3492,7 +3413,6 @@ namespace MessagePack.Decoders
 
         private FixUInt32()
         {
-
         }
 
         public UInt32 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3509,7 +3429,6 @@ namespace MessagePack.Decoders
 
         private UInt8UInt32()
         {
-
         }
 
         public UInt32 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3524,7 +3443,6 @@ namespace MessagePack.Decoders
 
         private UInt16UInt32()
         {
-
         }
 
         public UInt32 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3539,7 +3457,6 @@ namespace MessagePack.Decoders
 
         private UInt32UInt32()
         {
-
         }
 
         public UInt32 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3554,7 +3471,6 @@ namespace MessagePack.Decoders
 
         private InvalidUInt32()
         {
-
         }
 
         public UInt32 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3574,7 +3490,6 @@ namespace MessagePack.Decoders
 
         private FixUInt64()
         {
-
         }
 
         public UInt64 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3591,7 +3506,6 @@ namespace MessagePack.Decoders
 
         private UInt8UInt64()
         {
-
         }
 
         public UInt64 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3606,7 +3520,6 @@ namespace MessagePack.Decoders
 
         private UInt16UInt64()
         {
-
         }
 
         public UInt64 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3621,7 +3534,6 @@ namespace MessagePack.Decoders
 
         private UInt32UInt64()
         {
-
         }
 
         public UInt64 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3636,7 +3548,6 @@ namespace MessagePack.Decoders
 
         private UInt64UInt64()
         {
-
         }
 
         public UInt64 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3653,7 +3564,6 @@ namespace MessagePack.Decoders
 
         private InvalidUInt64()
         {
-
         }
 
         public UInt64 Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3673,7 +3583,6 @@ namespace MessagePack.Decoders
 
         private NilString()
         {
-
         }
 
         public String Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3689,7 +3598,6 @@ namespace MessagePack.Decoders
 
         private FixString()
         {
-
         }
 
         public String Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3706,7 +3614,6 @@ namespace MessagePack.Decoders
 
         private Str8String()
         {
-
         }
 
         public String Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3722,7 +3629,6 @@ namespace MessagePack.Decoders
 
         private Str16String()
         {
-
         }
 
         public String Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3738,7 +3644,6 @@ namespace MessagePack.Decoders
 
         private Str32String()
         {
-
         }
 
         public String Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3754,7 +3659,6 @@ namespace MessagePack.Decoders
 
         private InvalidString()
         {
-
         }
 
         public String Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3774,7 +3678,6 @@ namespace MessagePack.Decoders
 
         private NilStringSegment()
         {
-
         }
 
         public ArraySegment<byte> Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3789,7 +3692,6 @@ namespace MessagePack.Decoders
 
         private FixStringSegment()
         {
-
         }
 
         public ArraySegment<byte> Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3806,7 +3708,6 @@ namespace MessagePack.Decoders
 
         private Str8StringSegment()
         {
-
         }
 
         public ArraySegment<byte> Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3822,7 +3723,6 @@ namespace MessagePack.Decoders
 
         private Str16StringSegment()
         {
-
         }
 
         public ArraySegment<byte> Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3838,7 +3738,6 @@ namespace MessagePack.Decoders
 
         private Str32StringSegment()
         {
-
         }
 
         public ArraySegment<byte> Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3854,7 +3753,6 @@ namespace MessagePack.Decoders
 
         private InvalidStringSegment()
         {
-
         }
 
         public ArraySegment<byte> Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3874,7 +3772,6 @@ namespace MessagePack.Decoders
 
         private FixExt1()
         {
-
         }
 
         public ExtensionResult Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3892,7 +3789,6 @@ namespace MessagePack.Decoders
 
         private FixExt2()
         {
-
         }
 
         public ExtensionResult Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3909,7 +3805,6 @@ namespace MessagePack.Decoders
 
         private FixExt4()
         {
-
         }
 
         public ExtensionResult Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3926,7 +3821,6 @@ namespace MessagePack.Decoders
 
         private FixExt8()
         {
-
         }
 
         public ExtensionResult Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3943,7 +3837,6 @@ namespace MessagePack.Decoders
 
         private FixExt16()
         {
-
         }
 
         public ExtensionResult Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3960,7 +3853,6 @@ namespace MessagePack.Decoders
 
         private Ext8()
         {
-
         }
 
         public ExtensionResult Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3979,7 +3871,6 @@ namespace MessagePack.Decoders
 
         private Ext16()
         {
-
         }
 
         public ExtensionResult Read(ref ReadOnlySequence<byte> byteSequence)
@@ -3998,7 +3889,6 @@ namespace MessagePack.Decoders
 
         private Ext32()
         {
-
         }
 
         public ExtensionResult Read(ref ReadOnlySequence<byte> byteSequence)
@@ -4017,7 +3907,6 @@ namespace MessagePack.Decoders
 
         private InvalidExt()
         {
-
         }
 
         public ExtensionResult Read(ref ReadOnlySequence<byte> byteSequence)
@@ -4042,7 +3931,6 @@ namespace MessagePack.Decoders
 
         private FixExt1Header()
         {
-
         }
 
         public ExtensionHeader Read(ref ReadOnlySequence<byte> byteSequence)
@@ -4057,7 +3945,6 @@ namespace MessagePack.Decoders
 
         private FixExt2Header()
         {
-
         }
 
         public ExtensionHeader Read(ref ReadOnlySequence<byte> byteSequence)
@@ -4072,7 +3959,6 @@ namespace MessagePack.Decoders
 
         private FixExt4Header()
         {
-
         }
 
         public ExtensionHeader Read(ref ReadOnlySequence<byte> byteSequence)
@@ -4087,7 +3973,6 @@ namespace MessagePack.Decoders
 
         private FixExt8Header()
         {
-
         }
 
         public ExtensionHeader Read(ref ReadOnlySequence<byte> byteSequence)
@@ -4102,7 +3987,6 @@ namespace MessagePack.Decoders
 
         private FixExt16Header()
         {
-
         }
 
         public ExtensionHeader Read(ref ReadOnlySequence<byte> byteSequence)
@@ -4117,7 +4001,6 @@ namespace MessagePack.Decoders
 
         private Ext8Header()
         {
-
         }
 
         public ExtensionHeader Read(ref ReadOnlySequence<byte> byteSequence)
@@ -4132,7 +4015,6 @@ namespace MessagePack.Decoders
 
         private Ext16Header()
         {
-
         }
 
         public ExtensionHeader Read(ref ReadOnlySequence<byte> byteSequence)
@@ -4152,7 +4034,6 @@ namespace MessagePack.Decoders
 
         private Ext32Header()
         {
-
         }
 
         public ExtensionHeader Read(ref ReadOnlySequence<byte> byteSequence)
@@ -4172,7 +4053,6 @@ namespace MessagePack.Decoders
 
         private InvalidExtHeader()
         {
-
         }
 
         public ExtensionHeader Read(ref ReadOnlySequence<byte> byteSequence)
@@ -4192,7 +4072,6 @@ namespace MessagePack.Decoders
 
         private FixExt4DateTime()
         {
-
         }
 
         public DateTime Read(ref ReadOnlySequence<byte> byteSequence)
@@ -4200,7 +4079,8 @@ namespace MessagePack.Decoders
             return MessagePackBinary.Parse(
                 ref byteSequence,
                 6,
-                span => {
+                span =>
+                {
                     var typeCode = unchecked((sbyte)span[1]);
                     if (typeCode != ReservedMessagePackExtensionTypeCode.DateTime)
                     {
@@ -4222,7 +4102,6 @@ namespace MessagePack.Decoders
 
         private FixExt8DateTime()
         {
-
         }
 
         public DateTime Read(ref ReadOnlySequence<byte> byteSequence)
@@ -4230,7 +4109,8 @@ namespace MessagePack.Decoders
             return MessagePackBinary.Parse(
                 ref byteSequence,
                 10,
-                span => {
+                span =>
+                {
                     var typeCode = unchecked((sbyte)span[1]);
                     if (typeCode != ReservedMessagePackExtensionTypeCode.DateTime)
                     {
@@ -4254,7 +4134,6 @@ namespace MessagePack.Decoders
 
         private Ext8DateTime()
         {
-
         }
 
         public DateTime Read(ref ReadOnlySequence<byte> byteSequence)
@@ -4262,7 +4141,8 @@ namespace MessagePack.Decoders
             return MessagePackBinary.Parse(
                 ref byteSequence,
                 15,
-                span => {
+                span =>
+                {
                     var length = checked(span[1]);
                     var typeCode = unchecked((sbyte)span[2]);
                     if (length != 12 || typeCode != ReservedMessagePackExtensionTypeCode.DateTime)
@@ -4288,7 +4168,6 @@ namespace MessagePack.Decoders
 
         private InvalidDateTime()
         {
-
         }
 
         public DateTime Read(ref ReadOnlySequence<byte> byteSequence)
@@ -4308,7 +4187,6 @@ namespace MessagePack.Decoders
 
         private ReadNext1()
         {
-
         }
 
         public void Read(ref ReadOnlySequence<byte> byteSequence) { byteSequence = byteSequence.Slice(1); }
@@ -4320,7 +4198,6 @@ namespace MessagePack.Decoders
 
         private ReadNext2()
         {
-
         }
         public void Read(ref ReadOnlySequence<byte> byteSequence) { byteSequence = byteSequence.Slice(2); }
 
@@ -4331,7 +4208,6 @@ namespace MessagePack.Decoders
 
         private ReadNext3()
         {
-
         }
         public void Read(ref ReadOnlySequence<byte> byteSequence) { byteSequence = byteSequence.Slice(3); }
     }
@@ -4341,7 +4217,6 @@ namespace MessagePack.Decoders
 
         private ReadNext4()
         {
-
         }
         public void Read(ref ReadOnlySequence<byte> byteSequence) { byteSequence = byteSequence.Slice(4); }
     }
@@ -4351,7 +4226,6 @@ namespace MessagePack.Decoders
 
         private ReadNext5()
         {
-
         }
         public void Read(ref ReadOnlySequence<byte> byteSequence) { byteSequence = byteSequence.Slice(5); }
     }
@@ -4361,7 +4235,6 @@ namespace MessagePack.Decoders
 
         private ReadNext6()
         {
-
         }
         public void Read(ref ReadOnlySequence<byte> byteSequence) { byteSequence = byteSequence.Slice(6); }
     }
@@ -4372,7 +4245,6 @@ namespace MessagePack.Decoders
 
         private ReadNext9()
         {
-
         }
         public void Read(ref ReadOnlySequence<byte> byteSequence) { byteSequence = byteSequence.Slice(9); }
     }
@@ -4382,7 +4254,6 @@ namespace MessagePack.Decoders
 
         private ReadNext10()
         {
-
         }
         public void Read(ref ReadOnlySequence<byte> byteSequence) { byteSequence = byteSequence.Slice(10); }
     }
@@ -4392,7 +4263,6 @@ namespace MessagePack.Decoders
 
         private ReadNext18()
         {
-
         }
         public void Read(ref ReadOnlySequence<byte> byteSequence) { byteSequence = byteSequence.Slice(18); }
     }
@@ -4403,7 +4273,6 @@ namespace MessagePack.Decoders
 
         private ReadNextMap()
         {
-
         }
         public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
@@ -4422,7 +4291,6 @@ namespace MessagePack.Decoders
 
         private ReadNextArray()
         {
-
         }
         public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
@@ -4440,7 +4308,6 @@ namespace MessagePack.Decoders
 
         private ReadNextFixStr()
         {
-
         }
         public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
@@ -4455,7 +4322,6 @@ namespace MessagePack.Decoders
 
         private ReadNextStr8()
         {
-
         }
         public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
@@ -4470,7 +4336,6 @@ namespace MessagePack.Decoders
 
         private ReadNextStr16()
         {
-
         }
         public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
@@ -4485,7 +4350,6 @@ namespace MessagePack.Decoders
 
         private ReadNextStr32()
         {
-
         }
         public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
@@ -4500,7 +4364,6 @@ namespace MessagePack.Decoders
 
         private ReadNextBin8()
         {
-
         }
         public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
@@ -4515,7 +4378,6 @@ namespace MessagePack.Decoders
 
         private ReadNextBin16()
         {
-
         }
         public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
@@ -4530,7 +4392,6 @@ namespace MessagePack.Decoders
 
         private ReadNextBin32()
         {
-
         }
         public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
@@ -4545,7 +4406,6 @@ namespace MessagePack.Decoders
 
         private ReadNextExt8()
         {
-
         }
         public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
@@ -4560,7 +4420,6 @@ namespace MessagePack.Decoders
 
         private ReadNextExt16()
         {
-
         }
         public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
@@ -4575,7 +4434,6 @@ namespace MessagePack.Decoders
 
         private ReadNextExt32()
         {
-
         }
         public void Read(ref ReadOnlySequence<byte> byteSequence)
         {
