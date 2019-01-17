@@ -15,7 +15,7 @@ namespace MessagePack.Tests
     {
         private MessagePackSerializer serializer = new MessagePackSerializer();
 
-        delegate int WriteDelegate(IBufferWriter<byte> writer, byte[] ys);
+        delegate void WriteDelegate(IBufferWriter<byte> writer, ReadOnlySpan<byte> ys);
 
         [Theory]
         [InlineData('a', 1)]
@@ -44,8 +44,8 @@ namespace MessagePack.Tests
             {
                 var src = Enumerable.Range(0, i).Select(x => (byte)x).ToArray();
                 var dst = new Sequence<byte>();
-                var len = ((typeof(UnsafeMemory32).GetMethod("WriteRaw" + i)).CreateDelegate(typeof(WriteDelegate)) as WriteDelegate).Invoke(dst, src);
-                len.Is(i);
+                ((typeof(UnsafeMemory32).GetMethod("WriteRaw" + i)).CreateDelegate(typeof(WriteDelegate)) as WriteDelegate).Invoke(dst, src);
+                dst.Length.Is(i);
                 MessagePack.Internal.ByteArrayComparer.Equals(src, 0, src.Length, dst.AsReadOnlySequence.ToArray()).IsTrue();
             }
             // x64
@@ -53,8 +53,8 @@ namespace MessagePack.Tests
             {
                 var src = Enumerable.Range(0, i).Select(x => (byte)x).ToArray();
                 var dst = new Sequence<byte>();
-                var len = ((typeof(UnsafeMemory64).GetMethod("WriteRaw" + i)).CreateDelegate(typeof(WriteDelegate)) as WriteDelegate).Invoke(dst, src);
-                len.Is(i);
+                ((typeof(UnsafeMemory64).GetMethod("WriteRaw" + i)).CreateDelegate(typeof(WriteDelegate)) as WriteDelegate).Invoke(dst, src);
+                dst.Length.Is(i);
                 MessagePack.Internal.ByteArrayComparer.Equals(src, 0, src.Length, dst.AsReadOnlySequence.ToArray()).IsTrue();
             }
         }
