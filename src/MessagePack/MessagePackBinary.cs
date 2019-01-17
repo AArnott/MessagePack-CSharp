@@ -2574,7 +2574,7 @@ namespace MessagePack.Decoders
 
         public sbyte Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return MessagePackBinary.Parse(ref byteSequence, 2, span => (sbyte)span[1]);
+            return MessagePackBinary.Parse(ref byteSequence, 2, span => unchecked((sbyte)span[1]));
         }
     }
 
