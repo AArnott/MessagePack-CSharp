@@ -348,7 +348,7 @@ namespace MessagePack
         {
             var span = writer.GetSpan(rawMessagePackBlock.Length);
             rawMessagePackBlock.CopyTo(span);
-            writer.Advance(span.Length);
+            writer.Advance(rawMessagePackBlock.Length);
         }
 
         /// <summary>
