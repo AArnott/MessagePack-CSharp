@@ -90,13 +90,15 @@ namespace MessagePack
                         break;
                     case TinyJsonToken.StartObject:
                         {
-                            // Reserve space for the header.
-                            var headerSpan = writer.GetSpan(5);
-                            writer.Advance(5);
+                            using (var scratch = new Sequence<byte>())
+                            {
+                                var mapCount = FromJsonCore(jr, scratch);
+                                mapCount = mapCount / 2; // remove propertyname string count.
 
-                            var mapCount = FromJsonCore(jr, writer);
-                            mapCount = mapCount / 2; // remove propertyname string count.
-                            MessagePackBinary.WriteMapHeaderForceMap32Block(headerSpan, mapCount);
+                                MessagePackBinary.WriteMapHeaderForceMap32Block(writer, mapCount);
+                                scratch.AsReadOnlySequence.CopyTo(writer);
+                            }
+
                             count++;
                             break;
                         }

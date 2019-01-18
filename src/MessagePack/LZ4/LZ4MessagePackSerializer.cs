@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Buffers;
-using System.Diagnostics;
-using System.IO;
 using System.Runtime.InteropServices;
-using MessagePack.Internal;
 using MessagePack.LZ4;
 using Microsoft;
 
@@ -108,22 +105,12 @@ namespace MessagePack
         {
             if (serializedData.Length < NotCompressionSize)
             {
-                var span = writer.GetSpan((int)serializedData.Length);
-                serializedData.CopyTo(span);
-                writer.Advance((int)serializedData.Length);
+                serializedData.CopyTo(writer);
             }
             else
             {
-                // Reserve space for the extension header.
-                const int ExtensionHeaderLength = 6;
-                const int CompressedStreamLengthLength = 5;
-                var headerSpan = writer.GetSpan(ExtensionHeaderLength + CompressedStreamLengthLength);
-                writer.Advance(ExtensionHeaderLength + CompressedStreamLengthLength);
-                headerSpan = headerSpan.Slice(0, ExtensionHeaderLength + CompressedStreamLengthLength); // trim it to just what we promised to use
-
-                // write body
-                ArraySegment<byte> srcArray, dstArray;
-                bool rentedSourceArray = false, rentedTargetArray = false;
+                ArraySegment<byte> srcArray;
+                bool rentedSourceArray = false;
                 if (!serializedData.IsSingleSegment || !MemoryMarshal.TryGetArray(serializedData.First, out srcArray))
                 {
                     srcArray = new ArraySegment<byte>(ArrayPool<byte>.Shared.Rent((int)serializedData.Length));
@@ -132,23 +119,16 @@ namespace MessagePack
                 }
 
                 var maxOutCount = LZ4Codec.MaximumOutputLength((int)serializedData.Length);
-                var compressedMemory = writer.GetMemory(maxOutCount);
-                if (!MemoryMarshal.TryGetArray(compressedMemory, out dstArray))
-                {
-                    dstArray = new ArraySegment<byte>(ArrayPool<byte>.Shared.Rent(maxOutCount));
-                    rentedTargetArray = true;
-                }
+                var dstArray = new ArraySegment<byte>(ArrayPool<byte>.Shared.Rent(maxOutCount));
 
-                int lz4Length;
                 try
                 {
-                    lz4Length = LZ4Codec.Encode(srcArray.Array, srcArray.Offset, (int)serializedData.Length, dstArray.Array, dstArray.Offset, dstArray.Count);
-                    if (rentedTargetArray)
-                    {
-                        dstArray.AsSpan(0, lz4Length).CopyTo(compressedMemory.Span);
-                    }
+                    int lz4Length = LZ4Codec.Encode(srcArray.Array, srcArray.Offset, (int)serializedData.Length, dstArray.Array, dstArray.Offset, dstArray.Count);
 
-                    writer.Advance(lz4Length);
+                    const int CompressedStreamLengthLength = 5;
+                    MessagePackBinary.WriteExtensionFormatHeaderForceExt32Block(writer, ExtensionTypeCode, lz4Length + CompressedStreamLengthLength);
+                    MessagePackBinary.WriteInt32ForceInt32Block(writer, (int)serializedData.Length);
+                    writer.Write(dstArray.AsSpan(0, lz4Length));
                 }
                 finally
                 {
@@ -157,17 +137,8 @@ namespace MessagePack
                         ArrayPool<byte>.Shared.Return(srcArray.Array);
                     }
 
-                    if (rentedTargetArray)
-                    {
-                        ArrayPool<byte>.Shared.Return(dstArray.Array);
-                    }
+                    ArrayPool<byte>.Shared.Return(dstArray.Array);
                 }
-
-                // write extension header (always 6 bytes)
-                MessagePackBinary.WriteExtensionFormatHeaderForceExt32Block(headerSpan, ExtensionTypeCode, lz4Length + CompressedStreamLengthLength);
-
-                // write length of uncompressed stream (always 5 bytes)
-                MessagePackBinary.WriteInt32ForceInt32Block(headerSpan.Slice(ExtensionHeaderLength), (int)serializedData.Length);
             }
         }
     }
