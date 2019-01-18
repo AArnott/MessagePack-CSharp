@@ -70,7 +70,6 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
@@ -79,8 +78,6 @@ namespace MessagePack.Formatters
                 {
                     MessagePackBinary.WriteString(writer, value[i]);
                 }
-
-                return;
             }
         }
 
@@ -219,12 +216,10 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
                 MessagePackBinary.WriteString(writer, value.ToString());
-                return;
             }
         }
 
@@ -256,12 +251,10 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
                 MessagePackBinary.WriteString(writer, value.ToString());
-                return;
             }
         }
 
@@ -315,12 +308,10 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
                 MessagePackBinary.WriteString(writer, value.ToString());
-                return;
             }
         }
 
@@ -352,7 +343,6 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
@@ -488,13 +478,11 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
                 value.Wait(); // wait...!
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
         }
 

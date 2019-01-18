@@ -35,12 +35,10 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
                 MessagePackBinary.WriteInt16(writer, value.Value);
-                return;
             }
         }
 
@@ -72,7 +70,6 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
@@ -138,12 +135,10 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
                 MessagePackBinary.WriteInt32(writer, value.Value);
-                return;
             }
         }
 
@@ -175,7 +170,6 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
@@ -241,12 +235,10 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
                 MessagePackBinary.WriteInt64(writer, value.Value);
-                return;
             }
         }
 
@@ -278,7 +270,6 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
@@ -344,12 +335,10 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
                 MessagePackBinary.WriteUInt16(writer, value.Value);
-                return;
             }
         }
 
@@ -381,7 +370,6 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
@@ -447,12 +435,10 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
                 MessagePackBinary.WriteUInt32(writer, value.Value);
-                return;
             }
         }
 
@@ -484,7 +470,6 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
@@ -550,12 +535,10 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
                 MessagePackBinary.WriteUInt64(writer, value.Value);
-                return;
             }
         }
 
@@ -587,7 +570,6 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
@@ -653,12 +635,10 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
                 MessagePackBinary.WriteSingle(writer, value.Value);
-                return;
             }
         }
 
@@ -690,7 +670,6 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
@@ -756,12 +735,10 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
                 MessagePackBinary.WriteDouble(writer, value.Value);
-                return;
             }
         }
 
@@ -793,7 +770,6 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
@@ -859,12 +835,10 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
                 MessagePackBinary.WriteBoolean(writer, value.Value);
-                return;
             }
         }
 
@@ -896,7 +870,6 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
@@ -962,12 +935,10 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
                 MessagePackBinary.WriteByte(writer, value.Value);
-                return;
             }
         }
 
@@ -1019,12 +990,10 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
                 MessagePackBinary.WriteSByte(writer, value.Value);
-                return;
             }
         }
 
@@ -1056,7 +1025,6 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
@@ -1122,12 +1090,10 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
                 MessagePackBinary.WriteChar(writer, value.Value);
-                return;
             }
         }
 
@@ -1159,7 +1125,6 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
@@ -1225,12 +1190,10 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {
                 MessagePackBinary.WriteDateTime(writer, value.Value);
-                return;
             }
         }
 
@@ -1262,7 +1225,6 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {

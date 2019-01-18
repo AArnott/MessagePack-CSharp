@@ -211,7 +211,6 @@ namespace MessagePack.ReactivePropertyExtension
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
-                return;
             }
             else
             {

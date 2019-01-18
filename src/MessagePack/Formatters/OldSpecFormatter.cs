@@ -140,8 +140,8 @@ namespace MessagePack.Formatters
         {
             if (value == null)
             {
-                 MessagePackBinary.WriteNil(writer);
-                 return;
+                MessagePackBinary.WriteNil(writer);
+                return;
             }
 
             var byteCount = value.Length;

@@ -28,6 +28,7 @@ namespace MessagePack.Formatters
             if (value == null)
             {
                 MessagePackBinary.WriteNil(writer);
+                return;
             }
 
             var type = value.GetType();
