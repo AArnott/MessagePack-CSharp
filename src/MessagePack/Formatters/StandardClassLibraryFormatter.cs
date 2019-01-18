@@ -48,7 +48,6 @@ namespace MessagePack.Formatters
         public void Serialize(IBufferWriter<byte> writer, String value, IFormatterResolver typeResolver)
         {
             MessagePackBinary.WriteString(writer, value);
-            return;
         }
 
         public String Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)

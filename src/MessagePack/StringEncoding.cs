@@ -9,6 +9,11 @@ namespace MessagePack
 
         internal static unsafe int GetBytes(this Encoding encoding, ReadOnlySpan<char> chars, Span<byte> bytes)
         {
+            if (chars.Length == 0)
+            {
+                return 0;
+            }
+
             fixed (char* pChars = &chars[0])
             fixed (byte* pBytes = &bytes[0])
             {
@@ -18,6 +23,11 @@ namespace MessagePack
 
         internal static unsafe string GetString(this Encoding encoding, ReadOnlySpan<byte> bytes)
         {
+            if (bytes.Length == 0)
+            {
+                return string.Empty;
+            }
+
             fixed (byte* pBytes = &bytes[0])
             {
                 return encoding.GetString(pBytes, bytes.Length);
