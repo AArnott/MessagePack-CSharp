@@ -13,6 +13,12 @@ namespace MessagePack
 #if !SPAN_BUILTIN
     internal static class StreamPolyfillExtensions
     {
+        /// <summary>
+        /// Reads from the stream into a memory buffer.
+        /// </summary>
+        /// <param name="stream">The stream to read from.</param>
+        /// <param name="buffer">The buffer to read directly into.</param>
+        /// <returns>The number of bytes actually read.</returns>
         internal static int Read(this Stream stream, Span<byte> buffer)
         {
             Requires.NotNull(stream, nameof(stream));
