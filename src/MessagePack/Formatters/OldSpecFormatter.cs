@@ -151,24 +151,27 @@ namespace MessagePack.Formatters
                 var span = writer.GetSpan(byteCount + 1);
                 span[0] = (byte)(MessagePackCode.MinFixStr | byteCount);
                 value.CopyTo(span.Slice(1));
+                writer.Advance(byteCount + 1);
             }
             else if (byteCount <= ushort.MaxValue)
             {
                 var span = writer.GetSpan(byteCount + 3);
                 span[0] = MessagePackCode.Str16;
-                span[0 + 1] = unchecked((byte)(byteCount >> 8));
-                span[0 + 2] = unchecked((byte)byteCount);
+                span[1] = unchecked((byte)(byteCount >> 8));
+                span[2] = unchecked((byte)byteCount);
                 value.CopyTo(span.Slice(3));
+                writer.Advance(byteCount + 3);
             }
             else
             {
-                var span = writer.GetSpan(byteCount + 3);
+                var span = writer.GetSpan(byteCount + 5);
                 span[0] = MessagePackCode.Str32;
-                span[0 + 1] = unchecked((byte)(byteCount >> 24));
-                span[0 + 2] = unchecked((byte)(byteCount >> 16));
-                span[0 + 3] = unchecked((byte)(byteCount >> 8));
-                span[0 + 4] = unchecked((byte)byteCount);
+                span[1] = unchecked((byte)(byteCount >> 24));
+                span[2] = unchecked((byte)(byteCount >> 16));
+                span[3] = unchecked((byte)(byteCount >> 8));
+                span[4] = unchecked((byte)byteCount);
                 value.CopyTo(span.Slice(5));
+                writer.Advance(byteCount + 5);
             }
         }
 
@@ -202,7 +205,7 @@ namespace MessagePack.Formatters
                         return MessagePackBinary.Parse(
                             ref byteSequence,
                             3,
-                            lengthSpan => (lengthSpan[0 + 1] << 8) + (lengthSpan[0 + 2]),
+                            lengthSpan => (lengthSpan[1] << 8) + (lengthSpan[2]),
                             span => span.ToArray());
                     }
                     else if (code == MessagePackCode.Str32)
@@ -210,7 +213,7 @@ namespace MessagePack.Formatters
                         return MessagePackBinary.Parse(
                             ref byteSequence,
                             5,
-                            lengthSpan => (int)((uint)(lengthSpan[0 + 1] << 24) | (uint)(lengthSpan[0 + 2] << 16) | (uint)(lengthSpan[0 + 3] << 8) | (uint)lengthSpan[0 + 4]),
+                            lengthSpan => (int)((uint)(lengthSpan[1] << 24) | (uint)(lengthSpan[2] << 16) | (uint)(lengthSpan[3] << 8) | (uint)lengthSpan[4]),
                             span => span.ToArray());
                     }
                 }
