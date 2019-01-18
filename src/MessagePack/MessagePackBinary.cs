@@ -684,6 +684,7 @@ namespace MessagePack
             if (src == null)
             {
                 WriteNil(writer);
+                return;
             }
 
             if (src.Length <= byte.MaxValue)
@@ -2992,7 +2993,7 @@ namespace MessagePack.Decoders
 
         public Int16 Read(ref ReadOnlySequence<byte> byteSequence)
         {
-            return MessagePackBinary.Parse(ref byteSequence, 5, span => checked((Int16)((span[1] << 8) + (span[2]))));
+            return MessagePackBinary.Parse(ref byteSequence, 3, span => checked((Int16)((span[1] << 8) + (span[2]))));
         }
     }
 
