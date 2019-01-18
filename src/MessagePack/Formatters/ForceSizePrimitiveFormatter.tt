@@ -33,7 +33,7 @@ namespace MessagePack.Formatters
 
         public void Serialize(IBufferWriter<byte> writer, <#= t.Name #> value, IFormatterResolver formatterResolver)
         {
-            return MessagePackBinary.Write<#= t.Name #>Force<#= t.Name #>Block(writer, value);
+            MessagePackBinary.Write<#= t.Name #>Force<#= t.Name #>Block(writer, value);
         }
 
         public <#= t.Name #> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)

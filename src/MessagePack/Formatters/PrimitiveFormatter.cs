@@ -90,7 +90,6 @@ namespace MessagePack.Formatters
             }
             else
             {
-
                 var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 var array = new Int16[len];
                 for (int i = 0; i < array.Length; i++)
@@ -113,7 +112,6 @@ namespace MessagePack.Formatters
         public void Serialize(IBufferWriter<byte> writer, Int32 value, IFormatterResolver formatterResolver)
         {
             MessagePackBinary.WriteInt32(writer, value);
-            return;
         }
 
         public Int32 Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -190,7 +188,6 @@ namespace MessagePack.Formatters
             }
             else
             {
-
                 var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 var array = new Int32[len];
                 for (int i = 0; i < array.Length; i++)
@@ -213,7 +210,6 @@ namespace MessagePack.Formatters
         public void Serialize(IBufferWriter<byte> writer, Int64 value, IFormatterResolver formatterResolver)
         {
             MessagePackBinary.WriteInt64(writer, value);
-            return;
         }
 
         public Int64 Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -290,7 +286,6 @@ namespace MessagePack.Formatters
             }
             else
             {
-
                 var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 var array = new Int64[len];
                 for (int i = 0; i < array.Length; i++)
@@ -313,7 +308,6 @@ namespace MessagePack.Formatters
         public void Serialize(IBufferWriter<byte> writer, UInt16 value, IFormatterResolver formatterResolver)
         {
             MessagePackBinary.WriteUInt16(writer, value);
-            return;
         }
 
         public UInt16 Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -390,7 +384,6 @@ namespace MessagePack.Formatters
             }
             else
             {
-
                 var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 var array = new UInt16[len];
                 for (int i = 0; i < array.Length; i++)
@@ -413,7 +406,6 @@ namespace MessagePack.Formatters
         public void Serialize(IBufferWriter<byte> writer, UInt32 value, IFormatterResolver formatterResolver)
         {
             MessagePackBinary.WriteUInt32(writer, value);
-            return;
         }
 
         public UInt32 Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -490,7 +482,6 @@ namespace MessagePack.Formatters
             }
             else
             {
-
                 var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 var array = new UInt32[len];
                 for (int i = 0; i < array.Length; i++)
@@ -513,7 +504,6 @@ namespace MessagePack.Formatters
         public void Serialize(IBufferWriter<byte> writer, UInt64 value, IFormatterResolver formatterResolver)
         {
             MessagePackBinary.WriteUInt64(writer, value);
-            return;
         }
 
         public UInt64 Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -590,7 +580,6 @@ namespace MessagePack.Formatters
             }
             else
             {
-
                 var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 var array = new UInt64[len];
                 for (int i = 0; i < array.Length; i++)
@@ -613,7 +602,6 @@ namespace MessagePack.Formatters
         public void Serialize(IBufferWriter<byte> writer, Single value, IFormatterResolver formatterResolver)
         {
             MessagePackBinary.WriteSingle(writer, value);
-            return;
         }
 
         public Single Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -690,7 +678,6 @@ namespace MessagePack.Formatters
             }
             else
             {
-
                 var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 var array = new Single[len];
                 for (int i = 0; i < array.Length; i++)
@@ -713,7 +700,6 @@ namespace MessagePack.Formatters
         public void Serialize(IBufferWriter<byte> writer, Double value, IFormatterResolver formatterResolver)
         {
             MessagePackBinary.WriteDouble(writer, value);
-            return;
         }
 
         public Double Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -790,7 +776,6 @@ namespace MessagePack.Formatters
             }
             else
             {
-
                 var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 var array = new Double[len];
                 for (int i = 0; i < array.Length; i++)
@@ -813,7 +798,6 @@ namespace MessagePack.Formatters
         public void Serialize(IBufferWriter<byte> writer, Boolean value, IFormatterResolver formatterResolver)
         {
             MessagePackBinary.WriteBoolean(writer, value);
-            return;
         }
 
         public Boolean Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -890,7 +874,6 @@ namespace MessagePack.Formatters
             }
             else
             {
-
                 var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 var array = new Boolean[len];
                 for (int i = 0; i < array.Length; i++)
@@ -913,7 +896,6 @@ namespace MessagePack.Formatters
         public void Serialize(IBufferWriter<byte> writer, Byte value, IFormatterResolver formatterResolver)
         {
             MessagePackBinary.WriteByte(writer, value);
-            return;
         }
 
         public Byte Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -968,7 +950,6 @@ namespace MessagePack.Formatters
         public void Serialize(IBufferWriter<byte> writer, SByte value, IFormatterResolver formatterResolver)
         {
             MessagePackBinary.WriteSByte(writer, value);
-            return;
         }
 
         public SByte Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -1045,7 +1026,6 @@ namespace MessagePack.Formatters
             }
             else
             {
-
                 var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 var array = new SByte[len];
                 for (int i = 0; i < array.Length; i++)
@@ -1068,7 +1048,6 @@ namespace MessagePack.Formatters
         public void Serialize(IBufferWriter<byte> writer, Char value, IFormatterResolver formatterResolver)
         {
             MessagePackBinary.WriteChar(writer, value);
-            return;
         }
 
         public Char Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -1145,7 +1124,6 @@ namespace MessagePack.Formatters
             }
             else
             {
-
                 var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 var array = new Char[len];
                 for (int i = 0; i < array.Length; i++)
@@ -1168,7 +1146,6 @@ namespace MessagePack.Formatters
         public void Serialize(IBufferWriter<byte> writer, DateTime value, IFormatterResolver formatterResolver)
         {
             MessagePackBinary.WriteDateTime(writer, value);
-            return;
         }
 
         public DateTime Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -1245,7 +1222,6 @@ namespace MessagePack.Formatters
             }
             else
             {
-
                 var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
                 var array = new DateTime[len];
                 for (int i = 0; i < array.Length; i++)
