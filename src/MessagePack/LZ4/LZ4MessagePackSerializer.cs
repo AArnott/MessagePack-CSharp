@@ -94,7 +94,7 @@ namespace MessagePack
                     }
 
                     var compressedSegment = MessagePackBinary.ReadArraySegment(ref byteSequence, compressedLength);
-                    int actualUncompressedLength = LZ4Codec.Decode(compressedSegment.Array, compressedSegment.Offset, compressedSegment.Count, uncompressedSegment.Array, uncompressedSegment.Offset, uncompressedSegment.Count);
+                    int actualUncompressedLength = LZ4Codec.Decode(compressedSegment.Array, compressedSegment.Offset, compressedSegment.Count, uncompressedSegment.Array, uncompressedSegment.Offset, uncompressedLength);
                     Assumes.True(actualUncompressedLength == uncompressedLength);
                     writer.Advance(actualUncompressedLength);
                     return true;
