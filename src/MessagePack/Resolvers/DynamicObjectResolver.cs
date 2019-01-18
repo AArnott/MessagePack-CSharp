@@ -701,6 +701,7 @@ namespace MessagePack.Internal
             var emitter = tryEmitLoadCustomFormatter(index, member);
             if (emitter != null)
             {
+                emitter();
                 argWriter.EmitLoad();
                 argValue.EmitLoad();
                 member.EmitLoadValue(il);
