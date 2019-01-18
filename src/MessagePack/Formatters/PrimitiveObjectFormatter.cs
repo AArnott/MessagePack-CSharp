@@ -213,7 +213,8 @@ namespace MessagePack.Formatters
                 case MessagePackType.Binary:
                     return MessagePackBinary.ReadBytes(ref byteSequence);
                 case MessagePackType.Extension:
-                    var ext = MessagePackBinary.ReadExtensionFormatHeader(ref byteSequence);
+                    var byteSequence2 = byteSequence;
+                    var ext = MessagePackBinary.ReadExtensionFormatHeader(ref byteSequence2);
                     if (ext.TypeCode == ReservedMessagePackExtensionTypeCode.DateTime)
                     {
                         return MessagePackBinary.ReadDateTime(ref byteSequence);
