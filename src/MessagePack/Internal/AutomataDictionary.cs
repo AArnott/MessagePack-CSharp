@@ -21,7 +21,7 @@ namespace MessagePack.Internal
             root = new AutomataNode(0);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         public void Add(string str, int value)
         {
             ReadOnlySpan<byte> bytes = Encoding.UTF8.GetBytes(str);
@@ -212,7 +212,7 @@ namespace MessagePack.Internal
                 return v;
             }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
 
             public AutomataNode SearchNext(ref ReadOnlySpan<byte> value)
             {
@@ -422,7 +422,7 @@ namespace MessagePack.Internal
 
     public static class AutomataKeyGen
     {
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         public static readonly MethodInfo GetKeyMethod = typeof(AutomataKeyGen).GetRuntimeMethod(nameof(GetKey), new[] { typeof(ReadOnlySpan<byte>).MakeByRefType() });
 #endif
 

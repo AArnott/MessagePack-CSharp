@@ -291,7 +291,7 @@ namespace MessagePack
                         writer.Write(dt.ToString("o", CultureInfo.InvariantCulture));
                         writer.Write("\"");
                     }
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
                     else if (extHeader.TypeCode == TypelessFormatter.ExtensionTypeCode)
                     {
                         // prepare type name token

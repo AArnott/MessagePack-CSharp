@@ -250,17 +250,17 @@ namespace MessagePack
             dateTimeDecoders[MessagePackCode.Ext8] = Decoders.Ext8DateTime.Instance;
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static MessagePackType GetMessagePackType(ReadOnlySpan<byte> span) => MessagePackCode.ToMessagePackType(span[0]);
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static MessagePackType GetMessagePackType(ReadOnlySequence<byte> byteSequence) => GetMessagePackType(byteSequence.First.Span);
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void ReadNext(ref ReadOnlySequence<byte> byteSequence)
@@ -268,7 +268,7 @@ namespace MessagePack
             readNextDecoders[byteSequence.First.Span[0]].Read(ref byteSequence);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void ReadNextBlock(ref ReadOnlySequence<byte> byteSequence)
@@ -310,7 +310,7 @@ namespace MessagePack
             }
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteNil(IBufferWriter<byte> writer)
@@ -320,7 +320,7 @@ namespace MessagePack
             writer.Advance(1);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static Nil ReadNil(ref ReadOnlySequence<byte> byteSequence)
@@ -336,7 +336,7 @@ namespace MessagePack
             }
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static bool IsNil(ReadOnlySequence<byte> byteSequence)
@@ -355,7 +355,7 @@ namespace MessagePack
         /// Unsafe. If value is guranteed 0 ~ MessagePackRange.MaxFixMapCount(15), can use this method.
         /// </summary>
         /// <returns></returns>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteFixedMapHeaderUnsafe(IBufferWriter<byte> writer, int count)
@@ -368,7 +368,7 @@ namespace MessagePack
         /// <summary>
         /// Write map count.
         /// </summary>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteMapHeader(IBufferWriter<byte> writer, int count)
@@ -382,7 +382,7 @@ namespace MessagePack
         /// <summary>
         /// Write map count.
         /// </summary>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteMapHeader(IBufferWriter<byte> writer, uint count)
@@ -422,7 +422,7 @@ namespace MessagePack
         /// <summary>
         /// Write map format header, always use map32 format(length is fixed, 5).
         /// </summary>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteMapHeaderForceMap32Block(IBufferWriter<byte> writer, uint count)
@@ -435,7 +435,7 @@ namespace MessagePack
         /// <summary>
         /// Write map format header, always use map32 format(length is fixed, 5).
         /// </summary>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteMapHeaderForceMap32Block(Span<byte> span, uint count)
@@ -453,7 +453,7 @@ namespace MessagePack
         /// <summary>
         /// Return map count.
         /// </summary>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static int ReadMapHeader(ref ReadOnlySequence<byte> byteSequence)
@@ -467,7 +467,7 @@ namespace MessagePack
         /// <summary>
         /// Return map count.
         /// </summary>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static uint ReadMapHeaderRaw(ref ReadOnlySequence<byte> byteSequence)
@@ -475,7 +475,7 @@ namespace MessagePack
             return mapHeaderDecoders[byteSequence.First.Span[0]].Read(ref byteSequence);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static int GetArrayHeaderLength(int count)
@@ -498,7 +498,7 @@ namespace MessagePack
         /// Unsafe. If value is guranteed 0 ~ MessagePackRange.MaxFixArrayCount(15), can use this method.
         /// </summary>
         /// <returns></returns>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteFixedArrayHeaderUnsafe(IBufferWriter<byte> writer, int count)
@@ -511,7 +511,7 @@ namespace MessagePack
         /// <summary>
         /// Write array count.
         /// </summary>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteArrayHeader(IBufferWriter<byte> writer, int count)
@@ -525,7 +525,7 @@ namespace MessagePack
         /// <summary>
         /// Write array count.
         /// </summary>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteArrayHeader(IBufferWriter<byte> writer, uint count)
@@ -565,7 +565,7 @@ namespace MessagePack
         /// <summary>
         /// Write array format header, always use array32 format(length is fixed, 5).
         /// </summary>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteArrayHeaderForceArray32Block(IBufferWriter<byte> writer, uint count)
@@ -577,7 +577,7 @@ namespace MessagePack
         /// <summary>
         /// Write array format header, always use array32 format(length is fixed, 5).
         /// </summary>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteArrayHeaderForceArray32Block(Span<byte> span, uint count)
@@ -595,7 +595,7 @@ namespace MessagePack
         /// <summary>
         /// Return array count.
         /// </summary>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static int ReadArrayHeader(ref ReadOnlySequence<byte> byteSequence)
@@ -609,7 +609,7 @@ namespace MessagePack
         /// <summary>
         /// Return array count.
         /// </summary>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static uint ReadArrayHeaderRaw(ref ReadOnlySequence<byte> byteSequence)
@@ -617,7 +617,7 @@ namespace MessagePack
             return arrayHeaderDecoders[byteSequence.First.Span[0]].Read(ref byteSequence);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteBoolean(IBufferWriter<byte> writer, bool value)
@@ -627,7 +627,7 @@ namespace MessagePack
             writer.Advance(1);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static bool ReadBoolean(ref ReadOnlySequence<byte> byteSequence)
@@ -637,7 +637,7 @@ namespace MessagePack
             return result;
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteByte(IBufferWriter<byte> writer, byte value)
@@ -657,7 +657,7 @@ namespace MessagePack
             }
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteByteForceByteBlock(IBufferWriter<byte> writer, byte value)
@@ -668,7 +668,7 @@ namespace MessagePack
             writer.Advance(2);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static byte ReadByte(ref ReadOnlySequence<byte> byteSequence)
@@ -676,7 +676,7 @@ namespace MessagePack
             return byteDecoders[byteSequence.First.Span[0]].Read(ref byteSequence);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteBytes(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
@@ -732,7 +732,7 @@ namespace MessagePack
             }
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static byte[] ReadBytes(ref ReadOnlySequence<byte> byteSequence)
@@ -740,7 +740,7 @@ namespace MessagePack
             return bytesDecoders[byteSequence.First.Span[0]].Read(ref byteSequence);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static ArraySegment<byte> ReadBytesSegment(ref ReadOnlySequence<byte> byteSequence)
@@ -748,7 +748,7 @@ namespace MessagePack
             return bytesSegmentDecoders[byteSequence.First.Span[0]].Read(ref byteSequence);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteSByte(IBufferWriter<byte> writer, sbyte value)
@@ -768,7 +768,7 @@ namespace MessagePack
             }
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteSByteForceSByteBlock(IBufferWriter<byte> writer, sbyte value)
@@ -779,7 +779,7 @@ namespace MessagePack
             writer.Advance(2);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static sbyte ReadSByte(ref ReadOnlySequence<byte> byteSequence)
@@ -787,7 +787,7 @@ namespace MessagePack
             return sbyteDecoders[byteSequence.First.Span[0]].Read(ref byteSequence);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteSingle(IBufferWriter<byte> writer, float value)
@@ -815,7 +815,7 @@ namespace MessagePack
             writer.Advance(5);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static float ReadSingle(ref ReadOnlySequence<byte> byteSequence)
@@ -823,7 +823,7 @@ namespace MessagePack
             return singleDecoders[byteSequence.First.Span[0]].Read(ref byteSequence);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteDouble(IBufferWriter<byte> writer, double value)
@@ -859,7 +859,7 @@ namespace MessagePack
             writer.Advance(9);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static double ReadDouble(ref ReadOnlySequence<byte> byteSequence)
@@ -867,7 +867,7 @@ namespace MessagePack
             return doubleDecoders[byteSequence.First.Span[0]].Read(ref byteSequence);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteInt16(IBufferWriter<byte> writer, short value)
@@ -924,7 +924,7 @@ namespace MessagePack
             }
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteInt16ForceInt16Block(IBufferWriter<byte> writer, short value)
@@ -936,7 +936,7 @@ namespace MessagePack
             writer.Advance(3);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static short ReadInt16(ref ReadOnlySequence<byte> byteSequence)
@@ -947,7 +947,7 @@ namespace MessagePack
         /// <summary>
         /// Unsafe. If value is guranteed 0 ~ MessagePackCode.MaxFixInt(127), can use this method.
         /// </summary>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WritePositiveFixedIntUnsafe(IBufferWriter<byte> writer, int value)
@@ -957,7 +957,7 @@ namespace MessagePack
             writer.Advance(1);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteInt32(IBufferWriter<byte> writer, int value)
@@ -1037,7 +1037,7 @@ namespace MessagePack
         /// <summary>
         /// Acquire static message block(always 5 bytes).
         /// </summary>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteInt32ForceInt32Block(Span<byte> span, int value)
@@ -1052,7 +1052,7 @@ namespace MessagePack
         /// <summary>
         /// Acquire static message block(always 5 bytes).
         /// </summary>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteInt32ForceInt32Block(IBufferWriter<byte> writer, int value)
@@ -1062,7 +1062,7 @@ namespace MessagePack
             writer.Advance(5);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static int ReadInt32(ref ReadOnlySequence<byte> byteSequence)
@@ -1070,7 +1070,7 @@ namespace MessagePack
             return int32Decoders[byteSequence.First.Span[0]].Read(ref byteSequence);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteInt64(IBufferWriter<byte> writer, long value)
@@ -1175,7 +1175,7 @@ namespace MessagePack
             }
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteInt64ForceInt64Block(IBufferWriter<byte> writer, long value)
@@ -1193,7 +1193,7 @@ namespace MessagePack
             writer.Advance(9);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static long ReadInt64(ref ReadOnlySequence<byte> byteSequence)
@@ -1201,7 +1201,7 @@ namespace MessagePack
             return int64Decoders[byteSequence.First.Span[0]].Read(ref byteSequence);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteUInt16(IBufferWriter<byte> writer, ushort value)
@@ -1229,7 +1229,7 @@ namespace MessagePack
             }
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteUInt16ForceUInt16Block(IBufferWriter<byte> writer, ushort value)
@@ -1241,7 +1241,7 @@ namespace MessagePack
             writer.Advance(3);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static ushort ReadUInt16(ref ReadOnlySequence<byte> byteSequence)
@@ -1249,7 +1249,7 @@ namespace MessagePack
             return uint16Decoders[byteSequence.First.Span[0]].Read(ref byteSequence);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteUInt32(IBufferWriter<byte> writer, uint value)
@@ -1287,7 +1287,7 @@ namespace MessagePack
             }
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteUInt32ForceUInt32Block(IBufferWriter<byte> writer, uint value)
@@ -1301,7 +1301,7 @@ namespace MessagePack
             writer.Advance(5);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static uint ReadUInt32(ref ReadOnlySequence<byte> byteSequence)
@@ -1309,7 +1309,7 @@ namespace MessagePack
             return uint32Decoders[byteSequence.First.Span[0]].Read(ref byteSequence);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteUInt64(IBufferWriter<byte> writer, ulong value)
@@ -1361,7 +1361,7 @@ namespace MessagePack
             }
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteUInt64ForceUInt64Block(IBufferWriter<byte> writer, ulong value)
@@ -1379,7 +1379,7 @@ namespace MessagePack
             writer.Advance(9);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static ulong ReadUInt64(ref ReadOnlySequence<byte> byteSequence)
@@ -1387,7 +1387,7 @@ namespace MessagePack
             return uint64Decoders[byteSequence.First.Span[0]].Read(ref byteSequence);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteChar(IBufferWriter<byte> writer, char value)
@@ -1395,7 +1395,7 @@ namespace MessagePack
             WriteUInt16(writer, value);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static char ReadChar(ref ReadOnlySequence<byte> byteSequence)
@@ -1406,7 +1406,7 @@ namespace MessagePack
         /// <summary>
         /// Unsafe. If value is guaranteed length is 0 ~ 31, can use this method.
         /// </summary>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static unsafe void WriteFixedStringUnsafe(IBufferWriter<byte> writer, string value, int byteCount)
@@ -1419,7 +1419,7 @@ namespace MessagePack
         /// <summary>
         /// Unsafe. If pre-calculated byteCount of target string, can use this method.
         /// </summary>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteStringUnsafe(IBufferWriter<byte> writer, string value, int byteCount)
@@ -1461,7 +1461,7 @@ namespace MessagePack
             }
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteStringBytes(IBufferWriter<byte> writer, ReadOnlySpan<byte> utf8stringBytes)
@@ -1648,7 +1648,7 @@ namespace MessagePack
             writer.Advance(byteCount + 5);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static string ReadString(ref ReadOnlySequence<byte> byteSequence)
@@ -1656,7 +1656,7 @@ namespace MessagePack
             return stringDecoders[byteSequence.First.Span[0]].Read(ref byteSequence);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static ArraySegment<byte> ReadStringSegment(ref ReadOnlySequence<byte> byteSequence)
@@ -1664,7 +1664,7 @@ namespace MessagePack
             return stringSegmentDecoders[byteSequence.First.Span[0]].Read(ref byteSequence);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteExtensionFormatHeader(IBufferWriter<byte> writer, sbyte typeCode, int dataLength)
@@ -1741,7 +1741,7 @@ namespace MessagePack
         /// <summary>
         /// Write extension format header, always use ext32 format(length is fixed, 6).
         /// </summary>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteExtensionFormatHeaderForceExt32Block(Span<byte> span, sbyte typeCode, int dataLength)
@@ -1757,7 +1757,7 @@ namespace MessagePack
         /// <summary>
         /// Write extension format header, always use ext32 format(length is fixed, 6).
         /// </summary>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteExtensionFormatHeaderForceExt32Block(IBufferWriter<byte> writer, sbyte typeCode, int dataLength)
@@ -1767,7 +1767,7 @@ namespace MessagePack
             writer.Advance(6);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteExtensionFormat(IBufferWriter<byte> writer, sbyte typeCode, ReadOnlySpan<byte> data)
@@ -1877,7 +1877,7 @@ namespace MessagePack
             }
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static ExtensionResult ReadExtensionFormat(ref ReadOnlySequence<byte> byteSequence)
@@ -1888,7 +1888,7 @@ namespace MessagePack
         /// <summary>
         /// return byte length of ExtensionFormat.
         /// </summary>
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static ExtensionHeader ReadExtensionFormatHeader(ref ReadOnlySequence<byte> byteSequence)
@@ -1896,7 +1896,7 @@ namespace MessagePack
             return extHeaderDecoders[byteSequence.First.Span[0]].Read(ref byteSequence);
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static int GetExtensionFormatHeaderLength(int dataLength)
@@ -1931,7 +1931,7 @@ namespace MessagePack
         // FixExt8(-1) => nanoseconds + seconds | [1970-01-01 00:00:00.000000000 UTC, 2514-05-30 01:53:04.000000000 UTC) range
         // Ext8(12,-1) => nanoseconds + seconds | [-584554047284-02-23 16:59:44 UTC, 584554051223-11-09 07:00:16.000000000 UTC) range
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static void WriteDateTime(IBufferWriter<byte> writer, DateTime dateTime)
@@ -2026,7 +2026,7 @@ namespace MessagePack
             }
         }
 
-#if NETSTANDARD || NETFRAMEWORK
+#if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         public static DateTime ReadDateTime(ref ReadOnlySequence<byte> byteSequence)
