@@ -17,6 +17,7 @@ using System.Text;
 using System.IO.Compression;
 using System.Collections.Concurrent;
 using System.Reflection;
+using System.Buffers;
 
 namespace Sandbox
 {
@@ -243,14 +244,14 @@ namespace Sandbox
         // serialize/deserialize internal field.
         class CustomObjectFormatter : IMessagePackFormatter<CustomObject>
         {
-            public int Serialize(ref byte[] bytes, int offset, CustomObject value, IFormatterResolver formatterResolver)
+            public void Serialize(IBufferWriter<byte> writer, CustomObject value, IFormatterResolver formatterResolver)
             {
-                return formatterResolver.GetFormatterWithVerify<string>().Serialize(ref bytes, offset, value.internalId, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<string>().Serialize(writer, value.internalId, formatterResolver);
             }
 
-            public CustomObject Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+            public CustomObject Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
             {
-                var id = formatterResolver.GetFormatterWithVerify<string>().Deserialize(bytes, offset, formatterResolver, out readSize);
+                var id = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref byteSequence, formatterResolver);
                 return new CustomObject { internalId = id };
             }
         }
@@ -323,7 +324,7 @@ namespace Sandbox
         [Key(2)]
         public string Prop3 { get; set; }
         [Key(3)]
-        public SimlpeStringKeyData Prop4 { get; set; }
+        public SimpleStringKeyData Prop4 { get; set; }
         [Key(4)]
         public SimpleStructIntKeyData Prop5 { get; set; }
         [Key(5)]
@@ -350,7 +351,7 @@ namespace Sandbox
                 Prop1 = 100,
                 Prop2 = ByteEnum.C,
                 Prop3 = "abcde",
-                Prop4 = new SimlpeStringKeyData
+                Prop4 = new SimpleStringKeyData
                 {
                     Prop1 = 99999,
                     Prop2 = ByteEnum.E,
@@ -764,56 +765,48 @@ namespace Sandbox
             {1, 1 },
         };
 
-        public int Serialize(ref byte[] bytes, int offset, IHogeMoge value, IFormatterResolver formatterResolver)
+        public void Serialize(IBufferWriter<byte> writer, IHogeMoge value, IFormatterResolver formatterResolver)
         {
-            var startOffset = offset;
-
             KeyValuePair<int, int> key;
             if (map.TryGetValue(value.GetType(), out key))
             {
-                var headerLen = MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref bytes, offset, 2);
-                offset += headerLen;
-                var keyLength = MessagePackBinary.WriteInt32(ref bytes, offset, key.Key);
-                headerLen += keyLength;
+                MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 2);
+                MessagePackBinary.WriteInt32(writer, key.Key);
 
                 switch (key.Value)
                 {
                     case 0:
-                        offset += formatterResolver.GetFormatterWithVerify<HogeMoge1>().Serialize(ref bytes, offset, (HogeMoge1)value, formatterResolver);
+                        formatterResolver.GetFormatterWithVerify<HogeMoge1>().Serialize(writer, (HogeMoge1)value, formatterResolver);
                         break;
                     case 1:
-                        offset += formatterResolver.GetFormatterWithVerify<HogeMoge2>().Serialize(ref bytes, offset, (HogeMoge2)value, formatterResolver);
+                        formatterResolver.GetFormatterWithVerify<HogeMoge2>().Serialize(writer, (HogeMoge2)value, formatterResolver);
                         break;
                     default:
                         break;
                 }
 
-                return offset - startOffset;
+                return;
             }
 
-            return MessagePackBinary.WriteNil(ref bytes, offset);
+            MessagePackBinary.WriteNil(writer);
         }
 
-        public IHogeMoge Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public IHogeMoge Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
             // TODO:array header...
 
-            int keySize;
-            int valueSize;
-            var key = MessagePackBinary.ReadInt32(bytes, offset, out keySize);
+            var key = MessagePackBinary.ReadInt32(ref byteSequence);
 
             switch (key)
             {
                 case 0:
                     {
-                        var result = formatterResolver.GetFormatterWithVerify<HogeMoge1>().Deserialize(bytes, offset + keySize, formatterResolver, out valueSize);
-                        readSize = keySize + valueSize;
+                        var result = formatterResolver.GetFormatterWithVerify<HogeMoge1>().Deserialize(ref byteSequence, formatterResolver);
                         return (IHogeMoge)result;
                     }
                 case 1:
                     {
-                        var result = formatterResolver.GetFormatterWithVerify<HogeMoge2>().Deserialize(bytes, offset + keySize, formatterResolver, out valueSize);
-                        readSize = keySize + valueSize;
+                        var result = formatterResolver.GetFormatterWithVerify<HogeMoge2>().Deserialize(ref byteSequence, formatterResolver);
                         return (IHogeMoge)result;
                     }
                 default:
