@@ -463,6 +463,8 @@ namespace MessagePack.Formatters
         }
     }
 
+#pragma warning disable VSTHRD002 // This section will be removed when https://github.com/AArnott/MessagePack-CSharp/issues/29 is fixed
+
     public sealed class TaskUnitFormatter : IMessagePackFormatter<Task>
     {
         public static readonly IMessagePackFormatter<Task> Instance = new TaskUnitFormatter();
@@ -543,6 +545,8 @@ namespace MessagePack.Formatters
             return new ValueTask<T>(v);
         }
     }
+
+#pragma warning restore VSTHRD002
 
 #endif
 }

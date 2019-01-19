@@ -110,7 +110,14 @@ namespace MessagePack
         /// <param name="resolver">The resolver to use during deserialization. Use <c>null</c> to use the <see cref="DefaultResolver"/>.</param>
         public void Serialize<T>(Stream stream, T value, IFormatterResolver resolver = null)
         {
-            this.SerializeAsync(stream, value, resolver, CancellationToken.None).GetAwaiter().GetResult();
+            using (var sequence = new Sequence<byte>())
+            {
+                this.Serialize<T>(sequence, value, resolver);
+                foreach (var segment in sequence.AsReadOnlySequence)
+                {
+                    stream.Write(segment.Span);
+                }
+            }
         }
 
         /// <summary>
@@ -179,7 +186,7 @@ namespace MessagePack
         }
 
         /// <summary>
-        /// Deserializes a value of a given type from a stream.
+        /// Deserializes the entire content of a <see cref="Stream"/>.
         /// </summary>
         /// <typeparam name="T">The type of value to deserialize.</typeparam>
         /// <param name="stream">The stream to deserialize from.</param>
@@ -202,7 +209,7 @@ namespace MessagePack
         }
 
         /// <summary>
-        /// Deserializes a value of a given type from a stream.
+        /// Deserializes the entire content of a <see cref="Stream"/>.
         /// </summary>
         /// <typeparam name="T">The type of value to deserialize.</typeparam>
         /// <param name="stream">The stream to deserialize from.</param>
