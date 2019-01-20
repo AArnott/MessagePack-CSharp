@@ -25,7 +25,7 @@ namespace MessagePack.CodeGenerator
             // https://github.com/daveaglick/Buildalyzer/blob/b42d2e3ba1b3673a8133fb41e72b507b01bce1d6/src/Buildalyzer/Environment/BuildEnvironment.cs#L86-L96
             Dictionary<string, string> properties = new Dictionary<string, string>()
                 {
-                    {"IntermediateOutputPath", tempPath},
+                    {"IntermediateOutputPath", tempPath + Path.DirectorySeparatorChar + Path.DirectorySeparatorChar},
                     {"ProviderCommandLineArgs", "true"},
                     {"GenerateResourceMSBuildArchitecture", "CurrentArchitecture"},
                     {"DesignTimeBuild", "true"},
