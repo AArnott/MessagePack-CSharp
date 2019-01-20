@@ -1,8 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
+
+    <!-- Set this to true when updating sandbox\generated.cs. See sandbox\README.md for more info. -->
+    <RunningMPC>false</RunningMPC>
   </PropertyGroup>
-  <ItemGroup>
+  <ItemGroup Condition=" '$(RunningMPC)' != 'true' ">
     <ProjectReference Include="..\..\src\MessagePack\MessagePack.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(RunningMPC)' == 'true' ">
+    <Reference Include="..\..\bin\MessagePack\Debug\netstandard1.6\MessagePack.dll" />
+
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="System.Memory" Version="4.5.1" />
+    <PackageReference Include="Nerdbank.Streams" Version="2.0.206" />
   </ItemGroup>
 </Project>
