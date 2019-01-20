@@ -233,22 +233,3 @@ namespace MessagePack
         }
     }
 }
-
-namespace MessagePack.Internal
-{
-    // TODO: remove this?
-    internal static class InternalMemoryPool
-    {
-        [ThreadStatic]
-        private static byte[] buffer = null;
-
-        public static byte[] GetBuffer()
-        {
-            if (buffer == null)
-            {
-                buffer = new byte[65536];
-            }
-            return buffer;
-        }
-    }
-}
