@@ -11,6 +11,7 @@
 namespace <#= Namespace #>
 {
     using System;
+	using System.Buffers;
     using MessagePack;
 
 <# foreach(var objInfo in objectSerializationInfos) { #>
@@ -41,12 +42,13 @@ namespace <#= Namespace #>
 
 <# } #>
 
-        public int Serialize(ref byte[] bytes, int offset, <#= objInfo.FullName #> value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(IBufferWriter<byte> writer, <#= objInfo.FullName #> value, global::MessagePack.IFormatterResolver formatterResolver)
         {
 <# if( objInfo.IsClass) { #>
             if (value == null)
             {
-                return global::MessagePack.MessagePackBinary.WriteNil(ref bytes, offset);
+                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                return;
             }
 <# } #>            
 <#if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnBefore) { #>
@@ -54,49 +56,45 @@ namespace <#= Namespace #>
 <# } else if(objInfo.HasIMessagePackSerializationCallbackReceiver) { #>
             value.OnBeforeSerialize();
 <# } #>
-            var startOffset = offset;
 <# if( objInfo.IsIntKey) { if( (objInfo.MaxKey + 1) <= 15) { #>
-            offset += global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref bytes, offset, <#= objInfo.MaxKey + 1 #>);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, <#= objInfo.MaxKey + 1 #>);
 <# } else { #>
-            offset += global::MessagePack.MessagePackBinary.WriteArrayHeader(ref bytes, offset, <#= objInfo.MaxKey + 1 #>);
+            global::MessagePack.MessagePackBinary.WriteArrayHeader(writer, <#= objInfo.MaxKey + 1 #>);
 <# } } else if( objInfo.WriteCount <= 15) { #>
-            offset += global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(ref bytes, offset, <#= objInfo.WriteCount #>);
+            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(writer, <#= objInfo.WriteCount #>);
 <# } else { #>
-            offset += global::MessagePack.MessagePackBinary.WriteMapHeader(ref bytes, offset, <#= objInfo.WriteCount #>);
+            global::MessagePack.MessagePackBinary.WriteMapHeader(writer, <#= objInfo.WriteCount #>);
 <# } #>
 <# if(objInfo.IsIntKey) { #>
 <# for(var i =0; i<= objInfo.MaxKey; i++) { var member = objInfo.GetMember(i); #>
 <# if( member == null) { #>
-            offset += global::MessagePack.MessagePackBinary.WriteNil(ref bytes, offset);
+            global::MessagePack.MessagePackBinary.WriteNil(writer);
 <# } else { #>
-            offset += <#= member.GetSerializeMethodString() #>;
+            <#= member.GetSerializeMethodString() #>;
 <# } } } else { #>
 <# var index = 0; foreach(var x in objInfo.Members) { #>
-            offset += global::MessagePack.MessagePackBinary.WriteRaw(ref bytes, offset, this.____stringByteKeys[<#= index++ #>]);
-            offset += <#= x.GetSerializeMethodString() #>;
+            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[<#= index++ #>]);
+            <#= x.GetSerializeMethodString() #>;
 <# } } #>
-            return offset - startOffset;
         }
 
-        public <#= objInfo.FullName #> Deserialize(byte[] bytes, int offset, global::MessagePack.IFormatterResolver formatterResolver, out int readSize)
+        public <#= objInfo.FullName #> Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(bytes, offset))
+            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
             {
 <# if( objInfo.IsClass) { #>
-                readSize = 1;
+                byteSequence = byteSequence.Slice(1);
                 return null;
 <# } else { #>
                 throw new InvalidOperationException("typecode is null, struct not supported");
 <# } #>
             }
 
-            var startOffset = offset;
 <# if(objInfo.IsStringKey) { #>
-            var length = global::MessagePack.MessagePackBinary.ReadMapHeader(bytes, offset, out readSize);
+            var length = global::MessagePack.MessagePackBinary.ReadMapHeader(ref byteSequence);
 <# } else { #>
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(bytes, offset, out readSize);
+            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
 <# } #>
-            offset += readSize;
 
 <# foreach(var x in objInfo.Members) { #>
             var __<#= x.Name #>__ = default(<#= x.Type #>);
@@ -105,13 +103,12 @@ namespace <#= Namespace #>
             for (int i = 0; i < length; i++)
             {
 <# if(objInfo.IsStringKey) { #>
-                var stringKey = global::MessagePack.MessagePackBinary.ReadStringSegment(bytes, offset, out readSize);
-                offset += readSize;
+                var stringKey = global::MessagePack.MessagePackBinary.ReadStringSegment(ref byteSequence);
                 int key;
-                if (!____keyMapping.TryGetValueSafe(stringKey, out key))
+                if (!____keyMapping.TryGetValue(stringKey, out key))
                 {
-                    readSize = global::MessagePack.MessagePackBinary.ReadNextBlock(bytes, offset);
-                    goto NEXT_LOOP;
+                    global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                    continue;
                 }
 <# } else { #>
                 var key = i;
@@ -125,16 +122,10 @@ namespace <#= Namespace #>
                         break;
 <# } #>
                     default:
-                        readSize = global::MessagePack.MessagePackBinary.ReadNextBlock(bytes, offset);
+                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
                         break;
                 }
-<# if(objInfo.IsStringKey) { #>                
-                NEXT_LOOP:
-<# } #>
-                offset += readSize;
             }
-
-            readSize = offset - startOffset;
 
             var ____result = new <#= objInfo.GetConstructorString()  #>;
 <# foreach(var x in objInfo.Members.Where(x => x.IsWritable)) { #>

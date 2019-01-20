@@ -98,11 +98,11 @@ namespace MessagePack.CodeGenerator
         {
             if (primitiveTypes.Contains(Type))
             {
-                return $"MessagePackBinary.Write{ShortTypeName.Replace("[]", "s")}(ref bytes, offset, value.{Name})";
+                return $"MessagePackBinary.Write{ShortTypeName.Replace("[]", "s")}(writer, value.{Name})";
             }
             else
             {
-                return $"formatterResolver.GetFormatterWithVerify<{Type}>().Serialize(ref bytes, offset, value.{Name}, formatterResolver)";
+                return $"formatterResolver.GetFormatterWithVerify<{Type}>().Serialize(writer, value.{Name}, formatterResolver)";
             }
         }
 
@@ -110,11 +110,11 @@ namespace MessagePack.CodeGenerator
         {
             if (primitiveTypes.Contains(Type))
             {
-                return $"MessagePackBinary.Read{ShortTypeName.Replace("[]", "s")}(bytes, offset, out readSize)";
+                return $"MessagePackBinary.Read{ShortTypeName.Replace("[]", "s")}(ref byteSequence)";
             }
             else
             {
-                return $"formatterResolver.GetFormatterWithVerify<{Type}>().Deserialize(bytes, offset, formatterResolver, out readSize)";
+                return $"formatterResolver.GetFormatterWithVerify<{Type}>().Deserialize(ref byteSequence, formatterResolver)";
             }
         }
     }
