@@ -2,6 +2,7 @@
 using MessagePack.Formatters;
 using MessagePack.Internal;
 using MessagePack.Resolvers;
+using Nerdbank.Streams;
 using SharedData;
 using System;
 using System.Buffers;
@@ -21,7 +22,7 @@ namespace DynamicCodeDumper
             try
             {
                 // var mi = AutomataKeyGen.GetGetKeyMethod();
-                // mi.Invoke(null, new[] { 
+                // mi.Invoke(null, new[] {
 
                 //DynamicObjectResolver.Instance.GetFormatter<ArrayOptimizeClass>();
                 //DynamicObjectResolver.Instance.GetFormatter<Empty1>();
@@ -34,8 +35,8 @@ namespace DynamicCodeDumper
                 //DynamicObjectResolver.Instance.GetFormatter<Version1>();
                 //DynamicObjectResolver.Instance.GetFormatter<Version2>();
                 //DynamicObjectResolver.Instance.GetFormatter<SimpleIntKeyData>();
-                //DynamicObjectResolver.Instance.GetFormatter<SimlpeStringKeyData>();
-                //DynamicObjectResolver.Instance.GetFormatter<SimlpeStringKeyData2>();
+                //DynamicObjectResolver.Instance.GetFormatter<SimpleStringKeyData>();
+                //DynamicObjectResolver.Instance.GetFormatter<SimpleStringKeyData2>();
                 //DynamicObjectResolver.Instance.GetFormatter<StringKeySerializerTarget>();
                 //DynamicObjectResolver.Instance.GetFormatter<LongestString>();
                 var f = DynamicObjectResolverAllowPrivate.Instance.GetFormatter<MyClass>();
@@ -59,9 +60,10 @@ namespace DynamicCodeDumper
 
                 //DynamicContractlessObjectResolver.Instance.GetFormatter<EntityBase>();
 
-                byte[] b = null;
-                var bin = f.Serialize(ref b, 0, new MyClass { MyProperty1 = 100, MyProperty2 = "foo" }, null);
-
+                using (var sequence = new Sequence<byte>())
+                {
+                    f.Serialize(sequence, new MyClass { MyProperty1 = 100, MyProperty2 = "foo" }, null);
+                }
             }
             catch (Exception ex)
             {
@@ -207,7 +209,7 @@ namespace DynamicCodeDumper
     }
 
     [MessagePackObject(true)]
-    public class SimlpeStringKeyData2
+    public class SimpleStringKeyData2
     {
         public int MyProperty1 { get; set; }
         public int MyProperty2 { get; set; }
