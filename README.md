@@ -513,12 +513,13 @@ Benchmarks comparing to other serializers run on `Windows 10 Pro x64 Intel Core 
 
  MessagePack for C# uses many techniques for improve performance.
 
-* Serializer uses only ref byte[] and int offset, don't use (Memory)Stream(call Stream api has overhead)
-* High-level API uses internal memory pool, don't allocate working memory under 64K
+* Serializer uses only `IBufferWriter<byte>` rather than `System.IO.Stream` for reduced overhead.
+* Buffers are rented from pools to reduce allocations, keeping throughput high through reduced GC pressure.
 * Don't create intermediate utility instance(XxxWriter/Reader, XxxContext, etc...)
-* Avoid boxing all codes, all platforms(include Unity/IL2CPP)
-* Getting cached generated formatter on static generic field(don't use dictinary-cache because dictionary lookup is overhead): [see:Resolvers](https://github.com/neuecc/MessagePack-CSharp/tree/209f301e2e595ed366408624011ba2e856d23429/src/MessagePack/Resolvers)
-* Heavyly tuned dynamic il code generation: [see:DynamicObjectTypeBuilder](https://github.com/neuecc/MessagePack-CSharp/blob/209f301e2e595ed366408624011ba2e856d23429/src/MessagePack/Resolvers/DynamicObjectResolver.cs#L142-L754)
+* Utilize dynamic code generation to avoid boxing value types. Use AOT generation on platforms that prohibit JIT.
+* Getting cached generated formatter on static generic field (don't use dictinary-cache because dictionary lookup is overhead). See [Resolvers](https://github.com/neuecc/MessagePack-CSharp/tree/209f301e2e595ed366408624011ba2e856d23429/src/MessagePack/Resolvers)
+* Heavily tuned dynamic IL code generation to avoid boxing value types. See [DynamicObjectTypeBuilder](https://github.com/neuecc/MessagePack-CSharp/blob/209f301e2e595ed366408624011ba2e856d23429/src/MessagePack/Resolvers/DynamicObjectResolver.cs#L142-L754).
+Use AOT generation on platforms that prohibit JIT.
 * Call PrimitiveAPI directly when il code generation knows target is primitive
 * Reduce branch of variable length format when il code generation knows target(integer/string) range
 * Don't use `IEnumerable<T>` abstraction on iterate collection, [see:CollectionFormatterBase](https://github.com/neuecc/MessagePack-CSharp/blob/209f301e2e595ed366408624011ba2e856d23429/src/MessagePack/Formatters/CollectionFormatter.cs#L192-L355) and inherited collection formatters
@@ -776,36 +777,37 @@ IMessagePackFormatter is serializer by each type. For example `Int32Formatter : 
 ```csharp
 public interface IMessagePackFormatter<T>
 {
-    int Serialize(ref byte[] bytes, int offset, T value, IFormatterResolver formatterResolver);
-    T Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize);
+    void Serialize(IBufferWriter<byte> writer, T value, IFormatterResolver formatterResolver);
+    T Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver);
 }
 ```
 
-All api works on byte[] level, no use Stream, no use Writer/Reader so improve performance. Many builtin formatters exists under `MessagePack.Formatters`. You can get sub type serializer by `formatterResolver.GetFormatter<T>`. Here is sample of write own formatter.
+All api works on `Span<byte>` level, no use Stream, no use Writer/Reader so improve performance. Many builtin formatters exists under `MessagePack.Formatters`. You can get sub type serializer by `formatterResolver.GetFormatter<T>`. Here is sample of write own formatter.
 
 ```csharp
 // serialize fileinfo as string fullpath.
 public class FileInfoFormatter<T> : IMessagePackFormatter<FileInfo>
 {
-    public int Serialize(ref byte[] bytes, int offset, FileInfo value, IFormatterResolver formatterResolver)
+    public void Serialize(IBufferWriter<byte> writer, FileInfo value, IFormatterResolver formatterResolver)
     {
         if (value == null)
         {
-            return MessagePackBinary.WriteNil(ref bytes, offset);
+            MessagePackBinary.WriteNil(writer);
+            return;
         }
 
-        return MessagePackBinary.WriteString(ref bytes, offset, value.FullName);
+        MessagePackBinary.WriteString(writer, value.FullName);
     }
 
-    public FileInfo Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+    public FileInfo Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
     {
-        if (MessagePackBinary.IsNil(bytes, offset))
+        if (MessagePackBinary.IsNil(byteSequence))
         {
-            readSize = 1;
+            byteSequence = byteSequence.Slice(1);
             return null;
         }
 
-        var path = MessagePackBinary.ReadString(bytes, offset, out readSize);
+        var path = MessagePackBinary.ReadString(ref byteSequence);
         return new FileInfo(path);
     }
 }
@@ -846,7 +848,8 @@ Primitive API(MessagePackBinary)
 | FastResize | Buffer.BlockCopy version of Array.Resize. |
 | FastCloneWithResize | Same as FastResize but return copied byte[]. |
 
-Read API returns deserialized primitive and read size. Write API returns write size and guranteed auto ensure ref byte[]. Write/Read API has `byte[]` overload and `Stream` overload, basically the byte[] API is faster.
+The Read API returns deserialized primitive and advances a `ReadOnlySequence<byte>` to consume the deserialized bytes. The Write API uses an `IBufferWriter<byte>` for efficient writing and buffer management.
+Serialization methods include overloads for other common types such as `byte[]` and `Stream`, and have some small overhead over using the primitive types directly.
 
 DateTime is serialized to [MessagePack Timestamp format](https://github.com/msgpack/msgpack/blob/master/spec.md#formats-timestamp), it serialize/deserialize UTC and loses `Kind` info. If you use`NativeDateTimeResolver` serialized native DateTime binary format and it can keep `Kind` info but cannot communicate other platforms.
 
@@ -1057,14 +1060,14 @@ public class CustomObject
     // serialize/deserialize internal field.
     class CustomObjectFormatter : IMessagePackFormatter<CustomObject>
     {
-        public int Serialize(ref byte[] bytes, int offset, CustomObject value, IFormatterResolver formatterResolver)
+        public void Serialize(IBufferWriter<byte> writer, CustomObject value, IFormatterResolver formatterResolver)
         {
-            return formatterResolver.GetFormatterWithVerify<string>().Serialize(ref bytes, offset, value.internalId, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(writer, value.internalId, formatterResolver);
         }
 
-        public CustomObject Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+        public CustomObject Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
         {
-            var id = formatterResolver.GetFormatterWithVerify<string>().Deserialize(bytes, offset, formatterResolver, out readSize);
+            var id = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref byteSequence, formatterResolver);
             return new CustomObject { internalId = id };
         }
     }
@@ -1074,14 +1077,14 @@ public class CustomObject
 
 public class Int_x10Formatter : IMessagePackFormatter<int>
 {
-    public int Deserialize(byte[] bytes, int offset, IFormatterResolver formatterResolver, out int readSize)
+    public int Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
     {
-        return MessagePackBinary.ReadInt32(bytes, offset, out readSize) * 10;
+        return MessagePackBinary.ReadInt32(ref byteSequence) * 10;
     }
 
-    public int Serialize(ref byte[] bytes, int offset, int value, IFormatterResolver formatterResolver)
+    public void Serialize(IBufferWriter<byte> writer, int value, IFormatterResolver formatterResolver)
     {
-        return MessagePackBinary.WriteInt32(ref bytes, offset, value * 10);
+        MessagePackBinary.WriteInt32(writer, value * 10);
     }
 }
 
