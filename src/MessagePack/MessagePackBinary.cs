@@ -572,6 +572,7 @@ namespace MessagePack
         {
             var span = writer.GetSpan(5);
             WriteArrayHeaderForceArray32Block(span, count);
+            writer.Advance(5);
         }
 
         /// <summary>

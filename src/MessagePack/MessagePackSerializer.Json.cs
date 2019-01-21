@@ -68,17 +68,6 @@ namespace MessagePack
             }
         }
 
-        /// <summary>
-        /// return buffer is from memory pool, be careful to use. 
-        /// </summary>
-        internal static void FromJsonUnsafe(TextReader reader, IBufferWriter<byte> writer)
-        {
-            using (var jr = new TinyJsonReader(reader, false))
-            {
-                FromJsonCore(jr, writer);
-            }
-        }
-
         private static uint FromJsonCore(TinyJsonReader jr, IBufferWriter<byte> writer)
         {
             uint count = 0;
