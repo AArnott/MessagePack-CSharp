@@ -51,7 +51,7 @@ namespace MessagePack
         /// <param name="writer">The buffer writer to serialize with.</param>
         /// <param name="value">The value to serialize.</param>
         /// <param name="resolver">The resolver to use during deserialization. Use <c>null</c> to use the <see cref="DefaultResolver"/>.</param>
-        public virtual void Serialize<T>(IBufferWriter<byte> writer, T value, IFormatterResolver resolver)
+        public virtual void Serialize<T>(IBufferWriter<byte> writer, T value, IFormatterResolver resolver = null)
         {
             if (writer == null)
             {
@@ -66,6 +66,15 @@ namespace MessagePack
             var formatter = resolver.GetFormatterWithVerify<T>();
             formatter.Serialize(writer, value, resolver);
         }
+
+        /// <summary>
+        /// Deserializes a value of a given type from a sequence of bytes.
+        /// </summary>
+        /// <typeparam name="T">The type of value to deserialize.</typeparam>
+        /// <param name="byteSequence">The sequence to deserialize from.</param>
+        /// <param name="resolver">The resolver to use during deserialization. Use <c>null</c> to use the <see cref="DefaultResolver"/>.</param>
+        /// <returns>The deserialized value.</returns>
+        public T Deserialize<T>(ReadOnlySequence<byte> byteSequence, IFormatterResolver resolver = null) => this.Deserialize<T>(byteSequence, resolver, out _);
 
         /// <summary>
         /// Deserializes a value of a given type from a sequence of bytes.

@@ -36,7 +36,7 @@ namespace MessagePack
         /// <summary>
         /// Serialize to binary with default resolver.
         /// </summary>
-        public override void Serialize<T>(IBufferWriter<byte> writer, T value, IFormatterResolver resolver)
+        public override void Serialize<T>(IBufferWriter<byte> writer, T value, IFormatterResolver resolver = null)
         {
             if (resolver == null) resolver = DefaultResolver;
             var formatter = resolver.GetFormatterWithVerify<T>();
