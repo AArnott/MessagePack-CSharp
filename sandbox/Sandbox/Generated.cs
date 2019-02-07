@@ -210,9 +210,9 @@ namespace MessagePack.Formatters.SharedData
 
     public sealed class ByteEnumFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.ByteEnum>
     {
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.ByteEnum value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.ByteEnum value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            MessagePackBinary.WriteByte(writer, (Byte)value);
+            MessagePackBinary.WriteByte(ref writer, (Byte)value);
         }
         
         public global::SharedData.ByteEnum Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -241,9 +241,9 @@ namespace MessagePack.Formatters
 
     public sealed class GlobalMyEnumFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::GlobalMyEnum>
     {
-        public void Serialize(IBufferWriter<byte> writer, global::GlobalMyEnum value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::GlobalMyEnum value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            MessagePackBinary.WriteInt32(writer, (Int32)value);
+            MessagePackBinary.WriteInt32(ref writer, (Int32)value);
         }
         
         public global::GlobalMyEnum Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -295,26 +295,26 @@ namespace MessagePack.Formatters.SharedData
             };
         }
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.IUnionChecker value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.IUnionChecker value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             KeyValuePair<int, int> keyValuePair;
             if (value != null && this.typeToKeyAndJumpMap.TryGetValue(value.GetType().TypeHandle, out keyValuePair))
             {
-                MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 2);
-                MessagePackBinary.WriteInt32(writer, keyValuePair.Key);
+                MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
+                MessagePackBinary.WriteInt32(ref writer, keyValuePair.Key);
                 switch (keyValuePair.Value)
                 {
                     case 0:
-                        formatterResolver.GetFormatterWithVerify<global::SharedData.MySubUnion1>().Serialize(writer, (global::SharedData.MySubUnion1)value, formatterResolver);
+                        formatterResolver.GetFormatterWithVerify<global::SharedData.MySubUnion1>().Serialize(ref writer, (global::SharedData.MySubUnion1)value, formatterResolver);
                         break;
                     case 1:
-                        formatterResolver.GetFormatterWithVerify<global::SharedData.MySubUnion2>().Serialize(writer, (global::SharedData.MySubUnion2)value, formatterResolver);
+                        formatterResolver.GetFormatterWithVerify<global::SharedData.MySubUnion2>().Serialize(ref writer, (global::SharedData.MySubUnion2)value, formatterResolver);
                         break;
                     case 2:
-                        formatterResolver.GetFormatterWithVerify<global::SharedData.MySubUnion3>().Serialize(writer, (global::SharedData.MySubUnion3)value, formatterResolver);
+                        formatterResolver.GetFormatterWithVerify<global::SharedData.MySubUnion3>().Serialize(ref writer, (global::SharedData.MySubUnion3)value, formatterResolver);
                         break;
                     case 3:
-                        formatterResolver.GetFormatterWithVerify<global::SharedData.MySubUnion4>().Serialize(writer, (global::SharedData.MySubUnion4)value, formatterResolver);
+                        formatterResolver.GetFormatterWithVerify<global::SharedData.MySubUnion4>().Serialize(ref writer, (global::SharedData.MySubUnion4)value, formatterResolver);
                         break;
                     default:
                         break;
@@ -323,7 +323,7 @@ namespace MessagePack.Formatters.SharedData
                 return;
             }
 
-            MessagePackBinary.WriteNil(writer);
+            MessagePackBinary.WriteNil(ref writer);
         }
         
         public global::SharedData.IUnionChecker Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -393,26 +393,26 @@ namespace MessagePack.Formatters.SharedData
             };
         }
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.IUnionChecker2 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.IUnionChecker2 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             KeyValuePair<int, int> keyValuePair;
             if (value != null && this.typeToKeyAndJumpMap.TryGetValue(value.GetType().TypeHandle, out keyValuePair))
             {
-                MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 2);
-                MessagePackBinary.WriteInt32(writer, keyValuePair.Key);
+                MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
+                MessagePackBinary.WriteInt32(ref writer, keyValuePair.Key);
                 switch (keyValuePair.Value)
                 {
                     case 0:
-                        formatterResolver.GetFormatterWithVerify<global::SharedData.MySubUnion2>().Serialize(writer, (global::SharedData.MySubUnion2)value, formatterResolver);
+                        formatterResolver.GetFormatterWithVerify<global::SharedData.MySubUnion2>().Serialize(ref writer, (global::SharedData.MySubUnion2)value, formatterResolver);
                         break;
                     case 1:
-                        formatterResolver.GetFormatterWithVerify<global::SharedData.MySubUnion3>().Serialize(writer, (global::SharedData.MySubUnion3)value, formatterResolver);
+                        formatterResolver.GetFormatterWithVerify<global::SharedData.MySubUnion3>().Serialize(ref writer, (global::SharedData.MySubUnion3)value, formatterResolver);
                         break;
                     case 2:
-                        formatterResolver.GetFormatterWithVerify<global::SharedData.MySubUnion4>().Serialize(writer, (global::SharedData.MySubUnion4)value, formatterResolver);
+                        formatterResolver.GetFormatterWithVerify<global::SharedData.MySubUnion4>().Serialize(ref writer, (global::SharedData.MySubUnion4)value, formatterResolver);
                         break;
                     case 3:
-                        formatterResolver.GetFormatterWithVerify<global::SharedData.MySubUnion1>().Serialize(writer, (global::SharedData.MySubUnion1)value, formatterResolver);
+                        formatterResolver.GetFormatterWithVerify<global::SharedData.MySubUnion1>().Serialize(ref writer, (global::SharedData.MySubUnion1)value, formatterResolver);
                         break;
                     default:
                         break;
@@ -421,7 +421,7 @@ namespace MessagePack.Formatters.SharedData
                 return;
             }
 
-            MessagePackBinary.WriteNil(writer);
+            MessagePackBinary.WriteNil(ref writer);
         }
         
         public global::SharedData.IUnionChecker2 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -485,17 +485,17 @@ namespace MessagePack.Formatters.SharedData
             };
         }
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.IIVersioningUnion value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.IIVersioningUnion value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             KeyValuePair<int, int> keyValuePair;
             if (value != null && this.typeToKeyAndJumpMap.TryGetValue(value.GetType().TypeHandle, out keyValuePair))
             {
-                MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 2);
-                MessagePackBinary.WriteInt32(writer, keyValuePair.Key);
+                MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
+                MessagePackBinary.WriteInt32(ref writer, keyValuePair.Key);
                 switch (keyValuePair.Value)
                 {
                     case 0:
-                        formatterResolver.GetFormatterWithVerify<global::SharedData.MySubUnion1>().Serialize(writer, (global::SharedData.MySubUnion1)value, formatterResolver);
+                        formatterResolver.GetFormatterWithVerify<global::SharedData.MySubUnion1>().Serialize(ref writer, (global::SharedData.MySubUnion1)value, formatterResolver);
                         break;
                     default:
                         break;
@@ -504,7 +504,7 @@ namespace MessagePack.Formatters.SharedData
                 return;
             }
 
-            MessagePackBinary.WriteNil(writer);
+            MessagePackBinary.WriteNil(ref writer);
         }
         
         public global::SharedData.IIVersioningUnion Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -561,20 +561,20 @@ namespace MessagePack.Formatters.SharedData
             };
         }
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.RootUnionType value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.RootUnionType value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             KeyValuePair<int, int> keyValuePair;
             if (value != null && this.typeToKeyAndJumpMap.TryGetValue(value.GetType().TypeHandle, out keyValuePair))
             {
-                MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 2);
-                MessagePackBinary.WriteInt32(writer, keyValuePair.Key);
+                MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
+                MessagePackBinary.WriteInt32(ref writer, keyValuePair.Key);
                 switch (keyValuePair.Value)
                 {
                     case 0:
-                        formatterResolver.GetFormatterWithVerify<global::SharedData.SubUnionType1>().Serialize(writer, (global::SharedData.SubUnionType1)value, formatterResolver);
+                        formatterResolver.GetFormatterWithVerify<global::SharedData.SubUnionType1>().Serialize(ref writer, (global::SharedData.SubUnionType1)value, formatterResolver);
                         break;
                     case 1:
-                        formatterResolver.GetFormatterWithVerify<global::SharedData.SubUnionType2>().Serialize(writer, (global::SharedData.SubUnionType2)value, formatterResolver);
+                        formatterResolver.GetFormatterWithVerify<global::SharedData.SubUnionType2>().Serialize(ref writer, (global::SharedData.SubUnionType2)value, formatterResolver);
                         break;
                     default:
                         break;
@@ -583,7 +583,7 @@ namespace MessagePack.Formatters.SharedData
                 return;
             }
 
-            MessagePackBinary.WriteNil(writer);
+            MessagePackBinary.WriteNil(ref writer);
         }
         
         public global::SharedData.RootUnionType Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -643,20 +643,20 @@ namespace MessagePack.Formatters.SharedData
             };
         }
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.IUnionSample value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.IUnionSample value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             KeyValuePair<int, int> keyValuePair;
             if (value != null && this.typeToKeyAndJumpMap.TryGetValue(value.GetType().TypeHandle, out keyValuePair))
             {
-                MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 2);
-                MessagePackBinary.WriteInt32(writer, keyValuePair.Key);
+                MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
+                MessagePackBinary.WriteInt32(ref writer, keyValuePair.Key);
                 switch (keyValuePair.Value)
                 {
                     case 0:
-                        formatterResolver.GetFormatterWithVerify<global::SharedData.FooClass>().Serialize(writer, (global::SharedData.FooClass)value, formatterResolver);
+                        formatterResolver.GetFormatterWithVerify<global::SharedData.FooClass>().Serialize(ref writer, (global::SharedData.FooClass)value, formatterResolver);
                         break;
                     case 1:
-                        formatterResolver.GetFormatterWithVerify<global::SharedData.BarClass>().Serialize(writer, (global::SharedData.BarClass)value, formatterResolver);
+                        formatterResolver.GetFormatterWithVerify<global::SharedData.BarClass>().Serialize(ref writer, (global::SharedData.BarClass)value, formatterResolver);
                         break;
                     default:
                         break;
@@ -665,7 +665,7 @@ namespace MessagePack.Formatters.SharedData
                 return;
             }
 
-            MessagePackBinary.WriteNil(writer);
+            MessagePackBinary.WriteNil(ref writer);
         }
         
         public global::SharedData.IUnionSample Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -746,23 +746,23 @@ namespace MessagePack.Formatters
             };
         }
 
-        public void Serialize(IBufferWriter<byte> writer, global::IMessageBody value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::IMessageBody value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             KeyValuePair<int, int> keyValuePair;
             if (value != null && this.typeToKeyAndJumpMap.TryGetValue(value.GetType().TypeHandle, out keyValuePair))
             {
-                MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 2);
-                MessagePackBinary.WriteInt32(writer, keyValuePair.Key);
+                MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
+                MessagePackBinary.WriteInt32(ref writer, keyValuePair.Key);
                 switch (keyValuePair.Value)
                 {
                     case 0:
-                        formatterResolver.GetFormatterWithVerify<global::TextMessageBody>().Serialize(writer, (global::TextMessageBody)value, formatterResolver);
+                        formatterResolver.GetFormatterWithVerify<global::TextMessageBody>().Serialize(ref writer, (global::TextMessageBody)value, formatterResolver);
                         break;
                     case 1:
-                        formatterResolver.GetFormatterWithVerify<global::StampMessageBody>().Serialize(writer, (global::StampMessageBody)value, formatterResolver);
+                        formatterResolver.GetFormatterWithVerify<global::StampMessageBody>().Serialize(ref writer, (global::StampMessageBody)value, formatterResolver);
                         break;
                     case 2:
-                        formatterResolver.GetFormatterWithVerify<global::QuestMessageBody>().Serialize(writer, (global::QuestMessageBody)value, formatterResolver);
+                        formatterResolver.GetFormatterWithVerify<global::QuestMessageBody>().Serialize(ref writer, (global::QuestMessageBody)value, formatterResolver);
                         break;
                     default:
                         break;
@@ -771,7 +771,7 @@ namespace MessagePack.Formatters
                 return;
             }
 
-            MessagePackBinary.WriteNil(writer);
+            MessagePackBinary.WriteNil(ref writer);
         }
         
         public global::IMessageBody Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -838,18 +838,18 @@ namespace MessagePack.Formatters.SharedData
     public sealed class FirstSimpleDataFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.FirstSimpleData>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.FirstSimpleData value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.FirstSimpleData value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 3);
-            MessagePackBinary.WriteInt32(writer, value.Prop1);
-            formatterResolver.GetFormatterWithVerify<string>().Serialize(writer, value.Prop2, formatterResolver);
-            MessagePackBinary.WriteInt32(writer, value.Prop3);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 3);
+            MessagePackBinary.WriteInt32(ref writer, value.Prop1);
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Prop2, formatterResolver);
+            MessagePackBinary.WriteInt32(ref writer, value.Prop3);
         }
 
         public global::SharedData.FirstSimpleData Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -921,21 +921,21 @@ namespace MessagePack.Formatters.SharedData
         }
 
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.SimpleStringKeyData value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.SimpleStringKeyData value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(writer, 3);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[0]);
-            MessagePackBinary.WriteInt32(writer, value.Prop1);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[1]);
-            formatterResolver.GetFormatterWithVerify<global::SharedData.ByteEnum>().Serialize(writer, value.Prop2, formatterResolver);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[2]);
-            MessagePackBinary.WriteInt32(writer, value.Prop3);
+            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(ref writer, 3);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[0]);
+            MessagePackBinary.WriteInt32(ref writer, value.Prop1);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[1]);
+            formatterResolver.GetFormatterWithVerify<global::SharedData.ByteEnum>().Serialize(ref writer, value.Prop2, formatterResolver);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[2]);
+            MessagePackBinary.WriteInt32(ref writer, value.Prop3);
         }
 
         public global::SharedData.SimpleStringKeyData Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -991,13 +991,13 @@ namespace MessagePack.Formatters.SharedData
     public sealed class SimpleStructIntKeyDataFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.SimpleStructIntKeyData>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.SimpleStructIntKeyData value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.SimpleStructIntKeyData value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 3);
-            MessagePackBinary.WriteInt32(writer, value.X);
-            MessagePackBinary.WriteInt32(writer, value.Y);
-            formatterResolver.GetFormatterWithVerify<byte[]>().Serialize(writer, value.BytesSpecial, formatterResolver);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 3);
+            MessagePackBinary.WriteInt32(ref writer, value.X);
+            MessagePackBinary.WriteInt32(ref writer, value.Y);
+            formatterResolver.GetFormatterWithVerify<byte[]>().Serialize(ref writer, value.BytesSpecial, formatterResolver);
         }
 
         public global::SharedData.SimpleStructIntKeyData Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -1066,14 +1066,14 @@ namespace MessagePack.Formatters.SharedData
         }
 
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.SimpleStructStringKeyData value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.SimpleStructStringKeyData value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             
-            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(writer, 2);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[0]);
-            MessagePackBinary.WriteInt32(writer, value.X);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[1]);
-            formatterResolver.GetFormatterWithVerify<int[]>().Serialize(writer, value.Y, formatterResolver);
+            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(ref writer, 2);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[0]);
+            MessagePackBinary.WriteInt32(ref writer, value.X);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[1]);
+            formatterResolver.GetFormatterWithVerify<int[]>().Serialize(ref writer, value.Y, formatterResolver);
         }
 
         public global::SharedData.SimpleStructStringKeyData Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -1123,22 +1123,22 @@ namespace MessagePack.Formatters.SharedData
     public sealed class SimpleIntKeyDataFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.SimpleIntKeyData>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.SimpleIntKeyData value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.SimpleIntKeyData value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 7);
-            MessagePackBinary.WriteInt32(writer, value.Prop1);
-            formatterResolver.GetFormatterWithVerify<global::SharedData.ByteEnum>().Serialize(writer, value.Prop2, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<string>().Serialize(writer, value.Prop3, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<global::SharedData.SimpleStringKeyData>().Serialize(writer, value.Prop4, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<global::SharedData.SimpleStructIntKeyData>().Serialize(writer, value.Prop5, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<global::SharedData.SimpleStructStringKeyData>().Serialize(writer, value.Prop6, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<byte[]>().Serialize(writer, value.BytesSpecial, formatterResolver);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 7);
+            MessagePackBinary.WriteInt32(ref writer, value.Prop1);
+            formatterResolver.GetFormatterWithVerify<global::SharedData.ByteEnum>().Serialize(ref writer, value.Prop2, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Prop3, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<global::SharedData.SimpleStringKeyData>().Serialize(ref writer, value.Prop4, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<global::SharedData.SimpleStructIntKeyData>().Serialize(ref writer, value.Prop5, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<global::SharedData.SimpleStructStringKeyData>().Serialize(ref writer, value.Prop6, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<byte[]>().Serialize(ref writer, value.BytesSpecial, formatterResolver);
         }
 
         public global::SharedData.SimpleIntKeyData Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -1208,12 +1208,12 @@ namespace MessagePack.Formatters.SharedData
     public sealed class Vector2Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.Vector2>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.Vector2 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.Vector2 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 2);
-            MessagePackBinary.WriteSingle(writer, value.X);
-            MessagePackBinary.WriteSingle(writer, value.Y);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
+            MessagePackBinary.WriteSingle(ref writer, value.X);
+            MessagePackBinary.WriteSingle(ref writer, value.Y);
         }
 
         public global::SharedData.Vector2 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -1255,15 +1255,15 @@ namespace MessagePack.Formatters.SharedData
     public sealed class EmptyClassFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.EmptyClass>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.EmptyClass value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.EmptyClass value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 0);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 0);
         }
 
         public global::SharedData.EmptyClass Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -1298,10 +1298,10 @@ namespace MessagePack.Formatters.SharedData
     public sealed class EmptyStructFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.EmptyStruct>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.EmptyStruct value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.EmptyStruct value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 0);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 0);
         }
 
         public global::SharedData.EmptyStruct Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -1335,21 +1335,21 @@ namespace MessagePack.Formatters.SharedData
     public sealed class Version1Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.Version1>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.Version1 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.Version1 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 6);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty1);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty2);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty3);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 6);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty1);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty2);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty3);
         }
 
         public global::SharedData.Version1 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -1399,23 +1399,23 @@ namespace MessagePack.Formatters.SharedData
     public sealed class Version2Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.Version2>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.Version2 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.Version2 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 8);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty1);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty2);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty3);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty5);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 8);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty1);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty2);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty3);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty5);
         }
 
         public global::SharedData.Version2 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -1470,19 +1470,19 @@ namespace MessagePack.Formatters.SharedData
     public sealed class Version0Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.Version0>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.Version0 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.Version0 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 4);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty1);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 4);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty1);
         }
 
         public global::SharedData.Version0 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -1522,17 +1522,17 @@ namespace MessagePack.Formatters.SharedData
     public sealed class HolderV1Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.HolderV1>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.HolderV1 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.HolderV1 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 2);
-            formatterResolver.GetFormatterWithVerify<global::SharedData.Version1>().Serialize(writer, value.MyProperty1, formatterResolver);
-            MessagePackBinary.WriteInt32(writer, value.After);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
+            formatterResolver.GetFormatterWithVerify<global::SharedData.Version1>().Serialize(ref writer, value.MyProperty1, formatterResolver);
+            MessagePackBinary.WriteInt32(ref writer, value.After);
         }
 
         public global::SharedData.HolderV1 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -1577,17 +1577,17 @@ namespace MessagePack.Formatters.SharedData
     public sealed class HolderV2Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.HolderV2>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.HolderV2 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.HolderV2 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 2);
-            formatterResolver.GetFormatterWithVerify<global::SharedData.Version2>().Serialize(writer, value.MyProperty1, formatterResolver);
-            MessagePackBinary.WriteInt32(writer, value.After);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
+            formatterResolver.GetFormatterWithVerify<global::SharedData.Version2>().Serialize(ref writer, value.MyProperty1, formatterResolver);
+            MessagePackBinary.WriteInt32(ref writer, value.After);
         }
 
         public global::SharedData.HolderV2 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -1632,17 +1632,17 @@ namespace MessagePack.Formatters.SharedData
     public sealed class HolderV0Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.HolderV0>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.HolderV0 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.HolderV0 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 2);
-            formatterResolver.GetFormatterWithVerify<global::SharedData.Version0>().Serialize(writer, value.MyProperty1, formatterResolver);
-            MessagePackBinary.WriteInt32(writer, value.After);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
+            formatterResolver.GetFormatterWithVerify<global::SharedData.Version0>().Serialize(ref writer, value.MyProperty1, formatterResolver);
+            MessagePackBinary.WriteInt32(ref writer, value.After);
         }
 
         public global::SharedData.HolderV0 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -1687,17 +1687,17 @@ namespace MessagePack.Formatters.SharedData
     public sealed class Callback1Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.Callback1>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.Callback1 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.Callback1 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
             value.OnBeforeSerialize();
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 1);
-            MessagePackBinary.WriteInt32(writer, value.X);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 1);
+            MessagePackBinary.WriteInt32(ref writer, value.X);
         }
 
         public global::SharedData.Callback1 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -1738,17 +1738,17 @@ namespace MessagePack.Formatters.SharedData
     public sealed class Callback1_2Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.Callback1_2>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.Callback1_2 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.Callback1_2 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
             ((IMessagePackSerializationCallbackReceiver)value).OnBeforeSerialize();
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 1);
-            MessagePackBinary.WriteInt32(writer, value.X);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 1);
+            MessagePackBinary.WriteInt32(ref writer, value.X);
         }
 
         public global::SharedData.Callback1_2 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -1807,13 +1807,13 @@ namespace MessagePack.Formatters.SharedData
         }
 
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.Callback2 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.Callback2 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             
             value.OnBeforeSerialize();
-            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(writer, 1);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[0]);
-            MessagePackBinary.WriteInt32(writer, value.X);
+            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(ref writer, 1);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[0]);
+            MessagePackBinary.WriteInt32(ref writer, value.X);
         }
 
         public global::SharedData.Callback2 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -1877,13 +1877,13 @@ namespace MessagePack.Formatters.SharedData
         }
 
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.Callback2_2 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.Callback2_2 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             
             ((IMessagePackSerializationCallbackReceiver)value).OnBeforeSerialize();
-            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(writer, 1);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[0]);
-            MessagePackBinary.WriteInt32(writer, value.X);
+            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(ref writer, 1);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[0]);
+            MessagePackBinary.WriteInt32(ref writer, value.X);
         }
 
         public global::SharedData.Callback2_2 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -1929,17 +1929,17 @@ namespace MessagePack.Formatters.SharedData
     public sealed class SubUnionType1Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.SubUnionType1>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.SubUnionType1 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.SubUnionType1 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 2);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty1);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty1);
         }
 
         public global::SharedData.SubUnionType1 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -1984,17 +1984,17 @@ namespace MessagePack.Formatters.SharedData
     public sealed class SubUnionType2Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.SubUnionType2>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.SubUnionType2 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.SubUnionType2 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 2);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty2);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty2);
         }
 
         public global::SharedData.SubUnionType2 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -2039,19 +2039,19 @@ namespace MessagePack.Formatters.SharedData
     public sealed class MySubUnion1Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.MySubUnion1>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.MySubUnion1 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.MySubUnion1 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 4);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            MessagePackBinary.WriteInt32(writer, value.One);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 4);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            MessagePackBinary.WriteInt32(ref writer, value.One);
         }
 
         public global::SharedData.MySubUnion1 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -2091,16 +2091,16 @@ namespace MessagePack.Formatters.SharedData
     public sealed class MySubUnion2Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.MySubUnion2>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.MySubUnion2 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.MySubUnion2 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 6);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            MessagePackBinary.WriteInt32(writer, value.Two);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 6);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            MessagePackBinary.WriteInt32(ref writer, value.Two);
         }
 
         public global::SharedData.MySubUnion2 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -2139,18 +2139,18 @@ namespace MessagePack.Formatters.SharedData
     public sealed class MySubUnion3Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.MySubUnion3>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.MySubUnion3 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.MySubUnion3 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 3);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            MessagePackBinary.WriteInt32(writer, value.Three);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 3);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            MessagePackBinary.WriteInt32(ref writer, value.Three);
         }
 
         public global::SharedData.MySubUnion3 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -2190,18 +2190,18 @@ namespace MessagePack.Formatters.SharedData
     public sealed class MySubUnion4Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.MySubUnion4>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.MySubUnion4 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.MySubUnion4 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 8);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            MessagePackBinary.WriteInt32(writer, value.Four);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 8);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            MessagePackBinary.WriteInt32(ref writer, value.Four);
         }
 
         public global::SharedData.MySubUnion4 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -2240,23 +2240,23 @@ namespace MessagePack.Formatters.SharedData
     public sealed class VersioningUnionFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.VersioningUnion>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.VersioningUnion value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.VersioningUnion value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 8);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            MessagePackBinary.WriteInt32(writer, value.FV);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 8);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            MessagePackBinary.WriteInt32(ref writer, value.FV);
         }
 
         public global::SharedData.VersioningUnion Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -2296,18 +2296,18 @@ namespace MessagePack.Formatters.SharedData
     public sealed class MyClassFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.MyClass>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.MyClass value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.MyClass value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 3);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty1);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty2);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty3);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 3);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty1);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty2);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty3);
         }
 
         public global::SharedData.MyClass Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -2357,18 +2357,18 @@ namespace MessagePack.Formatters.SharedData
     public sealed class VersionBlockTestFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.VersionBlockTest>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.VersionBlockTest value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.VersionBlockTest value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 3);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty);
-            formatterResolver.GetFormatterWithVerify<global::SharedData.MyClass>().Serialize(writer, value.UnknownBlock, formatterResolver);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty2);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 3);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty);
+            formatterResolver.GetFormatterWithVerify<global::SharedData.MyClass>().Serialize(ref writer, value.UnknownBlock, formatterResolver);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty2);
         }
 
         public global::SharedData.VersionBlockTest Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -2418,18 +2418,18 @@ namespace MessagePack.Formatters.SharedData
     public sealed class UnVersionBlockTestFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.UnVersionBlockTest>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.UnVersionBlockTest value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.UnVersionBlockTest value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 3);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty);
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty2);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 3);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty2);
         }
 
         public global::SharedData.UnVersionBlockTest Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -2474,15 +2474,15 @@ namespace MessagePack.Formatters.SharedData
     public sealed class Empty1Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.Empty1>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.Empty1 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.Empty1 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 0);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 0);
         }
 
         public global::SharedData.Empty1 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -2533,15 +2533,15 @@ namespace MessagePack.Formatters.SharedData
         }
 
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.Empty2 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.Empty2 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(writer, 0);
+            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(ref writer, 0);
         }
 
         public global::SharedData.Empty2 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -2582,16 +2582,16 @@ namespace MessagePack.Formatters.SharedData
     public sealed class NonEmpty1Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.NonEmpty1>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.NonEmpty1 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.NonEmpty1 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 1);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 1);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty);
         }
 
         public global::SharedData.NonEmpty1 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -2649,17 +2649,17 @@ namespace MessagePack.Formatters.SharedData
         }
 
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.NonEmpty2 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.NonEmpty2 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(writer, 1);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[0]);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty);
+            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(ref writer, 1);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[0]);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty);
         }
 
         public global::SharedData.NonEmpty2 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -2705,12 +2705,12 @@ namespace MessagePack.Formatters.SharedData
     public sealed class VectorLike2Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.VectorLike2>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.VectorLike2 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.VectorLike2 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 2);
-            MessagePackBinary.WriteSingle(writer, value.x);
-            MessagePackBinary.WriteSingle(writer, value.y);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
+            MessagePackBinary.WriteSingle(ref writer, value.x);
+            MessagePackBinary.WriteSingle(ref writer, value.y);
         }
 
         public global::SharedData.VectorLike2 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -2754,13 +2754,13 @@ namespace MessagePack.Formatters.SharedData
     public sealed class Vector3LikeFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.Vector3Like>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.Vector3Like value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.Vector3Like value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 3);
-            MessagePackBinary.WriteSingle(writer, value.x);
-            MessagePackBinary.WriteSingle(writer, value.y);
-            MessagePackBinary.WriteSingle(writer, value.z);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 3);
+            MessagePackBinary.WriteSingle(ref writer, value.x);
+            MessagePackBinary.WriteSingle(ref writer, value.y);
+            MessagePackBinary.WriteSingle(ref writer, value.z);
         }
 
         public global::SharedData.Vector3Like Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -2809,31 +2809,31 @@ namespace MessagePack.Formatters.SharedData
     public sealed class ArrayOptimizeClassFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.ArrayOptimizeClass>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.ArrayOptimizeClass value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.ArrayOptimizeClass value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteArrayHeader(writer, 16);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty0);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty1);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty2);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty3);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty4);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty5);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty6);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty7);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty8);
-            MessagePackBinary.WriteInt32(writer, value.MyProvperty9);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty10);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty11);
-            MessagePackBinary.WriteInt32(writer, value.MyPropverty12);
-            MessagePackBinary.WriteInt32(writer, value.MyPropevrty13);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty14);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty15);
+            global::MessagePack.MessagePackBinary.WriteArrayHeader(ref writer, 16);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty0);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty1);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty2);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty3);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty4);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty5);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty6);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty7);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty8);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProvperty9);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty10);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty11);
+            MessagePackBinary.WriteInt32(ref writer, value.MyPropverty12);
+            MessagePackBinary.WriteInt32(ref writer, value.MyPropevrty13);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty14);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty15);
         }
 
         public global::SharedData.ArrayOptimizeClass Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -2948,16 +2948,16 @@ namespace MessagePack.Formatters.SharedData
     public sealed class NestParent_NestContractFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.NestParent.NestContract>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.NestParent.NestContract value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.NestParent.NestContract value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 1);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 1);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty);
         }
 
         public global::SharedData.NestParent.NestContract Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -2997,16 +2997,16 @@ namespace MessagePack.Formatters.SharedData
     public sealed class FooClassFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.FooClass>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.FooClass value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.FooClass value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 1);
-            MessagePackBinary.WriteInt32(writer, value.XYZ);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 1);
+            MessagePackBinary.WriteInt32(ref writer, value.XYZ);
         }
 
         public global::SharedData.FooClass Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -3046,16 +3046,16 @@ namespace MessagePack.Formatters.SharedData
     public sealed class BarClassFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.BarClass>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.BarClass value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.BarClass value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 1);
-            formatterResolver.GetFormatterWithVerify<string>().Serialize(writer, value.OPQ, formatterResolver);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 1);
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.OPQ, formatterResolver);
         }
 
         public global::SharedData.BarClass Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -3095,19 +3095,19 @@ namespace MessagePack.Formatters.SharedData
     public sealed class WithIndexerFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::SharedData.WithIndexer>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::SharedData.WithIndexer value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SharedData.WithIndexer value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 3);
-            MessagePackBinary.WriteInt32(writer, value.Data1);
-            formatterResolver.GetFormatterWithVerify<string>().Serialize(writer, value.Data2, formatterResolver);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 3);
+            MessagePackBinary.WriteInt32(ref writer, value.Data1);
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Data2, formatterResolver);
             throw new NotSupportedException();
-            //MessagePackBinary.WriteInt32(writer, value.this[]);
+            //MessagePackBinary.WriteInt32(ref writer, value.this[]);
         }
 
         public global::SharedData.WithIndexer Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -3174,16 +3174,16 @@ namespace MessagePack.Formatters.Abcdefg.Efcdigjl.Ateatatea.Hgfagfafgad
     public sealed class TnonodsfarnoiuAtatqagaFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Abcdefg.Efcdigjl.Ateatatea.Hgfagfafgad.TnonodsfarnoiuAtatqaga>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::Abcdefg.Efcdigjl.Ateatatea.Hgfagfafgad.TnonodsfarnoiuAtatqaga value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::Abcdefg.Efcdigjl.Ateatatea.Hgfagfafgad.TnonodsfarnoiuAtatqaga value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 1);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 1);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty);
         }
 
         public global::Abcdefg.Efcdigjl.Ateatatea.Hgfagfafgad.TnonodsfarnoiuAtatqaga Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -3240,16 +3240,16 @@ namespace MessagePack.Formatters
     public sealed class GlobalManFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::GlobalMan>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::GlobalMan value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::GlobalMan value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 1);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 1);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty);
         }
 
         public global::GlobalMan Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -3289,19 +3289,19 @@ namespace MessagePack.Formatters
     public sealed class MessageFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Message>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::Message value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::Message value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 4);
-            MessagePackBinary.WriteInt32(writer, value.UserId);
-            MessagePackBinary.WriteInt32(writer, value.RoomId);
-            formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Serialize(writer, value.PostTime, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<global::IMessageBody>().Serialize(writer, value.Body, formatterResolver);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 4);
+            MessagePackBinary.WriteInt32(ref writer, value.UserId);
+            MessagePackBinary.WriteInt32(ref writer, value.RoomId);
+            formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Serialize(ref writer, value.PostTime, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<global::IMessageBody>().Serialize(ref writer, value.Body, formatterResolver);
         }
 
         public global::Message Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -3356,16 +3356,16 @@ namespace MessagePack.Formatters
     public sealed class TextMessageBodyFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::TextMessageBody>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::TextMessageBody value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::TextMessageBody value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 1);
-            formatterResolver.GetFormatterWithVerify<string>().Serialize(writer, value.Text, formatterResolver);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 1);
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Text, formatterResolver);
         }
 
         public global::TextMessageBody Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -3405,16 +3405,16 @@ namespace MessagePack.Formatters
     public sealed class StampMessageBodyFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::StampMessageBody>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::StampMessageBody value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::StampMessageBody value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 1);
-            MessagePackBinary.WriteInt32(writer, value.StampId);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 1);
+            MessagePackBinary.WriteInt32(ref writer, value.StampId);
         }
 
         public global::StampMessageBody Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -3454,17 +3454,17 @@ namespace MessagePack.Formatters
     public sealed class QuestMessageBodyFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::QuestMessageBody>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::QuestMessageBody value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::QuestMessageBody value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 2);
-            MessagePackBinary.WriteInt32(writer, value.QuestId);
-            formatterResolver.GetFormatterWithVerify<string>().Serialize(writer, value.Text, formatterResolver);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
+            MessagePackBinary.WriteInt32(ref writer, value.QuestId);
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Text, formatterResolver);
         }
 
         public global::QuestMessageBody Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -3509,22 +3509,22 @@ namespace MessagePack.Formatters
     public sealed class ArrayTestTestFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::ArrayTestTest>
     {
 
-        public void Serialize(IBufferWriter<byte> writer, global::ArrayTestTest value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::ArrayTestTest value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 7);
-            formatterResolver.GetFormatterWithVerify<int[]>().Serialize(writer, value.MyProperty0, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<int[,]>().Serialize(writer, value.MyProperty1, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<global::GlobalMyEnum[,]>().Serialize(writer, value.MyProperty2, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<int[,,]>().Serialize(writer, value.MyProperty3, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<int[,,,]>().Serialize(writer, value.MyProperty4, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<global::GlobalMyEnum[]>().Serialize(writer, value.MyProperty5, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<global::QuestMessageBody[]>().Serialize(writer, value.MyProperty6, formatterResolver);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 7);
+            formatterResolver.GetFormatterWithVerify<int[]>().Serialize(ref writer, value.MyProperty0, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<int[,]>().Serialize(ref writer, value.MyProperty1, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<global::GlobalMyEnum[,]>().Serialize(ref writer, value.MyProperty2, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<int[,,]>().Serialize(ref writer, value.MyProperty3, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<int[,,,]>().Serialize(ref writer, value.MyProperty4, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<global::GlobalMyEnum[]>().Serialize(ref writer, value.MyProperty5, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<global::QuestMessageBody[]>().Serialize(ref writer, value.MyProperty6, formatterResolver);
         }
 
         public global::ArrayTestTest Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -3622,27 +3622,27 @@ namespace MessagePack.Formatters
         }
 
 
-        public void Serialize(IBufferWriter<byte> writer, global::SimpleModel value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::SimpleModel value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(writer, 6);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[0]);
-            MessagePackBinary.WriteInt32(writer, value.Id);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[1]);
-            formatterResolver.GetFormatterWithVerify<string>().Serialize(writer, value.Name, formatterResolver);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[2]);
-            formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Serialize(writer, value.CreatedOn, formatterResolver);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[3]);
-            MessagePackBinary.WriteInt32(writer, value.Precision);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[4]);
-            formatterResolver.GetFormatterWithVerify<decimal>().Serialize(writer, value.Money, formatterResolver);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[5]);
-            MessagePackBinary.WriteInt64(writer, value.Amount);
+            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(ref writer, 6);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[0]);
+            MessagePackBinary.WriteInt32(ref writer, value.Id);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[1]);
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Name, formatterResolver);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[2]);
+            formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Serialize(ref writer, value.CreatedOn, formatterResolver);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[3]);
+            MessagePackBinary.WriteInt32(ref writer, value.Precision);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[4]);
+            formatterResolver.GetFormatterWithVerify<decimal>().Serialize(ref writer, value.Money, formatterResolver);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[5]);
+            MessagePackBinary.WriteInt64(ref writer, value.Amount);
         }
 
         public global::SimpleModel Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -3740,27 +3740,27 @@ namespace MessagePack.Formatters
         }
 
 
-        public void Serialize(IBufferWriter<byte> writer, global::ComplexModel value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::ComplexModel value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(writer, 6);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[0]);
-            formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.IDictionary<string, string>>().Serialize(writer, value.AdditionalProperty, formatterResolver);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[1]);
-            formatterResolver.GetFormatterWithVerify<global::System.DateTimeOffset>().Serialize(writer, value.CreatedOn, formatterResolver);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[2]);
-            formatterResolver.GetFormatterWithVerify<global::System.Guid>().Serialize(writer, value.Id, formatterResolver);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[3]);
-            formatterResolver.GetFormatterWithVerify<string>().Serialize(writer, value.Name, formatterResolver);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[4]);
-            formatterResolver.GetFormatterWithVerify<global::System.DateTimeOffset>().Serialize(writer, value.UpdatedOn, formatterResolver);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[5]);
-            formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.IList<global::SimpleModel>>().Serialize(writer, value.SimpleModels, formatterResolver);
+            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(ref writer, 6);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[0]);
+            formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.IDictionary<string, string>>().Serialize(ref writer, value.AdditionalProperty, formatterResolver);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[1]);
+            formatterResolver.GetFormatterWithVerify<global::System.DateTimeOffset>().Serialize(ref writer, value.CreatedOn, formatterResolver);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[2]);
+            formatterResolver.GetFormatterWithVerify<global::System.Guid>().Serialize(ref writer, value.Id, formatterResolver);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[3]);
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Name, formatterResolver);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[4]);
+            formatterResolver.GetFormatterWithVerify<global::System.DateTimeOffset>().Serialize(ref writer, value.UpdatedOn, formatterResolver);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[5]);
+            formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.IList<global::SimpleModel>>().Serialize(ref writer, value.SimpleModels, formatterResolver);
         }
 
         public global::ComplexModel Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
@@ -3880,33 +3880,33 @@ namespace MessagePack.Formatters.PerfBenchmarkDotNet
         }
 
 
-        public void Serialize(IBufferWriter<byte> writer, global::PerfBenchmarkDotNet.StringKeySerializerTarget value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, global::PerfBenchmarkDotNet.StringKeySerializerTarget value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
             
-            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(writer, 9);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[0]);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty1);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[1]);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty2);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[2]);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty3);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[3]);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty4);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[4]);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty5);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[5]);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty6);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[6]);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty7);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[7]);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty8);
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[8]);
-            MessagePackBinary.WriteInt32(writer, value.MyProperty9);
+            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(ref writer, 9);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[0]);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty1);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[1]);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty2);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[2]);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty3);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[3]);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty4);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[4]);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty5);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[5]);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty6);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[6]);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty7);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[7]);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty8);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[8]);
+            MessagePackBinary.WriteInt32(ref writer, value.MyProperty9);
         }
 
         public global::PerfBenchmarkDotNet.StringKeySerializerTarget Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)

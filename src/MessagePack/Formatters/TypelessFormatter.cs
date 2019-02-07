@@ -21,7 +21,7 @@ namespace MessagePack.Formatters
 
         static readonly Regex SubtractFullNameRegex = new Regex(@", Version=\d+.\d+.\d+.\d+, Culture=\w+, PublicKeyToken=\w+", RegexOptions.Compiled);
 
-        delegate void SerializeMethod(object dynamicContractlessFormatter, IBufferWriter<byte> writer, object value, IFormatterResolver formatterResolver);
+        delegate void SerializeMethod(object dynamicContractlessFormatter, ref BufferWriter writer, object value, IFormatterResolver formatterResolver);
         delegate object DeserializeMethod(object dynamicContractlessFormatter, ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver);
 
         readonly ThreadsafeTypeKeyHashTable<KeyValuePair<object, SerializeMethod>> serializers = new ThreadsafeTypeKeyHashTable<KeyValuePair<object, SerializeMethod>>();
@@ -93,7 +93,7 @@ namespace MessagePack.Formatters
 
         public TypelessFormatter()
         {
-            serializers.TryAdd(typeof(object), _ => new KeyValuePair<object, SerializeMethod>(null, (object p1, IBufferWriter<byte> p2, object p3, IFormatterResolver p4) => { }));
+            serializers.TryAdd(typeof(object), _ => new KeyValuePair<object, SerializeMethod>(null, (object p1, ref BufferWriter p2, object p3, IFormatterResolver p4) => { }));
             deserializers.TryAdd(typeof(object), _ => new KeyValuePair<object, DeserializeMethod>(null, (object p1, ref ReadOnlySequence<byte> p2, IFormatterResolver p3) => new object()));
         }
 
@@ -120,11 +120,11 @@ namespace MessagePack.Formatters
             }
         }
 
-        public void Serialize(IBufferWriter<byte> writer, object value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, object value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(writer);
+                MessagePackBinary.WriteNil(ref writer);
                 return;
             }
 
@@ -152,7 +152,7 @@ namespace MessagePack.Formatters
 
             if (typeName == null)
             {
-                Resolvers.TypelessFormatterFallbackResolver.Instance.GetFormatter<object>().Serialize(writer, value, formatterResolver);
+                Resolvers.TypelessFormatterFallbackResolver.Instance.GetFormatter<object>().Serialize(ref writer, value, formatterResolver);
                 return;
             }
 
@@ -174,11 +174,11 @@ namespace MessagePack.Formatters
 
                         var formatterType = typeof(IMessagePackFormatter<>).MakeGenericType(type);
                         var param0 = Expression.Parameter(typeof(object), "formatter");
-                        var param1 = Expression.Parameter(typeof(IBufferWriter<byte>), "writer");
+                        var param1 = Expression.Parameter(typeof(BufferWriter).MakeByRefType(), "writer");
                         var param2 = Expression.Parameter(typeof(object), "value");
                         var param3 = Expression.Parameter(typeof(IFormatterResolver), "formatterResolver");
 
-                        var serializeMethodInfo = formatterType.GetRuntimeMethod("Serialize", new[] { typeof(IBufferWriter<byte>), type, typeof(IFormatterResolver) });
+                        var serializeMethodInfo = formatterType.GetRuntimeMethod("Serialize", new[] { typeof(BufferWriter).MakeByRefType(), type, typeof(IFormatterResolver) });
 
                         var body = Expression.Call(
                             Expression.Convert(param0, formatterType),
@@ -198,11 +198,13 @@ namespace MessagePack.Formatters
             // mark will be written at the end, when size is known
             using (var sequence = new Nerdbank.Streams.Sequence<byte>())
             {
-                MessagePackBinary.WriteStringBytes(sequence, typeName);
-                formatterAndDelegate.Value(formatterAndDelegate.Key, sequence, value, formatterResolver);
+                var sequenceWriter = new BufferWriter(sequence);
+                MessagePackBinary.WriteStringBytes(ref sequenceWriter, typeName);
+                formatterAndDelegate.Value(formatterAndDelegate.Key, ref sequenceWriter, value, formatterResolver);
+                sequenceWriter.Commit();
 
                 // mark as extension with code 100
-                MessagePackBinary.WriteExtensionFormatHeaderForceExt32Block(writer, (sbyte)TypelessFormatter.ExtensionTypeCode, (int)sequence.Length);
+                MessagePackBinary.WriteExtensionFormatHeaderForceExt32Block(ref writer, (sbyte)TypelessFormatter.ExtensionTypeCode, (int)sequence.Length);
                 var copySpan = writer.GetSpan((int)sequence.Length);
                 sequence.AsReadOnlySequence.CopyTo(copySpan);
                 writer.Advance((int)sequence.Length);

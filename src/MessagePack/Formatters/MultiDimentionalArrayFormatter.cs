@@ -11,11 +11,11 @@ namespace MessagePack.Formatters
     {
         const int ArrayLength = 3;
 
-        public void Serialize(IBufferWriter<byte> writer, T[,] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, T[,] value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(writer);
+                MessagePackBinary.WriteNil(ref writer);
             }
             else
             {
@@ -24,14 +24,14 @@ namespace MessagePack.Formatters
 
                 var formatter = formatterResolver.GetFormatterWithVerify<T>();
 
-                MessagePackBinary.WriteArrayHeader(writer, ArrayLength);
-                MessagePackBinary.WriteInt32(writer, i);
-                MessagePackBinary.WriteInt32(writer, j);
+                MessagePackBinary.WriteArrayHeader(ref writer, ArrayLength);
+                MessagePackBinary.WriteInt32(ref writer, i);
+                MessagePackBinary.WriteInt32(ref writer, j);
 
-                MessagePackBinary.WriteArrayHeader(writer, value.Length);
+                MessagePackBinary.WriteArrayHeader(ref writer, value.Length);
                 foreach (var item in value)
                 {
-                    formatter.Serialize(writer, item, formatterResolver);
+                    formatter.Serialize(ref writer, item, formatterResolver);
                 }
             }
         }
@@ -82,11 +82,11 @@ namespace MessagePack.Formatters
     {
         const int ArrayLength = 4;
 
-        public void Serialize(IBufferWriter<byte> writer, T[,,] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, T[,,] value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(writer);
+                MessagePackBinary.WriteNil(ref writer);
             }
             else
             {
@@ -96,15 +96,15 @@ namespace MessagePack.Formatters
 
                 var formatter = formatterResolver.GetFormatterWithVerify<T>();
 
-                MessagePackBinary.WriteArrayHeader(writer, ArrayLength);
-                MessagePackBinary.WriteInt32(writer, i);
-                MessagePackBinary.WriteInt32(writer, j);
-                MessagePackBinary.WriteInt32(writer, k);
+                MessagePackBinary.WriteArrayHeader(ref writer, ArrayLength);
+                MessagePackBinary.WriteInt32(ref writer, i);
+                MessagePackBinary.WriteInt32(ref writer, j);
+                MessagePackBinary.WriteInt32(ref writer, k);
 
-                MessagePackBinary.WriteArrayHeader(writer, value.Length);
+                MessagePackBinary.WriteArrayHeader(ref writer, value.Length);
                 foreach (var item in value)
                 {
-                    formatter.Serialize(writer, item, formatterResolver);
+                    formatter.Serialize(ref writer, item, formatterResolver);
                 }
             }
         }
@@ -163,11 +163,11 @@ namespace MessagePack.Formatters
     {
         const int ArrayLength = 5;
 
-        public void Serialize(IBufferWriter<byte> writer, T[,,,] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, T[,,,] value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(writer);
+                MessagePackBinary.WriteNil(ref writer);
             }
             else
             {
@@ -178,16 +178,16 @@ namespace MessagePack.Formatters
 
                 var formatter = formatterResolver.GetFormatterWithVerify<T>();
 
-                MessagePackBinary.WriteArrayHeader(writer, ArrayLength);
-                MessagePackBinary.WriteInt32(writer, i);
-                MessagePackBinary.WriteInt32(writer, j);
-                MessagePackBinary.WriteInt32(writer, k);
-                MessagePackBinary.WriteInt32(writer, l);
+                MessagePackBinary.WriteArrayHeader(ref writer, ArrayLength);
+                MessagePackBinary.WriteInt32(ref writer, i);
+                MessagePackBinary.WriteInt32(ref writer, j);
+                MessagePackBinary.WriteInt32(ref writer, k);
+                MessagePackBinary.WriteInt32(ref writer, l);
 
-                MessagePackBinary.WriteArrayHeader(writer, value.Length);
+                MessagePackBinary.WriteArrayHeader(ref writer, value.Length);
                 foreach (var item in value)
                 {
-                    formatter.Serialize(writer, item, formatterResolver);
+                    formatter.Serialize(ref writer, item, formatterResolver);
                 }
             }
         }

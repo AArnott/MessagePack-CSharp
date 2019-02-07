@@ -4,9 +4,9 @@ namespace MessagePack.Formatters
 {
     public sealed class IgnoreFormatter<T> : IMessagePackFormatter<T>
     {
-        public void Serialize(IBufferWriter<byte> writer, T value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, T value, IFormatterResolver formatterResolver)
         {
-            MessagePackBinary.WriteNil(writer);
+            MessagePackBinary.WriteNil(ref writer);
         }
 
         public T Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)

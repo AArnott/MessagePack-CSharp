@@ -12,6 +12,7 @@
 using System;
 using System.Buffers;
 using System.Runtime.CompilerServices;
+using MessagePack.Formatters;
 
 namespace MessagePack.Internal
 {
@@ -19,7 +20,7 @@ namespace MessagePack.Internal
     {
 <# for(var i = 4; i <= Max; i++) { #>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw<#= i #>(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw<#= i #>(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -44,7 +45,7 @@ namespace MessagePack.Internal
     {
 <# for(var i = 8; i <= Max; i++) { #>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw<#= i #>(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw<#= i #>(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 

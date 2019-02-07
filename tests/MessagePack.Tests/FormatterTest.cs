@@ -1,4 +1,5 @@
-﻿using Nerdbank.Streams;
+﻿using MessagePack.Formatters;
+using Nerdbank.Streams;
 using SharedData;
 using System;
 using System.Collections;
@@ -212,19 +213,27 @@ namespace MessagePack.Tests
             var d = new String('あ', 40000);
 
             var sequenceA = new Sequence<byte>();
-            MessagePackBinary.WriteString(sequenceA, a);
+            var sequenceAWriter = new BufferWriter(sequenceA);
+            MessagePackBinary.WriteString(ref sequenceAWriter, a);
+            sequenceAWriter.Commit();
             sequenceA.Length.Is(Encoding.UTF8.GetByteCount(a) + 1);
 
             var sequenceB = new Sequence<byte>();
-            MessagePackBinary.WriteString(sequenceB, b);
+            var sequenceBWriter = new BufferWriter(sequenceB);
+            MessagePackBinary.WriteString(ref sequenceBWriter, b);
+            sequenceBWriter.Commit();
             sequenceB.Length.Is(Encoding.UTF8.GetByteCount(b) + 2);
 
             var sequenceC = new Sequence<byte>();
-            MessagePackBinary.WriteString(sequenceC, c);
+            var sequenceCWriter = new BufferWriter(sequenceC);
+            MessagePackBinary.WriteString(ref sequenceCWriter, c);
+            sequenceCWriter.Commit();
             sequenceC.Length.Is(Encoding.UTF8.GetByteCount(c) + 3);
 
             var sequenceD = new Sequence<byte>();
-            MessagePackBinary.WriteString(sequenceD, d);
+            var sequenceDWriter = new BufferWriter(sequenceD);
+            MessagePackBinary.WriteString(ref sequenceDWriter, d);
+            sequenceDWriter.Commit();
             sequenceD.Length.Is(Encoding.UTF8.GetByteCount(d) + 5);
 
             var bytesA = sequenceA.AsReadOnlySequence;

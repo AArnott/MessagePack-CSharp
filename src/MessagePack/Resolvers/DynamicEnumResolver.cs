@@ -88,16 +88,16 @@ namespace MessagePack.Resolvers
 
             var typeBuilder = assembly.DefineType("MessagePack.Formatters." + enumType.FullName.Replace(".", "_") + "Formatter" + Interlocked.Increment(ref nameSequence), TypeAttributes.Public | TypeAttributes.Sealed, null, new[] { formatterType });
 
-            // void Serialize(IBufferWriter<byte> writer, T value, IFormatterResolver formatterResolver);
+            // void Serialize(ref BufferWriter writer, T value, IFormatterResolver formatterResolver);
             {
                 var method = typeBuilder.DefineMethod("Serialize", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual,
                     null,
-                    new Type[] { typeof(IBufferWriter<byte>), enumType, typeof(IFormatterResolver) });
+                    new Type[] { typeof(BufferWriter).MakeByRefType(), enumType, typeof(IFormatterResolver) });
 
                 var il = method.GetILGenerator();
                 il.Emit(OpCodes.Ldarg_1);
                 il.Emit(OpCodes.Ldarg_2);
-                il.Emit(OpCodes.Call, typeof(MessagePackBinary).GetRuntimeMethod("Write" + underlyingType.Name, new[] { typeof(IBufferWriter<byte>), underlyingType }));
+                il.Emit(OpCodes.Call, typeof(MessagePackBinary).GetRuntimeMethod("Write" + underlyingType.Name, new[] { typeof(BufferWriter).MakeByRefType(), underlyingType }));
                 il.Emit(OpCodes.Ret);
             }
 

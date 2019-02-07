@@ -49,11 +49,11 @@ namespace MessagePack.Formatters
 
 #endif
 
-        public void Serialize(IBufferWriter<byte> writer, object value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, object value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(writer);
+                MessagePackBinary.WriteNil(ref writer);
                 return;
             }
 
@@ -65,49 +65,49 @@ namespace MessagePack.Formatters
                 switch (code)
                 {
                     case 0:
-                        MessagePackBinary.WriteBoolean(writer, (bool)value);
+                        MessagePackBinary.WriteBoolean(ref writer, (bool)value);
                         return;
                     case 1:
-                        MessagePackBinary.WriteChar(writer, (char)value);
+                        MessagePackBinary.WriteChar(ref writer, (char)value);
                         return;
                     case 2:
-                        MessagePackBinary.WriteSByteForceSByteBlock(writer, (sbyte)value);
+                        MessagePackBinary.WriteSByteForceSByteBlock(ref writer, (sbyte)value);
                         return;
                     case 3:
-                        MessagePackBinary.WriteByteForceByteBlock(writer, (byte)value);
+                        MessagePackBinary.WriteByteForceByteBlock(ref writer, (byte)value);
                         return;
                     case 4:
-                        MessagePackBinary.WriteInt16ForceInt16Block(writer, (Int16)value);
+                        MessagePackBinary.WriteInt16ForceInt16Block(ref writer, (Int16)value);
                         return;
                     case 5:
-                        MessagePackBinary.WriteUInt16ForceUInt16Block(writer, (UInt16)value);
+                        MessagePackBinary.WriteUInt16ForceUInt16Block(ref writer, (UInt16)value);
                         return;
                     case 6:
-                        MessagePackBinary.WriteInt32ForceInt32Block(writer, (Int32)value);
+                        MessagePackBinary.WriteInt32ForceInt32Block(ref writer, (Int32)value);
                         return;
                     case 7:
-                        MessagePackBinary.WriteUInt32ForceUInt32Block(writer, (UInt32)value);
+                        MessagePackBinary.WriteUInt32ForceUInt32Block(ref writer, (UInt32)value);
                         return;
                     case 8:
-                        MessagePackBinary.WriteInt64ForceInt64Block(writer, (Int64)value);
+                        MessagePackBinary.WriteInt64ForceInt64Block(ref writer, (Int64)value);
                         return;
                     case 9:
-                        MessagePackBinary.WriteUInt64ForceUInt64Block(writer, (UInt64)value);
+                        MessagePackBinary.WriteUInt64ForceUInt64Block(ref writer, (UInt64)value);
                         return;
                     case 10:
-                        MessagePackBinary.WriteSingle(writer, (Single)value);
+                        MessagePackBinary.WriteSingle(ref writer, (Single)value);
                         return;
                     case 11:
-                        MessagePackBinary.WriteDouble(writer, (double)value);
+                        MessagePackBinary.WriteDouble(ref writer, (double)value);
                         return;
                     case 12:
-                        MessagePackBinary.WriteDateTime(writer, (DateTime)value);
+                        MessagePackBinary.WriteDateTime(ref writer, (DateTime)value);
                         return;
                     case 13:
-                        MessagePackBinary.WriteString(writer, (string)value);
+                        MessagePackBinary.WriteString(ref writer, (string)value);
                         return;
                     case 14:
-                        MessagePackBinary.WriteBytes(writer, (byte[])value);
+                        MessagePackBinary.WriteBytes(ref writer, (byte[])value);
                         return;
                     default:
                         throw new InvalidOperationException("Not supported primitive object resolver. type:" + t.Name);
@@ -126,28 +126,28 @@ namespace MessagePack.Formatters
                     switch (code2)
                     {
                         case 2:
-                            MessagePackBinary.WriteSByteForceSByteBlock(writer, (sbyte)value);
+                            MessagePackBinary.WriteSByteForceSByteBlock(ref writer, (sbyte)value);
                             return;
                         case 3:
-                            MessagePackBinary.WriteByteForceByteBlock(writer, (byte)value);
+                            MessagePackBinary.WriteByteForceByteBlock(ref writer, (byte)value);
                             return;
                         case 4:
-                            MessagePackBinary.WriteInt16ForceInt16Block(writer, (Int16)value);
+                            MessagePackBinary.WriteInt16ForceInt16Block(ref writer, (Int16)value);
                             return;
                         case 5:
-                            MessagePackBinary.WriteUInt16ForceUInt16Block(writer, (UInt16)value);
+                            MessagePackBinary.WriteUInt16ForceUInt16Block(ref writer, (UInt16)value);
                             return;
                         case 6:
-                            MessagePackBinary.WriteInt32ForceInt32Block(writer, (Int32)value);
+                            MessagePackBinary.WriteInt32ForceInt32Block(ref writer, (Int32)value);
                             return;
                         case 7:
-                            MessagePackBinary.WriteUInt32ForceUInt32Block(writer, (UInt32)value);
+                            MessagePackBinary.WriteUInt32ForceUInt32Block(ref writer, (UInt32)value);
                             return;
                         case 8:
-                            MessagePackBinary.WriteInt64ForceInt64Block(writer, (Int64)value);
+                            MessagePackBinary.WriteInt64ForceInt64Block(ref writer, (Int64)value);
                             return;
                         case 9:
-                            MessagePackBinary.WriteUInt64ForceUInt64Block(writer, (UInt64)value);
+                            MessagePackBinary.WriteUInt64ForceUInt64Block(ref writer, (UInt64)value);
                             return;
                         default:
                             break;
@@ -156,21 +156,21 @@ namespace MessagePack.Formatters
                 else if (value is System.Collections.IDictionary) // check IDictionary first
                 {
                     var d = value as System.Collections.IDictionary;
-                    MessagePackBinary.WriteMapHeader(writer, d.Count);
+                    MessagePackBinary.WriteMapHeader(ref writer, d.Count);
                     foreach (System.Collections.DictionaryEntry item in d)
                     {
-                        Serialize(writer, item.Key, formatterResolver);
-                        Serialize(writer, item.Value, formatterResolver);
+                        Serialize(ref writer, item.Key, formatterResolver);
+                        Serialize(ref writer, item.Value, formatterResolver);
                     }
                     return;
                 }
                 else if (value is System.Collections.ICollection)
                 {
                     var c = value as System.Collections.ICollection;
-                    MessagePackBinary.WriteArrayHeader(writer, c.Count);
+                    MessagePackBinary.WriteArrayHeader(ref writer, c.Count);
                     foreach (var item in c)
                     {
-                        Serialize(writer, item, formatterResolver);
+                        Serialize(ref writer, item, formatterResolver);
                     }
                     return;
                 }

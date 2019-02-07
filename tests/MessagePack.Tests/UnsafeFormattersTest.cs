@@ -16,7 +16,9 @@ namespace MessagePack.Tests
         {
             var guid = Guid.NewGuid();
             var sequence = new Sequence<byte>();
-            BinaryGuidFormatter.Instance.Serialize(sequence, guid, null);
+            var sequenceWriter = new BufferWriter(sequence);
+            BinaryGuidFormatter.Instance.Serialize(ref sequenceWriter, guid, null);
+            sequenceWriter.Commit();
             sequence.Length.Is(18);
 
             var sequenceReader = sequence.AsReadOnlySequence;
@@ -31,7 +33,9 @@ namespace MessagePack.Tests
         {
             var d = new Decimal(1341, 53156, 61, true, 3);
             var sequence = new Sequence<byte>();
-            BinaryDecimalFormatter.Instance.Serialize(sequence, d, null);
+            var sequenceWriter = new BufferWriter(sequence);
+            BinaryDecimalFormatter.Instance.Serialize(ref sequenceWriter, d, null);
+            sequenceWriter.Commit();
             sequence.Length.Is(18);
 
             var sequenceReader = sequence.AsReadOnlySequence;

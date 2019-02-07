@@ -3,13 +3,14 @@
 using System;
 using System.Buffers;
 using System.Runtime.CompilerServices;
+using MessagePack.Formatters;
 
 namespace MessagePack.Internal
 {
     public static partial class UnsafeMemory32
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw4(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw4(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -23,7 +24,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw5(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw5(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -38,7 +39,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw6(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw6(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -53,7 +54,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw7(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw7(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -68,7 +69,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw8(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw8(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -83,7 +84,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw9(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw9(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -99,7 +100,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw10(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw10(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -115,7 +116,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw11(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw11(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -131,7 +132,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw12(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw12(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -147,7 +148,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw13(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw13(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -164,7 +165,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw14(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw14(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -181,7 +182,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw15(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw15(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -198,7 +199,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw16(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw16(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -215,7 +216,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw17(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw17(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -233,7 +234,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw18(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw18(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -251,7 +252,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw19(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw19(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -269,7 +270,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw20(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw20(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -287,7 +288,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw21(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw21(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -306,7 +307,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw22(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw22(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -325,7 +326,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw23(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw23(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -344,7 +345,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw24(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw24(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -363,7 +364,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw25(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw25(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -383,7 +384,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw26(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw26(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -403,7 +404,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw27(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw27(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -423,7 +424,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw28(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw28(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -443,7 +444,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw29(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw29(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -464,7 +465,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw30(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw30(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -485,7 +486,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw31(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw31(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -510,7 +511,7 @@ namespace MessagePack.Internal
     public static partial class UnsafeMemory64
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw8(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw8(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -524,7 +525,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw9(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw9(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -539,7 +540,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw10(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw10(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -554,7 +555,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw11(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw11(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -569,7 +570,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw12(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw12(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -584,7 +585,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw13(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw13(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -599,7 +600,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw14(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw14(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -614,7 +615,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw15(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw15(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -629,7 +630,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw16(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw16(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -644,7 +645,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw17(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw17(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -660,7 +661,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw18(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw18(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -676,7 +677,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw19(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw19(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -692,7 +693,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw20(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw20(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -708,7 +709,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw21(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw21(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -724,7 +725,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw22(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw22(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -740,7 +741,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw23(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw23(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -756,7 +757,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw24(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw24(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -772,7 +773,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw25(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw25(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -789,7 +790,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw26(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw26(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -806,7 +807,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw27(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw27(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -823,7 +824,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw28(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw28(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -840,7 +841,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw29(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw29(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -857,7 +858,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw30(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw30(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 
@@ -874,7 +875,7 @@ namespace MessagePack.Internal
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void WriteRaw31(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static unsafe void WriteRaw31(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             var dst = writer.GetSpan(src.Length);
 

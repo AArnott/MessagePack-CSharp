@@ -17,11 +17,11 @@ namespace MessagePack.Formatters
         where TDictionary : IEnumerable<KeyValuePair<TKey, TValue>>
         where TEnumerator : IEnumerator<KeyValuePair<TKey, TValue>>
     {
-        public void Serialize(IBufferWriter<byte> writer, TDictionary value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, TDictionary value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(writer);
+                MessagePackBinary.WriteNil(ref writer);
             }
             else
             {
@@ -49,7 +49,7 @@ namespace MessagePack.Formatters
                     }
                 }
 
-                MessagePackBinary.WriteMapHeader(writer, count);
+                MessagePackBinary.WriteMapHeader(ref writer, count);
 
                 var e = GetSourceEnumerator(value);
                 try
@@ -57,8 +57,8 @@ namespace MessagePack.Formatters
                     while (e.MoveNext())
                     {
                         var item = e.Current;
-                        keyFormatter.Serialize(writer, item.Key, formatterResolver);
-                        valueFormatter.Serialize(writer, item.Value, formatterResolver);
+                        keyFormatter.Serialize(ref writer, item.Key, formatterResolver);
+                        valueFormatter.Serialize(ref writer, item.Value, formatterResolver);
                     }
                 }
                 finally
@@ -272,7 +272,7 @@ namespace MessagePack.Formatters
     public abstract class DictionaryFormatterBase<TKey, TValue, TIntermediate, TDictionary> : IMessagePackFormatter<TDictionary>
         where TDictionary : IDictionary<TKey, TValue>
     {
-        public void Serialize(IBufferWriter<byte> writer, TDictionary value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, TDictionary value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {

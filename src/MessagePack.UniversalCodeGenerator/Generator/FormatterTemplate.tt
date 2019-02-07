@@ -42,12 +42,12 @@ namespace <#= Namespace #>
 
 <# } #>
 
-        public void Serialize(IBufferWriter<byte> writer, <#= objInfo.FullName #> value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, <#= objInfo.FullName #> value, global::MessagePack.IFormatterResolver formatterResolver)
         {
 <# if( objInfo.IsClass) { #>
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(writer);
+                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
                 return;
             }
 <# } #>            
@@ -57,23 +57,23 @@ namespace <#= Namespace #>
             value.OnBeforeSerialize();
 <# } #>
 <# if( objInfo.IsIntKey) { if( (objInfo.MaxKey + 1) <= 15) { #>
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, <#= objInfo.MaxKey + 1 #>);
+            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, <#= objInfo.MaxKey + 1 #>);
 <# } else { #>
-            global::MessagePack.MessagePackBinary.WriteArrayHeader(writer, <#= objInfo.MaxKey + 1 #>);
+            global::MessagePack.MessagePackBinary.WriteArrayHeader(ref writer, <#= objInfo.MaxKey + 1 #>);
 <# } } else if( objInfo.WriteCount <= 15) { #>
-            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(writer, <#= objInfo.WriteCount #>);
+            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(ref writer, <#= objInfo.WriteCount #>);
 <# } else { #>
-            global::MessagePack.MessagePackBinary.WriteMapHeader(writer, <#= objInfo.WriteCount #>);
+            global::MessagePack.MessagePackBinary.WriteMapHeader(ref writer, <#= objInfo.WriteCount #>);
 <# } #>
 <# if(objInfo.IsIntKey) { #>
 <# for(var i =0; i<= objInfo.MaxKey; i++) { var member = objInfo.GetMember(i); #>
 <# if( member == null) { #>
-            global::MessagePack.MessagePackBinary.WriteNil(writer);
+            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
 <# } else { #>
             <#= member.GetSerializeMethodString() #>;
 <# } } } else { #>
 <# var index = 0; foreach(var x in objInfo.Members) { #>
-            global::MessagePack.MessagePackBinary.WriteRaw(writer, this.____stringByteKeys[<#= index++ #>]);
+            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[<#= index++ #>]);
             <#= x.GetSerializeMethodString() #>;
 <# } } #>
         }

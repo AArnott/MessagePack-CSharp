@@ -98,11 +98,11 @@ namespace MessagePack.CodeGenerator
         {
             if (primitiveTypes.Contains(Type))
             {
-                return $"MessagePackBinary.Write{ShortTypeName.Replace("[]", "s")}(writer, value.{Name})";
+                return $"MessagePackBinary.Write{ShortTypeName.Replace("[]", "s")}(ref writer, value.{Name})";
             }
             else
             {
-                return $"formatterResolver.GetFormatterWithVerify<{Type}>().Serialize(writer, value.{Name}, formatterResolver)";
+                return $"formatterResolver.GetFormatterWithVerify<{Type}>().Serialize(ref writer, value.{Name}, formatterResolver)";
             }
         }
 

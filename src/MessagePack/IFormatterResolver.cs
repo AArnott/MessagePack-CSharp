@@ -1,5 +1,6 @@
 ﻿
 using MessagePack.Formatters;
+using Microsoft;
 using System;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
@@ -15,6 +16,8 @@ namespace MessagePack
     {
         public static IMessagePackFormatter<T> GetFormatterWithVerify<T>(this IFormatterResolver resolver)
         {
+            Requires.NotNull(resolver, nameof(resolver));
+
             IMessagePackFormatter<T> formatter;
             try
             {

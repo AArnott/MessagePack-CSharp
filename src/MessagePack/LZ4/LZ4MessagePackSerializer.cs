@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Buffers;
 using System.Runtime.InteropServices;
+using MessagePack.Formatters;
 using MessagePack.LZ4;
 using Microsoft;
 
@@ -36,15 +37,17 @@ namespace MessagePack
         /// <summary>
         /// Serialize to binary with default resolver.
         /// </summary>
-        public override void Serialize<T>(IBufferWriter<byte> writer, T value, IFormatterResolver resolver = null)
+        protected override void Serialize<T>(ref BufferWriter writer, T value, IFormatterResolver resolver)
         {
             if (resolver == null) resolver = DefaultResolver;
             var formatter = resolver.GetFormatterWithVerify<T>();
 
-            using (var innerWriter = new Nerdbank.Streams.Sequence<byte>())
+            using (var sequence = new Nerdbank.Streams.Sequence<byte>())
             {
-                formatter.Serialize(innerWriter, value, resolver);
-                ToLZ4BinaryCore(innerWriter.AsReadOnlySequence, writer);
+                var sequenceWriter = new BufferWriter(sequence);
+                formatter.Serialize(ref sequenceWriter, value, resolver);
+                sequenceWriter.Commit();
+                ToLZ4BinaryCore(sequence.AsReadOnlySequence, ref writer);
             }
         }
 
@@ -101,11 +104,11 @@ namespace MessagePack
             return false;
         }
 
-        private static void ToLZ4BinaryCore(ReadOnlySequence<byte> serializedData, IBufferWriter<byte> writer)
+        private static void ToLZ4BinaryCore(ReadOnlySequence<byte> serializedData, ref BufferWriter writer)
         {
             if (serializedData.Length < NotCompressionSize)
             {
-                serializedData.CopyTo(writer);
+                serializedData.CopyTo(ref writer);
             }
             else
             {
@@ -126,8 +129,8 @@ namespace MessagePack
                     int lz4Length = LZ4Codec.Encode(srcArray.Array, srcArray.Offset, (int)serializedData.Length, dstArray.Array, dstArray.Offset, dstArray.Count);
 
                     const int CompressedStreamLengthLength = 5;
-                    MessagePackBinary.WriteExtensionFormatHeaderForceExt32Block(writer, ExtensionTypeCode, lz4Length + CompressedStreamLengthLength);
-                    MessagePackBinary.WriteInt32ForceInt32Block(writer, (int)serializedData.Length);
+                    MessagePackBinary.WriteExtensionFormatHeaderForceExt32Block(ref writer, ExtensionTypeCode, lz4Length + CompressedStreamLengthLength);
+                    MessagePackBinary.WriteInt32ForceInt32Block(ref writer, (int)serializedData.Length);
                     writer.Write(dstArray.AsSpan(0, lz4Length));
                 }
                 finally

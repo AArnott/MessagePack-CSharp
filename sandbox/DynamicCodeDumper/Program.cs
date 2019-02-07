@@ -62,7 +62,9 @@ namespace DynamicCodeDumper
 
                 using (var sequence = new Sequence<byte>())
                 {
-                    f.Serialize(sequence, new MyClass { MyProperty1 = 100, MyProperty2 = "foo" }, null);
+                    var sequenceWriter = new BufferWriter(sequence);
+                    f.Serialize(ref sequenceWriter, new MyClass { MyProperty1 = 100, MyProperty2 = "foo" }, null);
+                    sequenceWriter.Commit();
                 }
             }
             catch (Exception ex)
@@ -133,9 +135,9 @@ namespace DynamicCodeDumper
             return MessagePackBinary.ReadInt32(ref byteSequence) * 10;
         }
 
-        public void Serialize(IBufferWriter<byte> writer, int value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, int value, IFormatterResolver formatterResolver)
         {
-            MessagePackBinary.WriteInt32(writer, value * 10);
+            MessagePackBinary.WriteInt32(ref writer, value * 10);
         }
     }
 
@@ -147,9 +149,9 @@ namespace DynamicCodeDumper
             return s + s;
         }
 
-        public void Serialize(IBufferWriter<byte> writer, string value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, string value, IFormatterResolver formatterResolver)
         {
-            MessagePackBinary.WriteString(writer, value + value);
+            MessagePackBinary.WriteString(ref writer, value + value);
         }
     }
 

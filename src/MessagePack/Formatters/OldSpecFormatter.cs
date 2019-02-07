@@ -10,10 +10,10 @@ namespace MessagePack.Formatters
     {
         public static readonly NativeDateTimeFormatter Instance = new NativeDateTimeFormatter();
 
-        public void Serialize(IBufferWriter<byte> writer, DateTime value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, DateTime value, IFormatterResolver formatterResolver)
         {
             var dateData = value.ToBinary();
-            MessagePackBinary.WriteInt64(writer, dateData);
+            MessagePackBinary.WriteInt64(ref writer, dateData);
         }
 
         public DateTime Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -32,18 +32,18 @@ namespace MessagePack.Formatters
     {
         public static readonly NativeDateTimeArrayFormatter Instance = new NativeDateTimeArrayFormatter();
 
-        public void Serialize(IBufferWriter<byte> writer, DateTime[] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, DateTime[] value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(writer);
+                MessagePackBinary.WriteNil(ref writer);
             }
             else
             {
-                MessagePackBinary.WriteArrayHeader(writer, value.Length);
+                MessagePackBinary.WriteArrayHeader(ref writer, value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    MessagePackBinary.WriteInt64(writer, value[i].ToBinary());
+                    MessagePackBinary.WriteInt64(ref writer, value[i].ToBinary());
                 }
             }
         }
@@ -83,11 +83,11 @@ namespace MessagePack.Formatters
         public static readonly OldSpecStringFormatter Instance = new OldSpecStringFormatter();
 
         // Old spec does not exists str 8 format.
-        public void Serialize(IBufferWriter<byte> writer, string value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, string value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(writer);
+                MessagePackBinary.WriteNil(ref writer);
                 return;
             }
 
@@ -136,11 +136,11 @@ namespace MessagePack.Formatters
     {
         public static readonly OldSpecBinaryFormatter Instance = new OldSpecBinaryFormatter();
 
-        public void Serialize(IBufferWriter<byte> writer, byte[] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, byte[] value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(writer);
+                MessagePackBinary.WriteNil(ref writer);
                 return;
             }
 

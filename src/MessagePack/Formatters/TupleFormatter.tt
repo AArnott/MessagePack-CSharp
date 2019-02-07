@@ -20,18 +20,18 @@ namespace MessagePack.Formatters
 
     public sealed class TupleFormatter<<#= ts #>> : IMessagePackFormatter<<#= t #>>
     {
-        public void Serialize(IBufferWriter<byte> writer, <#= t #> value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, <#= t #> value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(writer);
+                MessagePackBinary.WriteNil(ref writer);
             }
             else
             {
-                MessagePackBinary.WriteArrayHeader(writer, <#= i #>);
+                MessagePackBinary.WriteArrayHeader(ref writer, <#= i #>);
 
 <# for(var j = 1; j <= i; j++) { #>
-                formatterResolver.GetFormatterWithVerify<<#= toT(j) #>>().Serialize(writer, value.<#= toItem(j) #>, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<<#= toT(j) #>>().Serialize(ref writer, value.<#= toItem(j) #>, formatterResolver);
 <# } #>
             }
         }

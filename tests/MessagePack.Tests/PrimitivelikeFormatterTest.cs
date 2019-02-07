@@ -28,7 +28,7 @@ namespace MessagePack.Tests
             throw new NotImplementedException();
         }
 
-        public void Serialize(IBufferWriter<byte> writer, string value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, string value, IFormatterResolver formatterResolver)
         {
             throw new NotImplementedException();
         }
@@ -41,7 +41,7 @@ namespace MessagePack.Tests
             throw new NotImplementedException();
         }
 
-        public void Serialize(IBufferWriter<byte> writer, DateTime value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, DateTime value, IFormatterResolver formatterResolver)
         {
             throw new NotImplementedException();
         }
@@ -54,7 +54,7 @@ namespace MessagePack.Tests
             throw new NotImplementedException();
         }
 
-        public void Serialize(IBufferWriter<byte> writer, byte[] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, byte[] value, IFormatterResolver formatterResolver)
         {
             throw new NotImplementedException();
         }

@@ -14,7 +14,7 @@ namespace MessagePack.Formatters
         /// <param name="writer">The writer to use when serializing the value.</param>
         /// <param name="value">The value to be serialized.</param>
         /// <param name="resolver">The resolver to use to obtain formatters for types that make up the composite type <typeparamref name="T"/>.</param>
-        void Serialize(IBufferWriter<byte> writer, T value, IFormatterResolver resolver);
+        void Serialize(ref BufferWriter writer, T value, IFormatterResolver resolver);
 
         /// <summary>
         /// Deserializes some value from a byte sequence.

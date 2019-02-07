@@ -777,7 +777,7 @@ IMessagePackFormatter is serializer by each type. For example `Int32Formatter : 
 ```csharp
 public interface IMessagePackFormatter<T>
 {
-    void Serialize(IBufferWriter<byte> writer, T value, IFormatterResolver formatterResolver);
+    void Serialize(ref BufferWriter writer, T value, IFormatterResolver formatterResolver);
     T Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver);
 }
 ```
@@ -788,15 +788,15 @@ All api works on `Span<byte>` level, no use Stream, no use Writer/Reader so impr
 // serialize fileinfo as string fullpath.
 public class FileInfoFormatter<T> : IMessagePackFormatter<FileInfo>
 {
-    public void Serialize(IBufferWriter<byte> writer, FileInfo value, IFormatterResolver formatterResolver)
+    public void Serialize(ref BufferWriter writer, FileInfo value, IFormatterResolver formatterResolver)
     {
         if (value == null)
         {
-            MessagePackBinary.WriteNil(writer);
+            MessagePackBinary.WriteNil(ref writer);
             return;
         }
 
-        MessagePackBinary.WriteString(writer, value.FullName);
+        MessagePackBinary.WriteString(ref writer, value.FullName);
     }
 
     public FileInfo Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -1060,9 +1060,9 @@ public class CustomObject
     // serialize/deserialize internal field.
     class CustomObjectFormatter : IMessagePackFormatter<CustomObject>
     {
-        public void Serialize(IBufferWriter<byte> writer, CustomObject value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, CustomObject value, IFormatterResolver formatterResolver)
         {
-            formatterResolver.GetFormatterWithVerify<string>().Serialize(writer, value.internalId, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.internalId, formatterResolver);
         }
 
         public CustomObject Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -1082,9 +1082,9 @@ public class Int_x10Formatter : IMessagePackFormatter<int>
         return MessagePackBinary.ReadInt32(ref byteSequence) * 10;
     }
 
-    public void Serialize(IBufferWriter<byte> writer, int value, IFormatterResolver formatterResolver)
+    public void Serialize(ref BufferWriter writer, int value, IFormatterResolver formatterResolver)
     {
-        MessagePackBinary.WriteInt32(writer, value * 10);
+        MessagePackBinary.WriteInt32(ref writer, value * 10);
     }
 }
 

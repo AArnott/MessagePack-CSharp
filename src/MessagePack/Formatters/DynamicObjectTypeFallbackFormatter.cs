@@ -12,7 +12,7 @@ namespace MessagePack.Formatters
 {
     public sealed class DynamicObjectTypeFallbackFormatter : IMessagePackFormatter<object>
     {
-        delegate void SerializeMethod(object dynamicFormatter, IBufferWriter<byte> writer, object value, IFormatterResolver formatterResolver);
+        delegate void SerializeMethod(object dynamicFormatter, ref BufferWriter writer, object value, IFormatterResolver formatterResolver);
 
         readonly MessagePack.Internal.ThreadsafeTypeKeyHashTable<KeyValuePair<object, SerializeMethod>> serializers = new Internal.ThreadsafeTypeKeyHashTable<KeyValuePair<object, SerializeMethod>>();
 
@@ -23,11 +23,11 @@ namespace MessagePack.Formatters
             this.innerResolvers = innerResolvers;
         }
 
-        public void Serialize(IBufferWriter<byte> writer, object value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, object value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(writer);
+                MessagePackBinary.WriteNil(ref writer);
                 return;
             }
 
@@ -37,7 +37,7 @@ namespace MessagePack.Formatters
             if (type == typeof(object))
             {
                 // serialize to empty map
-                MessagePackBinary.WriteMapHeader(writer, 0);
+                MessagePackBinary.WriteMapHeader(ref writer, 0);
                 return;
             }
 
@@ -63,11 +63,11 @@ namespace MessagePack.Formatters
                         {
                             var formatterType = typeof(IMessagePackFormatter<>).MakeGenericType(t);
                             var param0 = Expression.Parameter(typeof(object), "formatter");
-                            var param1 = Expression.Parameter(typeof(IBufferWriter<byte>), "writer");
+                            var param1 = Expression.Parameter(typeof(BufferWriter).MakeByRefType(), "writer");
                             var param2 = Expression.Parameter(typeof(object), "value");
                             var param3 = Expression.Parameter(typeof(IFormatterResolver), "formatterResolver");
 
-                            var serializeMethodInfo = formatterType.GetRuntimeMethod("Serialize", new[] { typeof(IBufferWriter<byte>), t, typeof(IFormatterResolver) });
+                            var serializeMethodInfo = formatterType.GetRuntimeMethod("Serialize", new[] { typeof(BufferWriter).MakeByRefType(), t, typeof(IFormatterResolver) });
 
                             var body = Expression.Call(
                                 Expression.Convert(param0, formatterType),
@@ -86,7 +86,7 @@ namespace MessagePack.Formatters
                 }
             }
 
-            formatterAndDelegate.Value(formatterAndDelegate.Key, writer, value, formatterResolver);
+            formatterAndDelegate.Value(formatterAndDelegate.Key, ref writer, value, formatterResolver);
         }
 
         public object Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)

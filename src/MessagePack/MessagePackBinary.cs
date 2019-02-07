@@ -3,6 +3,7 @@ using System.Buffers;
 using System.IO;
 using System.Runtime.InteropServices;
 using MessagePack.Decoders;
+using MessagePack.Formatters;
 using MessagePack.Internal;
 
 namespace MessagePack
@@ -313,7 +314,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteNil(IBufferWriter<byte> writer)
+        public static void WriteNil(ref BufferWriter writer)
         {
             var span = writer.GetSpan(1);
             span[0] = MessagePackCode.Nil;
@@ -344,11 +345,9 @@ namespace MessagePack
             return byteSequence.First.Span[0] == MessagePackCode.Nil;
         }
 
-        public static void WriteRaw(IBufferWriter<byte> writer, ReadOnlySpan<byte> rawMessagePackBlock)
+        public static void WriteRaw(ref BufferWriter writer, ReadOnlySpan<byte> rawMessagePackBlock)
         {
-            var span = writer.GetSpan(rawMessagePackBlock.Length);
-            rawMessagePackBlock.CopyTo(span);
-            writer.Advance(rawMessagePackBlock.Length);
+            writer.Write(rawMessagePackBlock);
         }
 
         /// <summary>
@@ -358,7 +357,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteFixedMapHeaderUnsafe(IBufferWriter<byte> writer, int count)
+        public static void WriteFixedMapHeaderUnsafe(ref BufferWriter writer, int count)
         {
             var span = writer.GetSpan(1);
             span[0] = (byte)(MessagePackCode.MinFixMap | count);
@@ -371,11 +370,11 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteMapHeader(IBufferWriter<byte> writer, int count)
+        public static void WriteMapHeader(ref BufferWriter writer, int count)
         {
             checked
             {
-                WriteMapHeader(writer, (uint)count);
+                WriteMapHeader(ref writer, (uint)count);
             }
         }
 
@@ -385,7 +384,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteMapHeader(IBufferWriter<byte> writer, uint count)
+        public static void WriteMapHeader(ref BufferWriter writer, uint count)
         {
             if (count <= MessagePackRange.MaxFixMapCount)
             {
@@ -425,7 +424,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteMapHeaderForceMap32Block(IBufferWriter<byte> writer, uint count)
+        public static void WriteMapHeaderForceMap32Block(ref BufferWriter writer, uint count)
         {
             var span = writer.GetSpan(5);
             WriteMapHeaderForceMap32Block(span, count);
@@ -501,7 +500,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteFixedArrayHeaderUnsafe(IBufferWriter<byte> writer, int count)
+        public static void WriteFixedArrayHeaderUnsafe(ref BufferWriter writer, int count)
         {
             var span = writer.GetSpan(1);
             span[0] = (byte)(MessagePackCode.MinFixArray | count);
@@ -514,11 +513,11 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteArrayHeader(IBufferWriter<byte> writer, int count)
+        public static void WriteArrayHeader(ref BufferWriter writer, int count)
         {
             checked
             {
-                WriteArrayHeader(writer, (uint)count);
+                WriteArrayHeader(ref writer, (uint)count);
             }
         }
 
@@ -528,7 +527,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteArrayHeader(IBufferWriter<byte> writer, uint count)
+        public static void WriteArrayHeader(ref BufferWriter writer, uint count)
         {
             if (count <= MessagePackRange.MaxFixArrayCount)
             {
@@ -568,7 +567,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteArrayHeaderForceArray32Block(IBufferWriter<byte> writer, uint count)
+        public static void WriteArrayHeaderForceArray32Block(ref BufferWriter writer, uint count)
         {
             var span = writer.GetSpan(5);
             WriteArrayHeaderForceArray32Block(span, count);
@@ -621,7 +620,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteBoolean(IBufferWriter<byte> writer, bool value)
+        public static void WriteBoolean(ref BufferWriter writer, bool value)
         {
             var span = writer.GetSpan(1);
             span[0] = (value ? MessagePackCode.True : MessagePackCode.False);
@@ -641,7 +640,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteByte(IBufferWriter<byte> writer, byte value)
+        public static void WriteByte(ref BufferWriter writer, byte value)
         {
             if (value <= MessagePackCode.MaxFixInt)
             {
@@ -661,7 +660,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteByteForceByteBlock(IBufferWriter<byte> writer, byte value)
+        public static void WriteByteForceByteBlock(ref BufferWriter writer, byte value)
         {
             var span = writer.GetSpan(2);
             span[0] = MessagePackCode.UInt8;
@@ -680,11 +679,11 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteBytes(IBufferWriter<byte> writer, ReadOnlySpan<byte> src)
+        public static void WriteBytes(ref BufferWriter writer, ReadOnlySpan<byte> src)
         {
             if (src == null)
             {
-                WriteNil(writer);
+                WriteNil(ref writer);
                 return;
             }
 
@@ -752,7 +751,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteSByte(IBufferWriter<byte> writer, sbyte value)
+        public static void WriteSByte(ref BufferWriter writer, sbyte value)
         {
             if (value < MessagePackRange.MinFixNegativeInt)
             {
@@ -772,7 +771,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteSByteForceSByteBlock(IBufferWriter<byte> writer, sbyte value)
+        public static void WriteSByteForceSByteBlock(ref BufferWriter writer, sbyte value)
         {
             var span = writer.GetSpan(2);
             span[0] = MessagePackCode.Int8;
@@ -791,7 +790,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteSingle(IBufferWriter<byte> writer, float value)
+        public static void WriteSingle(ref BufferWriter writer, float value)
         {
             var span = writer.GetSpan(5);
 
@@ -827,7 +826,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteDouble(IBufferWriter<byte> writer, double value)
+        public static void WriteDouble(ref BufferWriter writer, double value)
         {
             var span = writer.GetSpan(9);
 
@@ -871,7 +870,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteInt16(IBufferWriter<byte> writer, short value)
+        public static void WriteInt16(ref BufferWriter writer, short value)
         {
             if (value >= 0)
             {
@@ -928,7 +927,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteInt16ForceInt16Block(IBufferWriter<byte> writer, short value)
+        public static void WriteInt16ForceInt16Block(ref BufferWriter writer, short value)
         {
             var span = writer.GetSpan(3);
             span[0] = MessagePackCode.Int16;
@@ -951,7 +950,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WritePositiveFixedIntUnsafe(IBufferWriter<byte> writer, int value)
+        public static void WritePositiveFixedIntUnsafe(ref BufferWriter writer, int value)
         {
             var span = writer.GetSpan(1);
             span[0] = (byte)value;
@@ -961,7 +960,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteInt32(IBufferWriter<byte> writer, int value)
+        public static void WriteInt32(ref BufferWriter writer, int value)
         {
             if (value >= 0)
             {
@@ -1056,7 +1055,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteInt32ForceInt32Block(IBufferWriter<byte> writer, int value)
+        public static void WriteInt32ForceInt32Block(ref BufferWriter writer, int value)
         {
             var span = writer.GetSpan(5);
             WriteInt32ForceInt32Block(span, value);
@@ -1074,7 +1073,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteInt64(IBufferWriter<byte> writer, long value)
+        public static void WriteInt64(ref BufferWriter writer, long value)
         {
             if (value >= 0)
             {
@@ -1179,7 +1178,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteInt64ForceInt64Block(IBufferWriter<byte> writer, long value)
+        public static void WriteInt64ForceInt64Block(ref BufferWriter writer, long value)
         {
             var span = writer.GetSpan(9);
             span[0] = MessagePackCode.Int64;
@@ -1205,7 +1204,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteUInt16(IBufferWriter<byte> writer, ushort value)
+        public static void WriteUInt16(ref BufferWriter writer, ushort value)
         {
             if (value <= MessagePackRange.MaxFixPositiveInt)
             {
@@ -1233,7 +1232,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteUInt16ForceUInt16Block(IBufferWriter<byte> writer, ushort value)
+        public static void WriteUInt16ForceUInt16Block(ref BufferWriter writer, ushort value)
         {
             var span = writer.GetSpan(3);
             span[0] = MessagePackCode.UInt16;
@@ -1253,7 +1252,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteUInt32(IBufferWriter<byte> writer, uint value)
+        public static void WriteUInt32(ref BufferWriter writer, uint value)
         {
             if (value <= MessagePackRange.MaxFixPositiveInt)
             {
@@ -1291,7 +1290,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteUInt32ForceUInt32Block(IBufferWriter<byte> writer, uint value)
+        public static void WriteUInt32ForceUInt32Block(ref BufferWriter writer, uint value)
         {
             var span = writer.GetSpan(5);
             span[0] = MessagePackCode.UInt32;
@@ -1313,7 +1312,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteUInt64(IBufferWriter<byte> writer, ulong value)
+        public static void WriteUInt64(ref BufferWriter writer, ulong value)
         {
             if (value <= MessagePackRange.MaxFixPositiveInt)
             {
@@ -1365,7 +1364,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteUInt64ForceUInt64Block(IBufferWriter<byte> writer, ulong value)
+        public static void WriteUInt64ForceUInt64Block(ref BufferWriter writer, ulong value)
         {
             var span = writer.GetSpan(9);
             span[0] = MessagePackCode.UInt64;
@@ -1391,9 +1390,9 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteChar(IBufferWriter<byte> writer, char value)
+        public static void WriteChar(ref BufferWriter writer, char value)
         {
-            WriteUInt16(writer, value);
+            WriteUInt16(ref writer, value);
         }
 
 #if !UNITY
@@ -1410,7 +1409,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static unsafe void WriteFixedStringUnsafe(IBufferWriter<byte> writer, string value, int byteCount)
+        public static unsafe void WriteFixedStringUnsafe(ref BufferWriter writer, string value, int byteCount)
         {
             var span = writer.GetSpan(byteCount + 1);
             span[0] = (byte)(MessagePackCode.MinFixStr | byteCount);
@@ -1423,7 +1422,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteStringUnsafe(IBufferWriter<byte> writer, string value, int byteCount)
+        public static void WriteStringUnsafe(ref BufferWriter writer, string value, int byteCount)
         {
             if (byteCount <= MessagePackRange.MaxFixStringLength)
             {
@@ -1465,7 +1464,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteStringBytes(IBufferWriter<byte> writer, ReadOnlySpan<byte> utf8stringBytes)
+        public static void WriteStringBytes(ref BufferWriter writer, ReadOnlySpan<byte> utf8stringBytes)
         {
             var byteCount = utf8stringBytes.Length;
             if (byteCount <= MessagePackRange.MaxFixStringLength)
@@ -1545,11 +1544,11 @@ namespace MessagePack
             }
         }
 
-        public static void WriteString(IBufferWriter<byte> writer, string value)
+        public static void WriteString(ref BufferWriter writer, string value)
         {
             if (value == null)
             {
-                WriteNil(writer);
+                WriteNil(ref writer);
                 return;
             }
 
@@ -1629,11 +1628,11 @@ namespace MessagePack
             }
         }
 
-        public static void WriteStringForceStr32Block(IBufferWriter<byte> writer, string value)
+        public static void WriteStringForceStr32Block(ref BufferWriter writer, string value)
         {
             if (value == null)
             {
-                WriteNil(writer);
+                WriteNil(ref writer);
                 return;
             }
 
@@ -1668,7 +1667,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteExtensionFormatHeader(IBufferWriter<byte> writer, sbyte typeCode, int dataLength)
+        public static void WriteExtensionFormatHeader(ref BufferWriter writer, sbyte typeCode, int dataLength)
         {
             switch (dataLength)
             {
@@ -1761,7 +1760,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteExtensionFormatHeaderForceExt32Block(IBufferWriter<byte> writer, sbyte typeCode, int dataLength)
+        public static void WriteExtensionFormatHeaderForceExt32Block(ref BufferWriter writer, sbyte typeCode, int dataLength)
         {
             var span = writer.GetSpan(6);
             WriteExtensionFormatHeaderForceExt32Block(span, typeCode, dataLength);
@@ -1771,7 +1770,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteExtensionFormat(IBufferWriter<byte> writer, sbyte typeCode, ReadOnlySpan<byte> data)
+        public static void WriteExtensionFormat(ref BufferWriter writer, sbyte typeCode, ReadOnlySpan<byte> data)
         {
             var length = data.Length;
             switch (length)
@@ -1935,7 +1934,7 @@ namespace MessagePack
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void WriteDateTime(IBufferWriter<byte> writer, DateTime dateTime)
+        public static void WriteDateTime(ref BufferWriter writer, DateTime dateTime)
         {
             dateTime = dateTime.ToUniversalTime();
 

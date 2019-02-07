@@ -17,9 +17,9 @@ namespace <#= Namespace #>
 <# foreach(var info in enumSerializationInfos) { #>
     public sealed class <#= info.Name #>Formatter : global::MessagePack.Formatters.IMessagePackFormatter<<#= info.FullName #>>
     {
-        public void Serialize(IBufferWriter<byte> writer, <#= info.FullName #> value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, <#= info.FullName #> value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            MessagePackBinary.Write<#= info.UnderlyingType #>(writer, (<#= info.UnderlyingType #>)value);
+            MessagePackBinary.Write<#= info.UnderlyingType #>(ref writer, (<#= info.UnderlyingType #>)value);
         }
         
         public <#= info.FullName #> Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)

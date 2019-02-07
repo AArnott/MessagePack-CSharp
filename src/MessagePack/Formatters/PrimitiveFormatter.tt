@@ -36,9 +36,9 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(IBufferWriter<byte> writer, <#= t.Name #> value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, <#= t.Name #> value, IFormatterResolver formatterResolver)
         {
-            MessagePackBinary.Write<#= t.Name #>(writer, value);
+            MessagePackBinary.Write<#= t.Name #>(ref writer, value);
         }
 
         public <#= t.Name #> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -55,15 +55,15 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(IBufferWriter<byte> writer, <#= t.Name #>? value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, <#= t.Name #>? value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(writer);
+                MessagePackBinary.WriteNil(ref writer);
             }
             else
             {
-                MessagePackBinary.Write<#= t.Name #>(writer, value.Value);
+                MessagePackBinary.Write<#= t.Name #>(ref writer, value.Value);
             }
         }
 
@@ -91,18 +91,18 @@ namespace MessagePack.Formatters
 
         }
 
-        public void Serialize(IBufferWriter<byte> writer, <#= t.Name #>[] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, <#= t.Name #>[] value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(writer);
+                MessagePackBinary.WriteNil(ref writer);
             }
             else
             {
-                MessagePackBinary.WriteArrayHeader(writer, value.Length);
+                MessagePackBinary.WriteArrayHeader(ref writer, value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    MessagePackBinary.Write<#= t.Name #>(writer, value[i]);
+                    MessagePackBinary.Write<#= t.Name #>(ref writer, value[i]);
                 }
             }
         }

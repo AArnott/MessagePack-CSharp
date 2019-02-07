@@ -19,7 +19,7 @@ namespace MessagePack.Formatters
         // Guid's underlying _a,...,_k field is sequential and same layout as .NET Framework and Mono(Unity).
         // But target machines must be same endian so restrict only for little endian.
 
-        public unsafe void Serialize(IBufferWriter<byte> writer, Guid value, IFormatterResolver formatterResolver)
+        public unsafe void Serialize(ref BufferWriter writer, Guid value, IFormatterResolver formatterResolver)
         {
             if (!BitConverter.IsLittleEndian) throw new Exception("BinaryGuidFormatter only allows on little endian env.");
 
@@ -79,7 +79,7 @@ namespace MessagePack.Formatters
         // decimal underlying "flags, hi, lo, mid" fields are sequential and same layuout with .NET Framework and Mono(Unity)
         // But target machines must be same endian so restrict only for little endian.
 
-        public unsafe void Serialize(IBufferWriter<byte> writer, Decimal value, IFormatterResolver formatterResolver)
+        public unsafe void Serialize(ref BufferWriter writer, Decimal value, IFormatterResolver formatterResolver)
         {
             if (!BitConverter.IsLittleEndian) throw new Exception("BinaryGuidFormatter only allows on little endian env.");
 

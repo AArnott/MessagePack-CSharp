@@ -1,4 +1,5 @@
-﻿using MessagePack.Internal;
+﻿using MessagePack.Formatters;
+using MessagePack.Internal;
 using Nerdbank.Streams;
 using System;
 using System.Buffers;
@@ -15,7 +16,7 @@ namespace MessagePack.Tests
     {
         private MessagePackSerializer serializer = new MessagePackSerializer();
 
-        delegate void WriteDelegate(IBufferWriter<byte> writer, ReadOnlySpan<byte> ys);
+        delegate void WriteDelegate(ref BufferWriter writer, ReadOnlySpan<byte> ys);
 
         [Theory]
         [InlineData('a', 1)]
@@ -30,7 +31,9 @@ namespace MessagePack.Tests
             var bin1 = MessagePackBinary.GetEncodedStringBytes(s);
             var bin2 = serializer.Serialize(s);
             var bin3 = new Sequence<byte>();
-            MessagePackBinary.WriteRaw(bin3, bin1);
+            var bin3Writer = new BufferWriter(bin3);
+            MessagePackBinary.WriteRaw(ref bin3Writer, bin1);
+            bin3Writer.Commit();
 
             MessagePack.Internal.ByteArrayComparer.Equals(bin1, 0, bin1.Length, bin2).IsTrue();
             MessagePack.Internal.ByteArrayComparer.Equals(bin1, 0, bin1.Length, bin3.AsReadOnlySequence.ToArray()).IsTrue();
@@ -44,7 +47,9 @@ namespace MessagePack.Tests
             {
                 var src = Enumerable.Range(0, i).Select(x => (byte)x).ToArray();
                 var dst = new Sequence<byte>();
-                ((typeof(UnsafeMemory32).GetMethod("WriteRaw" + i)).CreateDelegate(typeof(WriteDelegate)) as WriteDelegate).Invoke(dst, src);
+                var dstWriter = new BufferWriter(dst);
+                ((typeof(UnsafeMemory32).GetMethod("WriteRaw" + i)).CreateDelegate(typeof(WriteDelegate)) as WriteDelegate).Invoke(ref dstWriter, src);
+                dstWriter.Commit();
                 dst.Length.Is(i);
                 MessagePack.Internal.ByteArrayComparer.Equals(src, 0, src.Length, dst.AsReadOnlySequence.ToArray()).IsTrue();
             }
@@ -53,7 +58,9 @@ namespace MessagePack.Tests
             {
                 var src = Enumerable.Range(0, i).Select(x => (byte)x).ToArray();
                 var dst = new Sequence<byte>();
-                ((typeof(UnsafeMemory64).GetMethod("WriteRaw" + i)).CreateDelegate(typeof(WriteDelegate)) as WriteDelegate).Invoke(dst, src);
+                var dstWriter = new BufferWriter(dst);
+                ((typeof(UnsafeMemory64).GetMethod("WriteRaw" + i)).CreateDelegate(typeof(WriteDelegate)) as WriteDelegate).Invoke(ref dstWriter, src);
+                dstWriter.Commit();
                 dst.Length.Is(i);
                 MessagePack.Internal.ByteArrayComparer.Equals(src, 0, src.Length, dst.AsReadOnlySequence.ToArray()).IsTrue();
             }

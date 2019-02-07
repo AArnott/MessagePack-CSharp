@@ -19,12 +19,12 @@ namespace MessagePack.Formatters
 
     public sealed class ValueTupleFormatter<<#= ts #>> : IMessagePackFormatter<<#= t #>><#= (t.Contains("TRest") ? " where TRest : struct" : "") #>
     {
-        public void Serialize(IBufferWriter<byte> writer, <#= t #> value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, <#= t #> value, IFormatterResolver formatterResolver)
         {
-            MessagePackBinary.WriteArrayHeader(writer, <#= i #>);
+            MessagePackBinary.WriteArrayHeader(ref writer, <#= i #>);
 
 <# for(var j = 1; j <= i; j++) { #>
-            formatterResolver.GetFormatterWithVerify<<#= toT(j) #>>().Serialize(writer, value.<#= toItem(j) #>, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<<#= toT(j) #>>().Serialize(ref writer, value.<#= toItem(j) #>, formatterResolver);
 <# } #>
         }
 

@@ -7,11 +7,11 @@ namespace MessagePack.Formatters
 
     public sealed class ValueTupleFormatter<T1> : IMessagePackFormatter<ValueTuple<T1>>
     {
-        public void Serialize(IBufferWriter<byte> writer, ValueTuple<T1> value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, ValueTuple<T1> value, IFormatterResolver formatterResolver)
         {
-            MessagePackBinary.WriteArrayHeader(writer, 1);
+            MessagePackBinary.WriteArrayHeader(ref writer, 1);
 
-            formatterResolver.GetFormatterWithVerify<T1>().Serialize(writer, value.Item1, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref writer, value.Item1, formatterResolver);
         }
 
         public ValueTuple<T1> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -35,12 +35,12 @@ namespace MessagePack.Formatters
 
     public sealed class ValueTupleFormatter<T1, T2> : IMessagePackFormatter<ValueTuple<T1, T2>>
     {
-        public void Serialize(IBufferWriter<byte> writer, ValueTuple<T1, T2> value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, ValueTuple<T1, T2> value, IFormatterResolver formatterResolver)
         {
-            MessagePackBinary.WriteArrayHeader(writer, 2);
+            MessagePackBinary.WriteArrayHeader(ref writer, 2);
 
-            formatterResolver.GetFormatterWithVerify<T1>().Serialize(writer, value.Item1, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T2>().Serialize(writer, value.Item2, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref writer, value.Item1, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref writer, value.Item2, formatterResolver);
         }
 
         public ValueTuple<T1, T2> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -65,13 +65,13 @@ namespace MessagePack.Formatters
 
     public sealed class ValueTupleFormatter<T1, T2, T3> : IMessagePackFormatter<ValueTuple<T1, T2, T3>>
     {
-        public void Serialize(IBufferWriter<byte> writer, ValueTuple<T1, T2, T3> value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, ValueTuple<T1, T2, T3> value, IFormatterResolver formatterResolver)
         {
-            MessagePackBinary.WriteArrayHeader(writer, 3);
+            MessagePackBinary.WriteArrayHeader(ref writer, 3);
 
-            formatterResolver.GetFormatterWithVerify<T1>().Serialize(writer, value.Item1, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T2>().Serialize(writer, value.Item2, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T3>().Serialize(writer, value.Item3, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref writer, value.Item1, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref writer, value.Item2, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref writer, value.Item3, formatterResolver);
         }
 
         public ValueTuple<T1, T2, T3> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -97,14 +97,14 @@ namespace MessagePack.Formatters
 
     public sealed class ValueTupleFormatter<T1, T2, T3, T4> : IMessagePackFormatter<ValueTuple<T1, T2, T3, T4>>
     {
-        public void Serialize(IBufferWriter<byte> writer, ValueTuple<T1, T2, T3, T4> value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, ValueTuple<T1, T2, T3, T4> value, IFormatterResolver formatterResolver)
         {
-            MessagePackBinary.WriteArrayHeader(writer, 4);
+            MessagePackBinary.WriteArrayHeader(ref writer, 4);
 
-            formatterResolver.GetFormatterWithVerify<T1>().Serialize(writer, value.Item1, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T2>().Serialize(writer, value.Item2, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T3>().Serialize(writer, value.Item3, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T4>().Serialize(writer, value.Item4, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref writer, value.Item1, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref writer, value.Item2, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref writer, value.Item3, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref writer, value.Item4, formatterResolver);
         }
 
         public ValueTuple<T1, T2, T3, T4> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -131,15 +131,15 @@ namespace MessagePack.Formatters
 
     public sealed class ValueTupleFormatter<T1, T2, T3, T4, T5> : IMessagePackFormatter<ValueTuple<T1, T2, T3, T4, T5>>
     {
-        public void Serialize(IBufferWriter<byte> writer, ValueTuple<T1, T2, T3, T4, T5> value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, ValueTuple<T1, T2, T3, T4, T5> value, IFormatterResolver formatterResolver)
         {
-            MessagePackBinary.WriteArrayHeader(writer, 5);
+            MessagePackBinary.WriteArrayHeader(ref writer, 5);
 
-            formatterResolver.GetFormatterWithVerify<T1>().Serialize(writer, value.Item1, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T2>().Serialize(writer, value.Item2, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T3>().Serialize(writer, value.Item3, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T4>().Serialize(writer, value.Item4, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T5>().Serialize(writer, value.Item5, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref writer, value.Item1, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref writer, value.Item2, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref writer, value.Item3, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref writer, value.Item4, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref writer, value.Item5, formatterResolver);
         }
 
         public ValueTuple<T1, T2, T3, T4, T5> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -167,16 +167,16 @@ namespace MessagePack.Formatters
 
     public sealed class ValueTupleFormatter<T1, T2, T3, T4, T5, T6> : IMessagePackFormatter<ValueTuple<T1, T2, T3, T4, T5, T6>>
     {
-        public void Serialize(IBufferWriter<byte> writer, ValueTuple<T1, T2, T3, T4, T5, T6> value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, ValueTuple<T1, T2, T3, T4, T5, T6> value, IFormatterResolver formatterResolver)
         {
-            MessagePackBinary.WriteArrayHeader(writer, 6);
+            MessagePackBinary.WriteArrayHeader(ref writer, 6);
 
-            formatterResolver.GetFormatterWithVerify<T1>().Serialize(writer, value.Item1, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T2>().Serialize(writer, value.Item2, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T3>().Serialize(writer, value.Item3, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T4>().Serialize(writer, value.Item4, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T5>().Serialize(writer, value.Item5, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T6>().Serialize(writer, value.Item6, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref writer, value.Item1, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref writer, value.Item2, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref writer, value.Item3, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref writer, value.Item4, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref writer, value.Item5, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T6>().Serialize(ref writer, value.Item6, formatterResolver);
         }
 
         public ValueTuple<T1, T2, T3, T4, T5, T6> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -205,17 +205,17 @@ namespace MessagePack.Formatters
 
     public sealed class ValueTupleFormatter<T1, T2, T3, T4, T5, T6, T7> : IMessagePackFormatter<ValueTuple<T1, T2, T3, T4, T5, T6, T7>>
     {
-        public void Serialize(IBufferWriter<byte> writer, ValueTuple<T1, T2, T3, T4, T5, T6, T7> value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, ValueTuple<T1, T2, T3, T4, T5, T6, T7> value, IFormatterResolver formatterResolver)
         {
-            MessagePackBinary.WriteArrayHeader(writer, 7);
+            MessagePackBinary.WriteArrayHeader(ref writer, 7);
 
-            formatterResolver.GetFormatterWithVerify<T1>().Serialize(writer, value.Item1, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T2>().Serialize(writer, value.Item2, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T3>().Serialize(writer, value.Item3, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T4>().Serialize(writer, value.Item4, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T5>().Serialize(writer, value.Item5, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T6>().Serialize(writer, value.Item6, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T7>().Serialize(writer, value.Item7, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref writer, value.Item1, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref writer, value.Item2, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref writer, value.Item3, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref writer, value.Item4, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref writer, value.Item5, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T6>().Serialize(ref writer, value.Item6, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T7>().Serialize(ref writer, value.Item7, formatterResolver);
         }
 
         public ValueTuple<T1, T2, T3, T4, T5, T6, T7> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -245,18 +245,18 @@ namespace MessagePack.Formatters
 
     public sealed class ValueTupleFormatter<T1, T2, T3, T4, T5, T6, T7, TRest> : IMessagePackFormatter<ValueTuple<T1, T2, T3, T4, T5, T6, T7, TRest>> where TRest : struct
     {
-        public void Serialize(IBufferWriter<byte> writer, ValueTuple<T1, T2, T3, T4, T5, T6, T7, TRest> value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, ValueTuple<T1, T2, T3, T4, T5, T6, T7, TRest> value, IFormatterResolver formatterResolver)
         {
-            MessagePackBinary.WriteArrayHeader(writer, 8);
+            MessagePackBinary.WriteArrayHeader(ref writer, 8);
 
-            formatterResolver.GetFormatterWithVerify<T1>().Serialize(writer, value.Item1, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T2>().Serialize(writer, value.Item2, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T3>().Serialize(writer, value.Item3, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T4>().Serialize(writer, value.Item4, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T5>().Serialize(writer, value.Item5, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T6>().Serialize(writer, value.Item6, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<T7>().Serialize(writer, value.Item7, formatterResolver);
-            formatterResolver.GetFormatterWithVerify<TRest>().Serialize(writer, value.Rest, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T1>().Serialize(ref writer, value.Item1, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T2>().Serialize(ref writer, value.Item2, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T3>().Serialize(ref writer, value.Item3, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T4>().Serialize(ref writer, value.Item4, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T5>().Serialize(ref writer, value.Item5, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T6>().Serialize(ref writer, value.Item6, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<T7>().Serialize(ref writer, value.Item7, formatterResolver);
+            formatterResolver.GetFormatterWithVerify<TRest>().Serialize(ref writer, value.Rest, formatterResolver);
         }
 
         public ValueTuple<T1, T2, T3, T4, T5, T6, T7, TRest> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)

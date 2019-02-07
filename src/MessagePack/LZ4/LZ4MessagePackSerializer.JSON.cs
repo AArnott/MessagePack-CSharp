@@ -35,12 +35,14 @@ namespace MessagePack
         /// <summary>
         /// From Json String to LZ4MessagePack binary
         /// </summary>
-        public override void FromJson(TextReader reader, IBufferWriter<byte> writer)
+        protected override void FromJson(TextReader reader, ref BufferWriter writer)
         {
             using (var sequence = new Nerdbank.Streams.Sequence<byte>())
             {
-                base.FromJson(reader, sequence);
-                ToLZ4BinaryCore(sequence, writer);
+                var sequenceWriter = new BufferWriter(sequence);
+                base.FromJson(reader, ref sequenceWriter);
+                sequenceWriter.Commit();
+                ToLZ4BinaryCore(sequence, ref writer);
             }
         }
     }

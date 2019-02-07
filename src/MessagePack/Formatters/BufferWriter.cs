@@ -57,6 +57,12 @@ namespace MessagePack.Formatters
         /// </summary>
         public long BytesCommitted => _bytesCommitted;
 
+        public Span<byte> GetSpan(int sizeHint)
+        {
+            Ensure(sizeHint);
+            return this.Span;
+        }
+
         /// <summary>
         /// Calls <see cref="IBufferWriter{T}.Advance(int)"/> on the underlying writer
         /// with the number of uncommitted bytes.

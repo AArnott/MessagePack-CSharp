@@ -244,9 +244,9 @@ namespace Sandbox
         // serialize/deserialize internal field.
         class CustomObjectFormatter : IMessagePackFormatter<CustomObject>
         {
-            public void Serialize(IBufferWriter<byte> writer, CustomObject value, IFormatterResolver formatterResolver)
+            public void Serialize(ref BufferWriter writer, CustomObject value, IFormatterResolver formatterResolver)
             {
-                formatterResolver.GetFormatterWithVerify<string>().Serialize(writer, value.internalId, formatterResolver);
+                formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.internalId, formatterResolver);
             }
 
             public CustomObject Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
@@ -765,21 +765,21 @@ namespace Sandbox
             {1, 1 },
         };
 
-        public void Serialize(IBufferWriter<byte> writer, IHogeMoge value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, IHogeMoge value, IFormatterResolver formatterResolver)
         {
             KeyValuePair<int, int> key;
             if (map.TryGetValue(value.GetType(), out key))
             {
-                MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 2);
-                MessagePackBinary.WriteInt32(writer, key.Key);
+                MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
+                MessagePackBinary.WriteInt32(ref writer, key.Key);
 
                 switch (key.Value)
                 {
                     case 0:
-                        formatterResolver.GetFormatterWithVerify<HogeMoge1>().Serialize(writer, (HogeMoge1)value, formatterResolver);
+                        formatterResolver.GetFormatterWithVerify<HogeMoge1>().Serialize(ref writer, (HogeMoge1)value, formatterResolver);
                         break;
                     case 1:
-                        formatterResolver.GetFormatterWithVerify<HogeMoge2>().Serialize(writer, (HogeMoge2)value, formatterResolver);
+                        formatterResolver.GetFormatterWithVerify<HogeMoge2>().Serialize(ref writer, (HogeMoge2)value, formatterResolver);
                         break;
                     default:
                         break;
@@ -788,7 +788,7 @@ namespace Sandbox
                 return;
             }
 
-            MessagePackBinary.WriteNil(writer);
+            MessagePackBinary.WriteNil(ref writer);
         }
 
         public IHogeMoge Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)

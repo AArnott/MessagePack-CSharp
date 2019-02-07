@@ -44,7 +44,9 @@ namespace MessagePack.Tests
             {
                 var original = Guid.NewGuid();
                 var sequence = new Sequence<byte>();
-                GuidFormatter.Instance.Serialize(sequence, original, null);
+                var sequenceWriter = new BufferWriter(sequence);
+                GuidFormatter.Instance.Serialize(ref sequenceWriter, original, null);
+                sequenceWriter.Commit();
                 sequence.Length.Is(38);
 
                 var sequenceReader = sequence.AsReadOnlySequence;

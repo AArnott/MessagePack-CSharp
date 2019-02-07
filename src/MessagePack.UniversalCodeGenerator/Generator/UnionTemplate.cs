@@ -159,8 +159,8 @@ namespace MessagePack.CodeGenerator.Generator
             KeyValuePair<int, int> keyValuePair;
             if (value != null && this.typeToKeyAndJumpMap.TryGetValue(value.GetType().TypeHandle, out keyValuePair))
             {
-                MessagePackBinary.WriteFixedArrayHeaderUnsafe(writer, 2);
-                MessagePackBinary.WriteInt32(writer, keyValuePair.Key);
+                MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
+                MessagePackBinary.WriteInt32(ref writer, keyValuePair.Key);
                 switch (keyValuePair.Value)
                 {
 ");
@@ -184,7 +184,7 @@ namespace MessagePack.CodeGenerator.Generator
             
             #line default
             #line hidden
-            this.Write(">().Serialize(writer, (");
+            this.Write(">().Serialize(ref writer, (");
             
             #line 51 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\UnionTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(item.Type));

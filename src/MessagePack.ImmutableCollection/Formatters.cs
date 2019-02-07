@@ -8,21 +8,21 @@ namespace MessagePack.ImmutableCollection
     // Immutablearray<T>.Enumerator is 'not' IEnumerator<T>, can't use abstraction layer.
     public class ImmutableArrayFormatter<T> : IMessagePackFormatter<ImmutableArray<T>>
     {
-        public void Serialize(IBufferWriter<byte> writer, ImmutableArray<T> value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, ImmutableArray<T> value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(writer);
+                MessagePackBinary.WriteNil(ref writer);
             }
             else
             {
                 var formatter = formatterResolver.GetFormatterWithVerify<T>();
 
-                MessagePackBinary.WriteArrayHeader(writer, value.Length);
+                MessagePackBinary.WriteArrayHeader(ref writer, value.Length);
 
                 foreach (var item in value)
                 {
-                    formatter.Serialize(writer, item, formatterResolver);
+                    formatter.Serialize(ref writer, item, formatterResolver);
                 }
             }
         }

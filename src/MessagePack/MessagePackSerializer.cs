@@ -3,6 +3,7 @@ using System.Buffers;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using MessagePack.Formatters;
 using MessagePack.Internal;
 using Nerdbank.Streams;
 
@@ -51,7 +52,7 @@ namespace MessagePack
         /// <param name="writer">The buffer writer to serialize with.</param>
         /// <param name="value">The value to serialize.</param>
         /// <param name="resolver">The resolver to use during deserialization. Use <c>null</c> to use the <see cref="DefaultResolver"/>.</param>
-        public virtual void Serialize<T>(IBufferWriter<byte> writer, T value, IFormatterResolver resolver = null)
+        public void Serialize<T>(IBufferWriter<byte> writer, T value, IFormatterResolver resolver = null)
         {
             if (writer == null)
             {
@@ -63,8 +64,9 @@ namespace MessagePack
                 resolver = this.DefaultResolver;
             }
 
-            var formatter = resolver.GetFormatterWithVerify<T>();
-            formatter.Serialize(writer, value, resolver);
+            var fastWriter = new BufferWriter(writer);
+            this.Serialize<T>(ref fastWriter, value, resolver);
+            fastWriter.Commit();
         }
 
         /// <summary>
@@ -239,6 +241,18 @@ namespace MessagePack
 
                 return this.Deserialize<T>(sequence.AsReadOnlySequence, resolver, out _);
             }
+        }
+
+        /// <summary>
+        /// Serializes a given value with the specified buffer writer.
+        /// </summary>
+        /// <param name="writer">The buffer writer to serialize with.</param>
+        /// <param name="value">The value to serialize.</param>
+        /// <param name="resolver">The resolver to use during deserialization. Use <c>null</c> to use the <see cref="DefaultResolver"/>.</param>
+        protected virtual void Serialize<T>(ref BufferWriter writer, T value, IFormatterResolver resolver)
+        {
+            var formatter = resolver.GetFormatterWithVerify<T>();
+            formatter.Serialize(ref writer, value, resolver);
         }
     }
 }

@@ -35,19 +35,19 @@ namespace MessagePack.Unity.Extension
         protected abstract sbyte TypeCode { get; }
         protected void CopyDeserializeUnsafe(ReadOnlySpan<byte> src, Span<T> dest) => src.CopyTo(MemoryMarshal.Cast<T, byte>(dest));
 
-        public void Serialize(IBufferWriter<byte> writer, T[] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref BufferWriter writer, T[] value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(writer);
+                MessagePackBinary.WriteNil(ref writer);
                 return;
             }
 
             var byteLen = value.Length * Marshal.SizeOf<T>();
 
-            MessagePackBinary.WriteExtensionFormatHeader(writer, TypeCode, byteLen);
-            MessagePackBinary.WriteInt32(writer, byteLen); // write original header(not array header)
-            MessagePackBinary.WriteBoolean(writer, BitConverter.IsLittleEndian);
+            MessagePackBinary.WriteExtensionFormatHeader(ref writer, TypeCode, byteLen);
+            MessagePackBinary.WriteInt32(ref writer, byteLen); // write original header(not array header)
+            MessagePackBinary.WriteBoolean(ref writer, BitConverter.IsLittleEndian);
 
             var span = writer.GetSpan(byteLen);
             MemoryMarshal.Cast<T, byte>(value).CopyTo(span);
