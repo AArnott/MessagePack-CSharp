@@ -2,6 +2,7 @@
 // Copyright (c) Andrew Arnott. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using Nerdbank.Streams;
 using System;
 using System.Buffers;
 using System.Runtime.CompilerServices;
@@ -16,7 +17,7 @@ namespace MessagePack.Formatters
         /// <summary>
         /// The underlying <see cref="IBufferWriter{T}"/>.
         /// </summary>
-        private IBufferWriter<byte> _output;
+        private Sequence<byte> _output;
 
         /// <summary>
         /// The result of the last call to <see cref="IBufferWriter{T}.GetSpan(int)"/>, less any bytes already "consumed" with <see cref="Advance(int)"/>.
@@ -43,8 +44,8 @@ namespace MessagePack.Formatters
         {
             _buffered = 0;
             _bytesCommitted = 0;
-            _output = output;
-            _span = output.GetSpan();
+            _output = (Sequence<byte>) output;
+            _span = _output.GetSpan(0);
         }
 
         /// <summary>
