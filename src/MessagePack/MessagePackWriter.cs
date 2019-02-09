@@ -6,10 +6,21 @@ using System.Text;
 
 namespace MessagePack
 {
+    /// <summary>
+    /// A primitive types writer for the MessagePack format.
+    /// </summary>
+    /// <typeparam name="T">The type of buffer writer in use. Use of a concrete type avoids cost of interface dispatch.</typeparam>
     public ref struct MessagePackWriter<T> where T : IBufferWriter<byte>
     {
+        /// <summary>
+        /// The writer to use.
+        /// </summary>
         private BufferWriter writer;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MessagePackWriter{T}"/> struct.
+        /// </summary>
+        /// <param name="writer">The writer to use.</param>
         public MessagePackWriter(IBufferWriter<byte> writer)
         {
             this.writer = new BufferWriter(writer);
@@ -50,6 +61,16 @@ namespace MessagePack
                 }
                 writer.Advance(5);
             }
+        }
+        
+        /// <summary>
+        /// Writes a nil value.
+        /// </summary>
+        public void WriteNil()
+        {
+            var span = writer.GetSpan(1);
+            span[0] = MessagePackCode.Nil;
+            writer.Advance(1);
         }
     }
 }
