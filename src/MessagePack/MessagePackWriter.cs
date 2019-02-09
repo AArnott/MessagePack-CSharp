@@ -72,5 +72,69 @@ namespace MessagePack
             span[0] = MessagePackCode.Nil;
             writer.Advance(1);
         }
+
+        /// <summary>
+        /// Copies bytes directly into the message pack writer.
+        /// </summary>
+        /// <param name="rawMessagePackBlock">The span of bytes to copy from.</param>
+        public void WriteRaw(ReadOnlySpan<byte> rawMessagePackBlock) => writer.Write(rawMessagePackBlock);
+
+        /// <summary>
+        /// Writes a 16-bit integer.
+        /// </summary>
+        /// <param name="value">The value to write.</param>
+        public void WriteInt16(short value)
+        {
+            if (value >= 0)
+            {
+                // positive int(use uint)
+                if (value <= MessagePackRange.MaxFixPositiveInt)
+                {
+                    var span = writer.GetSpan(1);
+                    span[0] = unchecked((byte)value);
+                    writer.Advance(1);
+                }
+                else if (value <= byte.MaxValue)
+                {
+                    var span = writer.GetSpan(2);
+                    span[0] = MessagePackCode.UInt8;
+                    span[1] = unchecked((byte)value);
+                    writer.Advance(2);
+                }
+                else
+                {
+                    var span = writer.GetSpan(3);
+                    span[0] = MessagePackCode.UInt16;
+                    span[1] = unchecked((byte)(value >> 8));
+                    span[2] = unchecked((byte)value);
+                    writer.Advance(3);
+                }
+            }
+            else
+            {
+                // negative int(use int)
+                if (MessagePackRange.MinFixNegativeInt <= value)
+                {
+                    var span = writer.GetSpan(1);
+                    span[0] = unchecked((byte)value);
+                    writer.Advance(1);
+                }
+                else if (sbyte.MinValue <= value)
+                {
+                    var span = writer.GetSpan(2);
+                    span[0] = MessagePackCode.Int8;
+                    span[1] = unchecked((byte)value);
+                    writer.Advance(2);
+                }
+                else
+                {
+                    var span = writer.GetSpan(3);
+                    span[0] = MessagePackCode.Int16;
+                    span[1] = unchecked((byte)(value >> 8));
+                    span[2] = unchecked((byte)value);
+                    writer.Advance(3);
+                }
+            }
+        }
     }
 }

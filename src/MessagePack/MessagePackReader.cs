@@ -67,6 +67,38 @@ namespace MessagePack
                 : throw ThrowInvalidCode(code);
         }
 
+        /// <summary>
+        /// Reads a 16-bit integer.
+        /// </summary>
+        /// <returns>A 16-bit integer.</returns>
+        public short ReadInt16()
+        {
+            ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte code));
+
+            switch (code)
+            {
+                case MessagePackCode.UInt8:
+                case MessagePackCode.Int8:
+                    ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte byteValue));
+                    return byteValue;
+                case MessagePackCode.UInt16:
+                case MessagePackCode.Int16:
+                    ThrowInsufficientBufferUnless(this.sequenceReader.TryReadBigEndian(out short shortValue));
+                    return shortValue;
+                default:
+                    if (code >= MessagePackCode.MinNegativeFixInt && code <= MessagePackCode.MaxNegativeFixInt)
+                    {
+                        return (sbyte)code;
+                    }
+                    else if (code >= MessagePackCode.MinFixInt && code <= MessagePackCode.MaxFixInt)
+                    {
+                        return code;
+                    }
+
+                    throw ThrowInvalidCode(code);
+            }
+        }
+
         private Exception ThrowInvalidCode(byte code)
         {
             throw new InvalidOperationException(string.Format("code is invalid. code: {0} format: {1}", code, MessagePackCode.ToFormatName(code)));
