@@ -25,6 +25,8 @@ namespace MessagePack.CodeGenerator
             // https://github.com/daveaglick/Buildalyzer/blob/b42d2e3ba1b3673a8133fb41e72b507b01bce1d6/src/Buildalyzer/Environment/BuildEnvironment.cs#L86-L96
             Dictionary<string, string> properties = new Dictionary<string, string>()
                 {
+                    // trailing '\' may cause unexpected escape
+                    {"IntermediateOutputPath", tempPath + "/"},
                     {"IntermediateOutputPath", tempPath + Path.DirectorySeparatorChar + Path.DirectorySeparatorChar},
                     {"ProviderCommandLineArgs", "true"},
                     {"GenerateResourceMSBuildArchitecture", "CurrentArchitecture"},
@@ -40,7 +42,7 @@ namespace MessagePack.CodeGenerator
                     {"UseCommonOutputDirectory", "true"},
                     {"GeneratePackageOnBuild", "false"},
                     {"RunPostBuildEvent", "false"},
-                    {"SolutionDir", new FileInfo(csprojPath).FullName}
+                    {"SolutionDir", (new FileInfo(csprojPath).Directory.FullName) + "/"}
                 };
             var propargs = string.Join(" ", properties.Select(kv => $"/p:{kv.Key}=\"{kv.Value}\""));
             // how to determine whether command should be executed('dotnet msbuild' or 'msbuild')?
