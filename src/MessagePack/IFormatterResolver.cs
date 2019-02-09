@@ -16,8 +16,6 @@ namespace MessagePack
     {
         public static IMessagePackFormatter<T> GetFormatterWithVerify<T>(this IFormatterResolver resolver)
         {
-            Requires.NotNull(resolver, nameof(resolver));
-
             IMessagePackFormatter<T> formatter;
             try
             {
