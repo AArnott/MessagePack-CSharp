@@ -11,6 +11,9 @@ namespace MessagePack
     /// A primitive types writer for the MessagePack format.
     /// </summary>
     /// <typeparam name="T">The type of buffer writer in use. Use of a concrete type avoids cost of interface dispatch.</typeparam>
+    /// <remarks>
+    /// <see href="https://github.com/msgpack/msgpack/blob/master/spec.md">The MessagePack spec.</see>
+    /// </remarks>
     public ref struct MessagePackWriter<T> where T : IBufferWriter<byte>
     {
         /// <summary>
@@ -913,8 +916,9 @@ namespace MessagePack
         {
             unchecked
             {
-                span[0] = (byte)(value >> 8);
+                // Write to highest index first so the JIT skips bounds checks on subsequent writes.
                 span[1] = (byte)value;
+                span[0] = (byte)(value >> 8);
             }
         }
 
@@ -922,10 +926,11 @@ namespace MessagePack
         {
             unchecked
             {
-                span[0] = (byte)(value >> 24);
-                span[1] = (byte)(value >> 16);
-                span[2] = (byte)(value >> 8);
+                // Write to highest index first so the JIT skips bounds checks on subsequent writes.
                 span[3] = (byte)value;
+                span[2] = (byte)(value >> 8);
+                span[1] = (byte)(value >> 16);
+                span[0] = (byte)(value >> 24);
             }
         }
 
@@ -933,14 +938,15 @@ namespace MessagePack
         {
             unchecked
             {
-                span[0] = (byte)(value >> 56);
-                span[1] = (byte)(value >> 48);
-                span[2] = (byte)(value >> 40);
-                span[3] = (byte)(value >> 32);
-                span[4] = (byte)(value >> 24);
-                span[5] = (byte)(value >> 16);
-                span[6] = (byte)(value >> 8);
+                // Write to highest index first so the JIT skips bounds checks on subsequent writes.
                 span[7] = (byte)value;
+                span[6] = (byte)(value >> 8);
+                span[5] = (byte)(value >> 16);
+                span[4] = (byte)(value >> 24);
+                span[3] = (byte)(value >> 32);
+                span[2] = (byte)(value >> 40);
+                span[1] = (byte)(value >> 48);
+                span[0] = (byte)(value >> 56);
             }
         }
     }

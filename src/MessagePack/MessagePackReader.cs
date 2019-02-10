@@ -13,6 +13,9 @@ namespace MessagePack
     /// <summary>
     /// A primitive types reader for the MessagePack format.
     /// </summary>
+    /// <remarks>
+    /// <see href="https://github.com/msgpack/msgpack/blob/master/spec.md">The MessagePack spec.</see>
+    /// </remarks>
     public ref struct MessagePackReader
     {
         /// <summary>
