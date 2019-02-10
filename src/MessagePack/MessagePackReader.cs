@@ -159,6 +159,62 @@ namespace MessagePack
         }
 
         /// <summary>
+        /// Reads a <see cref="long"/> from any of:
+        /// <see cref="MessagePackCode.UInt8"/>,
+        /// <see cref="MessagePackCode.Int8"/>,
+        /// <see cref="MessagePackCode.UInt16"/>,
+        /// <see cref="MessagePackCode.Int16"/>,
+        /// <see cref="MessagePackCode.UInt32"/>,
+        /// <see cref="MessagePackCode.Int32"/>,
+        /// <see cref="MessagePackCode.UInt64"/>,
+        /// <see cref="MessagePackCode.Int64"/>,
+        /// or anything between <see cref="MessagePackCode.MinNegativeFixInt"/> and <see cref="MessagePackCode.MaxNegativeFixInt"/>,
+        /// or anything between <see cref="MessagePackCode.MinFixInt"/> and <see cref="MessagePackCode.MaxFixInt"/>.
+        /// </summary>
+        /// <returns>A 32-bit integer.</returns>
+        public long ReadInt64()
+        {
+            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
+
+            switch (code)
+            {
+                case MessagePackCode.UInt8:
+                    ThrowInsufficientBufferUnless(this.reader.TryRead(out byte byteValue));
+                    return byteValue;
+                case MessagePackCode.Int8:
+                    ThrowInsufficientBufferUnless(this.reader.TryRead(out byteValue));
+                    return (sbyte)byteValue;
+                case MessagePackCode.UInt16:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out short shortValue));
+                    return (ushort)shortValue;
+                case MessagePackCode.Int16:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out shortValue));
+                    return shortValue;
+                case MessagePackCode.UInt32:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out int intValue));
+                    return (uint)intValue;
+                case MessagePackCode.Int32:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out intValue));
+                    return intValue;
+                case MessagePackCode.UInt64:
+                case MessagePackCode.Int64:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out long longValue));
+                    return longValue;
+                default:
+                    if (code >= MessagePackCode.MinNegativeFixInt && code <= MessagePackCode.MaxNegativeFixInt)
+                    {
+                        return (sbyte)code;
+                    }
+                    else if (code >= MessagePackCode.MinFixInt && code <= MessagePackCode.MaxFixInt)
+                    {
+                        return code;
+                    }
+
+                    throw ThrowInvalidCode(code);
+            }
+        }
+
+        /// <summary>
         /// Reads a boolean value from either a <see cref="MessagePackCode.False"/> or <see cref="MessagePackCode.True"/>.
         /// </summary>
         /// <returns>The value.</returns>

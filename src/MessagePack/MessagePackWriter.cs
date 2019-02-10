@@ -230,6 +230,108 @@ namespace MessagePack
             }
         }
 
+        public void WriteInt64(long value)
+        {
+            if (value >= 0)
+            {
+                // positive int(use uint)
+                if (value <= MessagePackRange.MaxFixPositiveInt)
+                {
+                    var span = writer.GetSpan(1);
+                    span[0] = unchecked((byte)value);
+                    writer.Advance(1);
+                }
+                else if (value <= byte.MaxValue)
+                {
+                    var span = writer.GetSpan(2);
+                    span[0] = MessagePackCode.UInt8;
+                    span[1] = unchecked((byte)value);
+                    writer.Advance(2);
+                }
+                else if (value <= ushort.MaxValue)
+                {
+                    var span = writer.GetSpan(3);
+                    span[0] = MessagePackCode.UInt16;
+                    span[1] = unchecked((byte)(value >> 8));
+                    span[2] = unchecked((byte)value);
+                    writer.Advance(3);
+                }
+                else if (value <= uint.MaxValue)
+                {
+                    var span = writer.GetSpan(5);
+                    span[0] = MessagePackCode.UInt32;
+                    span[1] = unchecked((byte)(value >> 24));
+                    span[2] = unchecked((byte)(value >> 16));
+                    span[3] = unchecked((byte)(value >> 8));
+                    span[4] = unchecked((byte)value);
+                    writer.Advance(5);
+                }
+                else
+                {
+                    var span = writer.GetSpan(9);
+                    span[0] = MessagePackCode.UInt64;
+                    span[1] = unchecked((byte)(value >> 56));
+                    span[2] = unchecked((byte)(value >> 48));
+                    span[3] = unchecked((byte)(value >> 40));
+                    span[4] = unchecked((byte)(value >> 32));
+                    span[5] = unchecked((byte)(value >> 24));
+                    span[6] = unchecked((byte)(value >> 16));
+                    span[7] = unchecked((byte)(value >> 8));
+                    span[8] = unchecked((byte)value);
+                    writer.Advance(9);
+                }
+            }
+            else
+            {
+                // negative int(use int)
+                if (MessagePackRange.MinFixNegativeInt <= value)
+                {
+                    var span = writer.GetSpan(1);
+                    span[0] = unchecked((byte)value);
+                    writer.Advance(1);
+                }
+                else if (sbyte.MinValue <= value)
+                {
+                    var span = writer.GetSpan(2);
+                    span[0] = MessagePackCode.Int8;
+                    span[1] = unchecked((byte)value);
+                    writer.Advance(2);
+                }
+                else if (short.MinValue <= value)
+                {
+                    var span = writer.GetSpan(3);
+                    span[0] = MessagePackCode.Int16;
+                    span[1] = unchecked((byte)(value >> 8));
+                    span[2] = unchecked((byte)value);
+                    writer.Advance(3);
+                }
+                else if (int.MinValue <= value)
+                {
+                    var span = writer.GetSpan(5);
+                    span[0] = MessagePackCode.Int32;
+                    span[1] = unchecked((byte)(value >> 24));
+                    span[2] = unchecked((byte)(value >> 16));
+                    span[3] = unchecked((byte)(value >> 8));
+                    span[4] = unchecked((byte)value);
+                    writer.Advance(5);
+                }
+                else
+                {
+                    var span = writer.GetSpan(9);
+                    span[0] = MessagePackCode.Int64;
+                    span[1] = unchecked((byte)(value >> 56));
+                    span[2] = unchecked((byte)(value >> 48));
+                    span[3] = unchecked((byte)(value >> 40));
+                    span[4] = unchecked((byte)(value >> 32));
+                    span[5] = unchecked((byte)(value >> 24));
+                    span[6] = unchecked((byte)(value >> 16));
+                    span[7] = unchecked((byte)(value >> 8));
+                    span[8] = unchecked((byte)value);
+                    writer.Advance(9);
+                }
+            }
+        }
+
         /// <summary>
         /// Writes a <see cref="bool"/> value using either <see cref="MessagePackCode.True"/> or <see cref="MessagePackCode.False"/>.
         /// </summary>
