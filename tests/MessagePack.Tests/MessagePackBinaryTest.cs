@@ -700,12 +700,12 @@ namespace MessagePack.Tests
             var sequenceReader = sequence.AsReadOnlySequence;
             var ext = MessagePackBinary.ReadExtensionFormat(ref sequenceReader);
             ext.TypeCode.Is(typeCode);
-            ext.Data.SequenceEqual(target).IsTrue();
+            ext.Data.ToArray().SequenceEqual(target).IsTrue();
             (sequence.Length - sequenceReader.Length).Is(returnLength);
 
             var ext2 = CreateUnpackedReference(sequence).AsMessagePackExtendedTypeObject();
             ext2.TypeCode.Is((byte)ext.TypeCode);
-            ext2.GetBody().SequenceEqual(ext.Data).IsTrue();
+            ext2.GetBody().SequenceEqual(ext.Data.ToArray()).IsTrue();
         }
 
         // FixExt4(-1) => seconds |  [1970-01-01 00:00:00 UTC, 2106-02-07 06:28:16 UTC) range

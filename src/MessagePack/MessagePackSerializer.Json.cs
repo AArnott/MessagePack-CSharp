@@ -348,7 +348,7 @@ namespace MessagePack
                         writer.Write(ext.TypeCode);
                         writer.Write(",");
                         writer.Write("\"");
-                        writer.Write(Convert.ToBase64String(ext.Data));
+                        writer.Write(Convert.ToBase64String(ext.Data.ToArray()));
                         writer.Write("\"");
                         writer.Write("]");
                     }

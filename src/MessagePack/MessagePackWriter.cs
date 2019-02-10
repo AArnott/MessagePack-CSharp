@@ -43,6 +43,12 @@ namespace MessagePack
         public void WriteRaw(ReadOnlySpan<byte> rawMessagePackBlock) => writer.Write(rawMessagePackBlock);
 
         /// <summary>
+        /// Copies bytes directly into the message pack writer.
+        /// </summary>
+        /// <param name="rawMessagePackBlock">The span of bytes to copy from.</param>
+        public void WriteRaw(ReadOnlySequence<byte> rawMessagePackBlock) => rawMessagePackBlock.CopyTo(ref writer);
+
+        /// <summary>
         /// Write the length of the next array to be written in the most compact form of
         /// <see cref="MessagePackCode.MinFixArray"/>,
         /// <see cref="MessagePackCode.Array16"/>, or
@@ -63,7 +69,7 @@ namespace MessagePack
                 {
                     span[0] = MessagePackCode.Array16;
                     span[1] = (byte)(count >> 8);
-                    span[2] = (byte)(count);
+                    span[2] = (byte)count;
                 }
                 writer.Advance(3);
             }
@@ -76,7 +82,7 @@ namespace MessagePack
                     span[1] = (byte)(count >> 24);
                     span[2] = (byte)(count >> 16);
                     span[3] = (byte)(count >> 8);
-                    span[4] = (byte)(count);
+                    span[4] = (byte)count;
                 }
                 writer.Advance(5);
             }
@@ -113,7 +119,7 @@ namespace MessagePack
             {
                 var span = writer.GetSpan(2);
                 span[0] = MessagePackCode.Int8;
-                span[1] = unchecked((byte)(value));
+                span[1] = unchecked((byte)value);
                 writer.Advance(2);
             }
             else
@@ -534,7 +540,7 @@ namespace MessagePack
                 {
                     span[0] = MessagePackCode.Bin16;
                     span[1] = (byte)(src.Length >> 8);
-                    span[2] = (byte)(src.Length);
+                    span[2] = (byte)src.Length;
                 }
 
                 src.CopyTo(span.Slice(3));
@@ -551,7 +557,7 @@ namespace MessagePack
                     span[1] = (byte)(src.Length >> 24);
                     span[2] = (byte)(src.Length >> 16);
                     span[3] = (byte)(src.Length >> 8);
-                    span[4] = (byte)(src.Length);
+                    span[4] = (byte)src.Length;
                 }
 
                 src.CopyTo(span.Slice(5));
@@ -711,6 +717,109 @@ namespace MessagePack
                 span[4] = unchecked((byte)byteCount);
                 writer.Advance(byteCount + 5);
             }
+        }
+
+        /// <summary>
+        /// Writes the extension format header, using the smallest one of these codes:
+        /// <see cref="MessagePackCode.FixExt1"/>,
+        /// <see cref="MessagePackCode.FixExt2"/>,
+        /// <see cref="MessagePackCode.FixExt4"/>,
+        /// <see cref="MessagePackCode.FixExt8"/>,
+        /// <see cref="MessagePackCode.FixExt16"/>,
+        /// <see cref="MessagePackCode.Ext8"/>,
+        /// <see cref="MessagePackCode.Ext16"/>, or
+        /// <see cref="MessagePackCode.Ext32"/>.
+        /// </summary>
+        /// <param name="extensionHeader">The extension header.</param>
+        public void WriteExtensionFormatHeader(ExtensionHeader extensionHeader)
+        {
+            int dataLength = (int)extensionHeader.Length;
+            byte typeCode = (byte)extensionHeader.TypeCode;
+            switch (dataLength)
+            {
+                case 1:
+                    var span = writer.GetSpan(2);
+                    span[0] = MessagePackCode.FixExt1;
+                    span[1] = unchecked(typeCode);
+                    writer.Advance(2);
+                    return;
+                case 2:
+                    span = writer.GetSpan(2);
+                    span[0] = MessagePackCode.FixExt2;
+                    span[1] = unchecked(typeCode);
+                    writer.Advance(2);
+                    return;
+                case 4:
+                    span = writer.GetSpan(2);
+                    span[0] = MessagePackCode.FixExt4;
+                    span[1] = unchecked(typeCode);
+                    writer.Advance(2);
+                    return;
+                case 8:
+                    span = writer.GetSpan(2);
+                    span[0] = MessagePackCode.FixExt8;
+                    span[1] = unchecked(typeCode);
+                    writer.Advance(2);
+                    return;
+                case 16:
+                    span = writer.GetSpan(2);
+                    span[0] = MessagePackCode.FixExt16;
+                    span[1] = unchecked(typeCode);
+                    writer.Advance(2);
+                    return;
+                default:
+                    unchecked
+                    {
+                        if (dataLength <= byte.MaxValue)
+                        {
+                            span = writer.GetSpan(dataLength + 3);
+                            span[0] = MessagePackCode.Ext8;
+                            span[1] = unchecked((byte)dataLength);
+                            span[2] = unchecked(typeCode);
+                            writer.Advance(3);
+                        }
+                        else if (dataLength <= UInt16.MaxValue)
+                        {
+                            span = writer.GetSpan(dataLength + 4);
+                            span[0] = MessagePackCode.Ext16;
+                            span[1] = unchecked((byte)(dataLength >> 8));
+                            span[2] = unchecked((byte)dataLength);
+                            span[3] = unchecked(typeCode);
+                            writer.Advance(4);
+                        }
+                        else
+                        {
+                            span = writer.GetSpan(dataLength + 6);
+                            span[0] = MessagePackCode.Ext32;
+                            span[1] = unchecked((byte)(dataLength >> 24));
+                            span[2] = unchecked((byte)(dataLength >> 16));
+                            span[3] = unchecked((byte)(dataLength >> 8));
+                            span[4] = unchecked((byte)dataLength);
+                            span[5] = unchecked(typeCode);
+                            writer.Advance(6);
+                        }
+                    }
+
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Writes an extension format, using the smallest one of these codes:
+        /// <see cref="MessagePackCode.FixExt1"/>,
+        /// <see cref="MessagePackCode.FixExt2"/>,
+        /// <see cref="MessagePackCode.FixExt4"/>,
+        /// <see cref="MessagePackCode.FixExt8"/>,
+        /// <see cref="MessagePackCode.FixExt16"/>,
+        /// <see cref="MessagePackCode.Ext8"/>,
+        /// <see cref="MessagePackCode.Ext16"/>, or
+        /// <see cref="MessagePackCode.Ext32"/>.
+        /// </summary>
+        /// <param name="extensionData">The extension data.</param>
+        public void WriteExtensionFormat(ExtensionResult extensionData)
+        {
+            WriteExtensionFormatHeader(extensionData.Header);
+            WriteRaw(extensionData.Data);
         }
     }
 }

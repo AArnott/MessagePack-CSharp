@@ -539,7 +539,10 @@ namespace MessagePack
         /// <see cref="MessagePackCode.Bin16"/>,
         /// <see cref="MessagePackCode.Bin32"/>.
         /// </summary>
-        /// <returns>A sequence of bytes.</returns>
+        /// <returns>
+        /// A sequence of bytes.
+        /// The data is a slice from the original sequence passed to this reader's constructor.
+        /// </returns>
         public ReadOnlySequence<byte> ReadBytes()
         {
             ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
@@ -576,7 +579,10 @@ namespace MessagePack
         /// <see cref="MessagePackCode.Str32"/>,
         /// or a code between <see cref="MessagePackCode.MinFixStr"/> and <see cref="MessagePackCode.MaxFixStr"/>.
         /// </summary>
-        /// <returns>A sequence of bytes.</returns>
+        /// <returns>
+        /// The sequence of bytes. 
+        /// The data is a slice from the original sequence passed to this reader's constructor.
+        /// </returns>
         public ReadOnlySequence<byte> ReadStringSegment()
         {
             int length = GetStringLengthInBytes();
@@ -649,6 +655,83 @@ namespace MessagePack
                 return value;
 #endif
             }
+        }
+
+        /// <summary>
+        /// Reads an extension format header, based on one of these codes:
+        /// <see cref="MessagePackCode.FixExt1"/>,
+        /// <see cref="MessagePackCode.FixExt2"/>,
+        /// <see cref="MessagePackCode.FixExt4"/>,
+        /// <see cref="MessagePackCode.FixExt8"/>,
+        /// <see cref="MessagePackCode.FixExt16"/>,
+        /// <see cref="MessagePackCode.Ext8"/>,
+        /// <see cref="MessagePackCode.Ext16"/>, or
+        /// <see cref="MessagePackCode.Ext32"/>.
+        /// </summary>
+        /// <returns>The extension header.</returns>
+        public ExtensionHeader ReadExtensionFormatHeader()
+        {
+            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
+
+            uint length;
+            switch (code)
+            {
+                case MessagePackCode.FixExt1:
+                    length = 1;
+                    break;
+                case MessagePackCode.FixExt2:
+                    length = 2;
+                    break;
+                case MessagePackCode.FixExt4:
+                    length = 4;
+                    break;
+                case MessagePackCode.FixExt8:
+                    length = 8;
+                    break;
+                case MessagePackCode.FixExt16:
+                    length = 16;
+                    break;
+                case MessagePackCode.Ext8:
+                    ThrowInsufficientBufferUnless(this.reader.TryRead(out byte byteLength));
+                    length = byteLength;
+                    break;
+                case MessagePackCode.Ext16:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out short shortLength));
+                    length = (ushort)shortLength;
+                    break;
+                case MessagePackCode.Ext32:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out int intLength));
+                    length = (uint)intLength;
+                    break;
+                default:
+                    throw ThrowInvalidCode(code);
+            }
+
+            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte typeCode));
+            return new ExtensionHeader((sbyte)typeCode, length);
+        }
+
+        /// <summary>
+        /// Reads an extension format header and data, based on one of these codes:
+        /// <see cref="MessagePackCode.FixExt1"/>,
+        /// <see cref="MessagePackCode.FixExt2"/>,
+        /// <see cref="MessagePackCode.FixExt4"/>,
+        /// <see cref="MessagePackCode.FixExt8"/>,
+        /// <see cref="MessagePackCode.FixExt16"/>,
+        /// <see cref="MessagePackCode.Ext8"/>,
+        /// <see cref="MessagePackCode.Ext16"/>, or
+        /// <see cref="MessagePackCode.Ext32"/>.
+        /// </summary>
+        /// <returns>
+        /// The extension format. 
+        /// The data is a slice from the original sequence passed to this reader's constructor.
+        /// </returns>
+        public ExtensionResult ReadExtensionFormat()
+        {
+            var header = ReadExtensionFormatHeader();
+            var data = this.reader.Sequence.Slice(this.reader.Position, header.Length);
+            this.reader.Advance(header.Length);
+            return new ExtensionResult(header.TypeCode, data);
         }
 
         private static Exception ThrowInvalidCode(byte code)
