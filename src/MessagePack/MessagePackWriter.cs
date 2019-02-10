@@ -1,4 +1,5 @@
 ﻿using MessagePack.Formatters;
+using MessagePack.Internal;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
@@ -509,6 +510,107 @@ namespace MessagePack
             }
 
             writer.Advance(9);
+        }
+
+        /// <summary>
+        /// Writes a <see cref="DateTime"/> using the message code <see cref="ReservedMessagePackExtensionTypeCode.DateTime"/>.
+        /// </summary>
+        /// <param name="dateTime">The value to write.</param>
+        public void WriteDateTime(DateTime dateTime)
+        {
+            // Timestamp spec
+            // https://github.com/msgpack/msgpack/pull/209
+            // FixExt4(-1) => seconds |  [1970-01-01 00:00:00 UTC, 2106-02-07 06:28:16 UTC) range
+            // FixExt8(-1) => nanoseconds + seconds | [1970-01-01 00:00:00.000000000 UTC, 2514-05-30 01:53:04.000000000 UTC) range
+            // Ext8(12,-1) => nanoseconds + seconds | [-584554047284-02-23 16:59:44 UTC, 584554051223-11-09 07:00:16.000000000 UTC) range
+            dateTime = dateTime.ToUniversalTime();
+
+            var secondsSinceBclEpoch = dateTime.Ticks / TimeSpan.TicksPerSecond;
+            var seconds = secondsSinceBclEpoch - DateTimeConstants.BclSecondsAtUnixEpoch;
+            var nanoseconds = (dateTime.Ticks % TimeSpan.TicksPerSecond) * DateTimeConstants.NanosecondsPerTick;
+
+            // reference pseudo code.
+            /*
+            struct timespec {
+                long tv_sec;  // seconds
+                long tv_nsec; // nanoseconds
+            } time;
+            if ((time.tv_sec >> 34) == 0)
+            {
+                uint64_t data64 = (time.tv_nsec << 34) | time.tv_sec;
+                if (data & 0xffffffff00000000L == 0)
+                {
+                    // timestamp 32
+                    uint32_t data32 = data64;
+                    serialize(0xd6, -1, data32)
+                }
+                else
+                {
+                    // timestamp 64
+                    serialize(0xd7, -1, data64)
+                }
+            }
+            else
+            {
+                // timestamp 96
+                serialize(0xc7, 12, -1, time.tv_nsec, time.tv_sec)
+            }
+            */
+
+            if ((seconds >> 34) == 0)
+            {
+                var data64 = unchecked((ulong)((nanoseconds << 34) | seconds));
+                if ((data64 & 0xffffffff00000000L) == 0)
+                {
+                    // timestamp 32(seconds in 32-bit unsigned int)
+                    var data32 = (UInt32)data64;
+                    var span = writer.GetSpan(6);
+                    span[0] = MessagePackCode.FixExt4;
+                    span[1] = unchecked((byte)ReservedMessagePackExtensionTypeCode.DateTime);
+                    span[2] = unchecked((byte)(data32 >> 24));
+                    span[3] = unchecked((byte)(data32 >> 16));
+                    span[4] = unchecked((byte)(data32 >> 8));
+                    span[5] = unchecked((byte)data32);
+                    writer.Advance(6);
+                }
+                else
+                {
+                    // timestamp 64(nanoseconds in 30-bit unsigned int | seconds in 34-bit unsigned int)
+                    var span = writer.GetSpan(10);
+                    span[0] = MessagePackCode.FixExt8;
+                    span[1] = unchecked((byte)ReservedMessagePackExtensionTypeCode.DateTime);
+                    span[2] = unchecked((byte)(data64 >> 56));
+                    span[3] = unchecked((byte)(data64 >> 48));
+                    span[4] = unchecked((byte)(data64 >> 40));
+                    span[5] = unchecked((byte)(data64 >> 32));
+                    span[6] = unchecked((byte)(data64 >> 24));
+                    span[7] = unchecked((byte)(data64 >> 16));
+                    span[8] = unchecked((byte)(data64 >> 8));
+                    span[9] = unchecked((byte)data64);
+                    writer.Advance(10);
+                }
+            }
+            else
+            {
+                // timestamp 96( nanoseconds in 32-bit unsigned int | seconds in 64-bit signed int )
+                var span = writer.GetSpan(15);
+                span[0] = MessagePackCode.Ext8;
+                span[1] = 12;
+                span[2] = unchecked((byte)ReservedMessagePackExtensionTypeCode.DateTime);
+                span[3] = unchecked((byte)(nanoseconds >> 24));
+                span[4] = unchecked((byte)(nanoseconds >> 16));
+                span[5] = unchecked((byte)(nanoseconds >> 8));
+                span[6] = unchecked((byte)nanoseconds);
+                span[7] = unchecked((byte)(seconds >> 56));
+                span[8] = unchecked((byte)(seconds >> 48));
+                span[9] = unchecked((byte)(seconds >> 40));
+                span[10] = unchecked((byte)(seconds >> 32));
+                span[11] = unchecked((byte)(seconds >> 24));
+                span[12] = unchecked((byte)(seconds >> 16));
+                span[13] = unchecked((byte)(seconds >> 8));
+                span[14] = unchecked((byte)seconds);
+                writer.Advance(15);
+            }
         }
 
         /// <summary>

@@ -534,6 +534,37 @@ namespace MessagePack
         }
 
         /// <summary>
+        /// Reads a <see cref="DateTime"/> from a value encoded with 
+        /// <see cref="MessagePackCode.FixExt4"/>,
+        /// <see cref="MessagePackCode.FixExt8"/>, or
+        /// <see cref="MessagePackCode.Ext8"/>.
+        /// Expects extension type code <see cref="ReservedMessagePackExtensionTypeCode.DateTime"/>.
+        /// </summary>
+        /// <returns>The value.</returns>
+        public DateTime ReadDateTime()
+        {
+            var header = ReadExtensionFormatHeader();
+            if (header.TypeCode != ReservedMessagePackExtensionTypeCode.DateTime)
+            {
+                throw new InvalidOperationException(string.Format("Extension TypeCode is invalid. typeCode: {0}", header.TypeCode));
+            }
+
+            switch (header.Length)
+            {
+                case 4:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out int intValue));
+                    return DateTimeConstants.UnixEpoch.AddSeconds((uint)intValue);
+                case 8:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out long longValue));
+                    var nanoseconds = (long)(longValue >> 34);
+                    var seconds = longValue & 0x00000003ffffffffL;
+                    return DateTimeConstants.UnixEpoch.AddSeconds(seconds).AddTicks(nanoseconds / DateTimeConstants.NanosecondsPerTick);
+                default:
+                    throw new InvalidOperationException($"Length of extension was {header.Length}. Either 4 or 8 were expected.");
+            }
+        }
+
+        /// <summary>
         /// Reads a span of bytes, whose length is determined by a header of one of these types:
         /// <see cref="MessagePackCode.Bin8"/>,
         /// <see cref="MessagePackCode.Bin16"/>,
