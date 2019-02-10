@@ -71,6 +71,34 @@ namespace MessagePack
         }
 
         /// <summary>
+        /// Read a map header from
+        /// <see cref="MessagePackCode.Map16"/>,
+        /// <see cref="MessagePackCode.Map32"/>, or
+        /// some built-in code between <see cref="MessagePackCode.MinFixMap"/> and <see cref="MessagePackCode.MaxFixMap"/>.
+        /// </summary>
+        public uint ReadMapHeader()
+        {
+            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
+
+            switch(code)
+            {
+                case MessagePackCode.Map16:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out short shortValue));
+                    return (ushort)shortValue;
+                case MessagePackCode.Map32:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out int intValue));
+                    return (uint)intValue;
+                default:
+                    if (code >= MessagePackCode.MinFixMap && code <= MessagePackCode.MaxFixMap)
+                    {
+                        return (uint)(code & 0xF);
+                    }
+
+                    throw ThrowInvalidCode(code);
+            }
+        }
+
+        /// <summary>
         /// Reads a <see cref="byte"/> value either from
         /// a built-in code between <see cref="MessagePackCode.MinFixInt"/> and <see cref="MessagePackCode.MaxFixInt"/>,
         /// or a <see cref="MessagePackCode.UInt8"/>.

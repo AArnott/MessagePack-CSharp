@@ -80,6 +80,36 @@ namespace MessagePack
         }
 
         /// <summary>
+        /// Write the length of the next map to be written in the most compact form of
+        /// <see cref="MessagePackCode.MinFixMap"/>,
+        /// <see cref="MessagePackCode.Map16"/>, or
+        /// <see cref="MessagePackCode.Map32"/>
+        /// </summary>
+        public void WriteMapHeader(uint count)
+        {
+            if (count <= MessagePackRange.MaxFixMapCount)
+            {
+                var span = writer.GetSpan(1);
+                span[0] = (byte)(MessagePackCode.MinFixMap | count);
+                writer.Advance(1);
+            }
+            else if (count <= ushort.MaxValue)
+            {
+                var span = writer.GetSpan(3);
+                span[0] = MessagePackCode.Map16;
+                WriteBigEndian((ushort)count, span.Slice(1));
+                writer.Advance(3);
+            }
+            else
+            {
+                var span = writer.GetSpan(5);
+                span[0] = MessagePackCode.Map32;
+                WriteBigEndian(count, span.Slice(1));
+                writer.Advance(5);
+            }
+        }
+
+        /// <summary>
         /// Writes a <see cref="byte"/> value using a 1-byte code when possible, otherwise as <see cref="MessagePackCode.UInt8"/>.
         /// </summary>
         /// <param name="value">The value.</param>
