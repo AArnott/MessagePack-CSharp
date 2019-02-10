@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Buffers;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using MessagePack.Decoders;
 using MessagePack.Formatters;
 using MessagePack.Internal;
+using Microsoft;
 
 namespace MessagePack
 {
@@ -27,7 +29,127 @@ namespace MessagePack
         /// <summary>
         /// Checks whether the reader position is pointing at a nil value.
         /// </summary>
-        public bool IsNil => this.reader.TryPeek(out byte code) && code == MessagePackCode.Nil;
+        /// <exception cref="EndOfStreamException">Thrown if the end of the sequence provided to the constructor is reached before the expected end of the data.</exception>
+        public bool IsNil => NextCode == MessagePackCode.Nil;
+
+        /// <summary>
+        /// Gets the next message pack type to be read.
+        /// </summary>
+        private MessagePackType NextMessagePackType => MessagePackCode.ToMessagePackType(NextCode);
+
+        /// <summary>
+        /// Gets the type of the next MessagePack block.
+        /// </summary>
+        /// <exception cref="EndOfStreamException">Thrown if the end of the sequence provided to the constructor is reached before the expected end of the data.</exception>
+        /// <remarks>
+        /// See <see cref="MessagePackCode"/> for valid message pack codes and ranges.
+        /// </remarks>
+        private byte NextCode
+        {
+            get
+            {
+                ThrowInsufficientBufferUnless(this.reader.TryPeek(out byte code));
+                return code;
+            }
+        }
+
+        /// <summary>
+        /// Advances the reader to the next MessagePack primitive to be read.
+        /// </summary>
+        /// <remarks>
+        /// The entire primitive is skipped, including content of maps or arrays, or any other type with payloads.
+        /// </remarks>
+        public void ReadNext()
+        {
+            byte code = NextCode;
+            switch (code)
+            {
+                case MessagePackCode.Nil:
+                case MessagePackCode.True:
+                case MessagePackCode.False:
+                    this.reader.Advance(1);
+                    break;
+                case MessagePackCode.Int8:
+                case MessagePackCode.UInt8:
+                    this.reader.Advance(2);
+                    break;
+                case MessagePackCode.Int16:
+                case MessagePackCode.UInt16:
+                    this.reader.Advance(3);
+                    break;
+                case MessagePackCode.Int32:
+                case MessagePackCode.UInt32:
+                case MessagePackCode.Float32:
+                    this.reader.Advance(5);
+                    break;
+                case MessagePackCode.Int64:
+                case MessagePackCode.UInt64:
+                case MessagePackCode.Float64:
+                    this.reader.Advance(9);
+                    break;
+                case MessagePackCode.Map16:
+                case MessagePackCode.Map32:
+                    ReadNextMap();
+                    break;
+                case MessagePackCode.Array16:
+                case MessagePackCode.Array32:
+                    ReadNextArray();
+                    break;
+                case MessagePackCode.Str8:
+                case MessagePackCode.Str16:
+                case MessagePackCode.Str32:
+                    int length = GetStringLengthInBytes();
+                    this.reader.Advance(length);
+                    break;
+                case MessagePackCode.Bin8:
+                case MessagePackCode.Bin16:
+                case MessagePackCode.Bin32:
+                    length = GetBytesLength();
+                    this.reader.Advance(length);
+                    break;
+                case MessagePackCode.FixExt1:
+                case MessagePackCode.FixExt2:
+                case MessagePackCode.FixExt4:
+                case MessagePackCode.FixExt8:
+                case MessagePackCode.FixExt16:
+                case MessagePackCode.Ext8:
+                case MessagePackCode.Ext16:
+                case MessagePackCode.Ext32:
+                    var header = ReadExtensionFormatHeader();
+                    this.reader.Advance(header.Length);
+                    break;
+                default:
+                    if ((code >= MessagePackCode.MinNegativeFixInt && code <= MessagePackCode.MaxNegativeFixInt) ||
+                        (code >= MessagePackCode.MinFixInt && code <= MessagePackCode.MaxFixInt))
+                    {
+                        this.reader.Advance(1);
+                        break;
+                    }
+
+                    if (code >= MessagePackCode.MinFixMap && code <= MessagePackCode.MaxFixMap)
+                    {
+                        ReadNextMap();
+                        break;
+                    }
+
+                    if (code >= MessagePackCode.MinFixArray && code <= MessagePackCode.MaxFixArray)
+                    {
+                        ReadNextArray();
+                        break;
+                    }
+
+                    if (code >= MessagePackCode.MinFixStr && code <= MessagePackCode.MaxFixStr)
+                    {
+                        length = GetStringLengthInBytes();
+                        this.reader.Advance(length);
+                        break;
+                    }
+
+                    // We don't actually expect to ever hit this point, since every code is supported.
+                    Debug.Fail("Missing handler for code: " + code);
+                    throw ThrowInvalidCode(code);
+            }
+        }
 
         /// <summary>
         /// Reads a <see cref="MessagePackCode.Nil"/> value.
@@ -80,7 +202,7 @@ namespace MessagePack
         {
             ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
 
-            switch(code)
+            switch (code)
             {
                 case MessagePackCode.Map16:
                     ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out short shortValue));
@@ -604,27 +726,7 @@ namespace MessagePack
         /// </returns>
         public ReadOnlySequence<byte> ReadBytes()
         {
-            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
-
-            int length;
-            switch (code)
-            {
-                case MessagePackCode.Bin8:
-                    ThrowInsufficientBufferUnless(this.reader.TryRead(out byte byteLength));
-                    length = byteLength;
-                    break;
-                case MessagePackCode.Bin16:
-                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out short shortLength));
-                    length = (ushort)shortLength;
-                    break;
-                case MessagePackCode.Bin32:
-                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out length));
-                    break;
-                default:
-                    throw ThrowInvalidCode(code);
-            }
-
-            // Check that we have enough bytes before allocating memory to copy it in.
+            int length = GetBytesLength();
             ThrowInsufficientBufferUnless(this.reader.Remaining >= length);
             var result = this.reader.Sequence.Slice(this.reader.Position, length);
             this.reader.Advance(length);
@@ -798,6 +900,11 @@ namespace MessagePack
             throw new InvalidOperationException(string.Format("code is invalid. code: {0} format: {1}", code, MessagePackCode.ToFormatName(code)));
         }
 
+        /// <summary>
+        /// Throws <see cref="EndOfStreamException"/> if a condition is false.
+        /// </summary>
+        /// <param name="condition">A boolean value.</param>
+        /// <exception cref="EndOfStreamException">Thrown if <paramref name="condition"/> is <c>false</c>.</exception>
         private static void ThrowInsufficientBufferUnless(bool condition)
         {
             if (!condition)
@@ -806,35 +913,73 @@ namespace MessagePack
             }
         }
 
+        private int GetBytesLength()
+        {
+            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
+
+            int length;
+            switch (code)
+            {
+                case MessagePackCode.Bin8:
+                    ThrowInsufficientBufferUnless(this.reader.TryRead(out byte byteLength));
+                    length = byteLength;
+                    break;
+                case MessagePackCode.Bin16:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out short shortLength));
+                    length = (ushort)shortLength;
+                    break;
+                case MessagePackCode.Bin32:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out length));
+                    break;
+                default:
+                    throw ThrowInvalidCode(code);
+            }
+
+            return length;
+        }
+
         private int GetStringLengthInBytes()
         {
             ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
 
-            int byteLength;
             switch (code)
             {
                 case MessagePackCode.Str8:
                     ThrowInsufficientBufferUnless(this.reader.TryRead(out byte byteValue));
-                    byteLength = byteValue;
-                    break;
+                    return byteValue;
                 case MessagePackCode.Str16:
                     ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out short shortValue));
-                    byteLength = (ushort)shortValue;
-                    break;
+                    return (ushort)shortValue;
                 case MessagePackCode.Str32:
                     ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out int intValue));
-                    byteLength = intValue;
-                    break;
+                    return intValue;
                 default:
                     if (code >= MessagePackCode.MinFixStr && code <= MessagePackCode.MaxFixStr)
                     {
-                        byteLength = code & 0x1F;
+                        return code & 0x1F;
                     }
 
                     throw ThrowInvalidCode(code);
             }
+        }
 
-            return byteLength;
+        private void ReadNextArray()
+        {
+            uint count = ReadArrayHeader();
+            for (int i = 0; i < count; i++)
+            {
+                ReadNext();
+            }
+        }
+
+        private void ReadNextMap()
+        {
+            uint count = ReadMapHeader();
+            for (int i = 0; i < count; i++)
+            {
+                ReadNext(); // key
+                ReadNext(); // value
+            }
         }
     }
 }
