@@ -418,6 +418,7 @@ namespace MessagePack
                     byte* pScratch = stackalloc byte[4];
                     Span<byte> scratch = new Span<byte>(pScratch, 4);
                     ThrowInsufficientBufferUnless(this.reader.TryCopyTo(scratch));
+                    this.reader.Advance(4);
                     var floatValue = new Float32Bits(scratch);
                     return floatValue.Value;
                 case MessagePackCode.Int8:
@@ -484,12 +485,14 @@ namespace MessagePack
                     byte* pScratch8 = stackalloc byte[8];
                     Span<byte> scratch8 = new Span<byte>(pScratch8, 8);
                     ThrowInsufficientBufferUnless(this.reader.TryCopyTo(scratch8));
+                    this.reader.Advance(scratch8.Length);
                     var doubleValue = new Float64Bits(scratch8);
                     return doubleValue.Value;
                 case MessagePackCode.Float32:
                     byte* pScratch4 = stackalloc byte[4];
                     Span<byte> scratch4 = new Span<byte>(pScratch4, 4);
                     ThrowInsufficientBufferUnless(this.reader.TryCopyTo(scratch4));
+                    this.reader.Advance(scratch4.Length);
                     var floatValue = new Float32Bits(scratch4);
                     return floatValue.Value;
                 case MessagePackCode.Int8:
@@ -536,8 +539,8 @@ namespace MessagePack
         /// <see cref="MessagePackCode.Bin16"/>,
         /// <see cref="MessagePackCode.Bin32"/>.
         /// </summary>
-        /// <returns>A span of bytes.</returns>
-        public ReadOnlySpan<byte> ReadBytes()
+        /// <returns>A sequence of bytes.</returns>
+        public ReadOnlySequence<byte> ReadBytes()
         {
             ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
 
@@ -561,9 +564,91 @@ namespace MessagePack
 
             // Check that we have enough bytes before allocating memory to copy it in.
             ThrowInsufficientBufferUnless(this.reader.Remaining >= length);
-            var result = new byte[length];
-            ThrowInsufficientBufferUnless(this.reader.TryCopyTo(result));
+            var result = this.reader.Sequence.Slice(this.reader.Position, length);
+            this.reader.Advance(length);
             return result;
+        }
+
+        /// <summary>
+        /// Reads a string of bytes, whose length is determined by a header of one of these types:
+        /// <see cref="MessagePackCode.Str8"/>,
+        /// <see cref="MessagePackCode.Str16"/>,
+        /// <see cref="MessagePackCode.Str32"/>,
+        /// or a code between <see cref="MessagePackCode.MinFixStr"/> and <see cref="MessagePackCode.MaxFixStr"/>.
+        /// </summary>
+        /// <returns>A sequence of bytes.</returns>
+        public ReadOnlySequence<byte> ReadStringSegment()
+        {
+            int length = GetStringLengthInBytes();
+            ThrowInsufficientBufferUnless(this.reader.Remaining >= length);
+            var result = this.reader.Sequence.Slice(this.reader.Position, length);
+            this.reader.Advance(length);
+            return result;
+        }
+
+        /// <summary>
+        /// Reads a string, whose length is determined by a header of one of these types:
+        /// <see cref="MessagePackCode.Str8"/>,
+        /// <see cref="MessagePackCode.Str16"/>,
+        /// <see cref="MessagePackCode.Str32"/>,
+        /// or a code between <see cref="MessagePackCode.MinFixStr"/> and <see cref="MessagePackCode.MaxFixStr"/>.
+        /// </summary>
+        /// <returns>A string.</returns>
+        public string ReadString()
+        {
+            int byteLength = GetStringLengthInBytes();
+
+            ThrowInsufficientBufferUnless(this.reader.Remaining >= byteLength);
+            if (this.reader.UnreadSpan.Length >= byteLength)
+            {
+                // Fast path: all bytes to decode appear in the same span.
+                string value = StringEncoding.UTF8.GetString(this.reader.UnreadSpan.Slice(0, byteLength));
+                this.reader.Advance(byteLength);
+                return value;
+            }
+            else
+            {
+                // Slow path
+#if NETSTANDARD1_6
+                // We need to concatenate all the bytes together into one array.
+                byte[] byteArray = ArrayPool<byte>.Shared.Rent(byteLength);
+                ThrowInsufficientBufferUnless(this.reader.TryCopyTo(byteArray));
+                this.reader.Advance(byteArray.Length);
+                string value = StringEncoding.UTF8.GetString(byteArray);
+                ArrayPool<byte>.Shared.Return(byteArray);
+                return value;
+#else
+                // We need to decode bytes incrementally across multiple spans.
+                int maxCharLength = StringEncoding.UTF8.GetMaxCharCount(byteLength);
+                char[] charArray = ArrayPool<char>.Shared.Rent(maxCharLength);
+                var decoder = StringEncoding.UTF8.GetDecoder();
+
+                int remainingByteLength = byteLength;
+                int initializedChars = 0;
+                while (remainingByteLength > 0)
+                {
+                    int bytesRead = Math.Min(remainingByteLength, this.reader.UnreadSpan.Length);
+                    remainingByteLength -= bytesRead;
+                    bool flush = remainingByteLength == 0;
+#if NETCOREAPP2_1
+                    initializedChars += decoder.GetChars(this.reader.UnreadSpan.Slice(0, bytesRead), charArray.AsSpan(initializedChars), flush);
+#else
+                    unsafe
+                    {
+                        fixed (byte* pUnreadSpan = this.reader.UnreadSpan)
+                        fixed (char* pCharArray = &charArray[initializedChars])
+                        {
+                            initializedChars += decoder.GetChars(pUnreadSpan, bytesRead, pCharArray, charArray.Length - initializedChars, flush);
+                        }
+                    }
+#endif
+                }
+
+                string value = new string(charArray, 0, initializedChars);
+                ArrayPool<char>.Shared.Return(charArray);
+                return value;
+#endif
+            }
         }
 
         private static Exception ThrowInvalidCode(byte code)
@@ -577,6 +662,37 @@ namespace MessagePack
             {
                 throw new EndOfStreamException();
             }
+        }
+
+        private int GetStringLengthInBytes()
+        {
+            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
+
+            int byteLength;
+            switch (code)
+            {
+                case MessagePackCode.Str8:
+                    ThrowInsufficientBufferUnless(this.reader.TryRead(out byte byteValue));
+                    byteLength = byteValue;
+                    break;
+                case MessagePackCode.Str16:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out short shortValue));
+                    byteLength = (ushort)shortValue;
+                    break;
+                case MessagePackCode.Str32:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out int intValue));
+                    byteLength = intValue;
+                    break;
+                default:
+                    if (code >= MessagePackCode.MinFixStr && code <= MessagePackCode.MaxFixStr)
+                    {
+                        byteLength = code & 0x1F;
+                    }
+
+                    throw ThrowInvalidCode(code);
+            }
+
+            return byteLength;
         }
     }
 }

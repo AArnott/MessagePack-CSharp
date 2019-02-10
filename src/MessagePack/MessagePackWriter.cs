@@ -558,5 +558,159 @@ namespace MessagePack
                 writer.Advance(size);
             }
         }
+
+        /// <summary>
+        /// Writes out an array of bytes that represent a UTF-8 encoded string, prefixed with the length using one of these message codes:
+        /// <see cref="MessagePackCode.MinFixStr"/>,
+        /// <see cref="MessagePackCode.Str8"/>,
+        /// <see cref="MessagePackCode.Str16"/>,
+        /// <see cref="MessagePackCode.Str32"/>,
+        /// </summary>
+        /// <param name="utf8stringBytes">The bytes to write.</param>
+        public void WriteStringBytes(ReadOnlySpan<byte> utf8stringBytes)
+        {
+            var byteCount = utf8stringBytes.Length;
+            if (byteCount <= MessagePackRange.MaxFixStringLength)
+            {
+                var span = writer.GetSpan(byteCount + 1);
+                span[0] = (byte)(MessagePackCode.MinFixStr | byteCount);
+                utf8stringBytes.CopyTo(span.Slice(1));
+                writer.Advance(byteCount + 1);
+            }
+            else if (byteCount <= byte.MaxValue)
+            {
+                var span = writer.GetSpan(byteCount + 2);
+                span[0] = MessagePackCode.Str8;
+                span[1] = unchecked((byte)byteCount);
+                utf8stringBytes.CopyTo(span.Slice(2));
+                writer.Advance(byteCount + 2);
+            }
+            else if (byteCount <= ushort.MaxValue)
+            {
+                var span = writer.GetSpan(byteCount + 3);
+                span[0] = MessagePackCode.Str16;
+                span[1] = unchecked((byte)(byteCount >> 8));
+                span[2] = unchecked((byte)byteCount);
+                utf8stringBytes.CopyTo(span.Slice(3));
+                writer.Advance(byteCount + 3);
+            }
+            else
+            {
+                var span = writer.GetSpan(byteCount + 5);
+                span[0] = MessagePackCode.Str32;
+                span[1] = unchecked((byte)(byteCount >> 24));
+                span[2] = unchecked((byte)(byteCount >> 16));
+                span[3] = unchecked((byte)(byteCount >> 8));
+                span[4] = unchecked((byte)byteCount);
+                utf8stringBytes.CopyTo(span.Slice(5));
+                writer.Advance(byteCount + 5);
+            }
+        }
+
+        /// <summary>
+        /// Writes out a <see cref="string"/>, prefixed with the length using one of these message codes:
+        /// <see cref="MessagePackCode.Nil"/>,
+        /// <see cref="MessagePackCode.MinFixStr"/>,
+        /// <see cref="MessagePackCode.Str8"/>,
+        /// <see cref="MessagePackCode.Str16"/>,
+        /// <see cref="MessagePackCode.Str32"/>,
+        /// </summary>
+        /// <param name="value">The value to write.</param>
+        public void WriteString(string value)
+        {
+            if (value == null)
+            {
+                WriteNil();
+                return;
+            }
+
+            WriteString(value.AsSpan());
+        }
+
+        /// <summary>
+        /// Writes out a <see cref="string"/>, prefixed with the length using one of these message codes:
+        /// <see cref="MessagePackCode.MinFixStr"/>,
+        /// <see cref="MessagePackCode.Str8"/>,
+        /// <see cref="MessagePackCode.Str16"/>,
+        /// <see cref="MessagePackCode.Str32"/>,
+        /// </summary>
+        /// <param name="value">The value to write.</param>
+        public void WriteString(ReadOnlySpan<char> value)
+        {
+            // MaxByteCount -> WritePrefix -> GetBytes has some overheads of `MaxByteCount`
+            // solves heuristic length check
+
+            // ensure buffer by MaxByteCount(faster than GetByteCount)
+            var span = writer.GetSpan(StringEncoding.UTF8.GetMaxByteCount(value.Length) + 5);
+
+            int useOffset;
+            if (value.Length <= MessagePackRange.MaxFixStringLength)
+            {
+                useOffset = 1;
+            }
+            else if (value.Length <= byte.MaxValue)
+            {
+                useOffset = 2;
+            }
+            else if (value.Length <= ushort.MaxValue)
+            {
+                useOffset = 3;
+            }
+            else
+            {
+                useOffset = 5;
+            }
+
+            // skip length area
+            var byteCount = StringEncoding.UTF8.GetBytes(value, span.Slice(useOffset));
+
+            // move body and write prefix
+            if (byteCount <= MessagePackRange.MaxFixStringLength)
+            {
+                if (useOffset != 1)
+                {
+                    span.Slice(useOffset, byteCount).CopyTo(span.Slice(1));
+                }
+                span[0] = (byte)(MessagePackCode.MinFixStr | byteCount);
+                writer.Advance(byteCount + 1);
+            }
+            else if (byteCount <= byte.MaxValue)
+            {
+                if (useOffset != 2)
+                {
+                    span.Slice(useOffset, byteCount).CopyTo(span.Slice(2));
+                }
+
+                span[0] = MessagePackCode.Str8;
+                span[1] = unchecked((byte)byteCount);
+                writer.Advance(byteCount + 2);
+            }
+            else if (byteCount <= ushort.MaxValue)
+            {
+                if (useOffset != 3)
+                {
+                    span.Slice(useOffset, byteCount).CopyTo(span.Slice(3));
+                }
+
+                span[0] = MessagePackCode.Str16;
+                span[1] = unchecked((byte)(byteCount >> 8));
+                span[2] = unchecked((byte)byteCount);
+                writer.Advance(byteCount + 3);
+            }
+            else
+            {
+                if (useOffset != 5)
+                {
+                    span.Slice(useOffset, byteCount).CopyTo(span.Slice(5));
+                }
+
+                span[0] = MessagePackCode.Str32;
+                span[1] = unchecked((byte)(byteCount >> 24));
+                span[2] = unchecked((byte)(byteCount >> 16));
+                span[3] = unchecked((byte)(byteCount >> 8));
+                span[4] = unchecked((byte)byteCount);
+                writer.Advance(byteCount + 5);
+            }
+        }
     }
 }
