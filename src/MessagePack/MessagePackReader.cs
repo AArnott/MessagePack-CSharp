@@ -124,6 +124,35 @@ namespace MessagePack
         }
 
         /// <summary>
+        /// Reads a <see cref="ushort"/> from any of:
+        /// <see cref="MessagePackCode.UInt8"/>,
+        /// <see cref="MessagePackCode.UInt16"/>,
+        /// or anything between <see cref="MessagePackCode.MinFixInt"/> and <see cref="MessagePackCode.MaxFixInt"/>.
+        /// </summary>
+        /// <returns>A 16-bit integer.</returns>
+        public ushort ReadUInt16()
+        {
+            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
+
+            switch (code)
+            {
+                case MessagePackCode.UInt8:
+                    ThrowInsufficientBufferUnless(this.reader.TryRead(out byte byteValue));
+                    return byteValue;
+                case MessagePackCode.UInt16:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out short shortValue));
+                    return (ushort)shortValue;
+                default:
+                    if (code >= MessagePackCode.MinFixInt && code <= MessagePackCode.MaxFixInt)
+                    {
+                        return code;
+                    }
+
+                    throw ThrowInvalidCode(code);
+            }
+        }
+
+        /// <summary>
         /// Reads a <see cref="short"/> from any of:
         /// <see cref="MessagePackCode.UInt8"/>,
         /// <see cref="MessagePackCode.Int8"/>,
