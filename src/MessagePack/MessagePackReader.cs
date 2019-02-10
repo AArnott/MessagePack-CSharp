@@ -13,7 +13,7 @@ namespace MessagePack
         /// <summary>
         /// The reader over the sequence.
         /// </summary>
-        private SequenceReader<byte> sequenceReader;
+        private SequenceReader<byte> reader;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MessagePackReader"/> struct.
@@ -21,13 +21,13 @@ namespace MessagePack
         /// <param name="readOnlySequence">The sequence to read from.</param>
         public MessagePackReader(ReadOnlySequence<byte> readOnlySequence)
         {
-            this.sequenceReader = new SequenceReader<byte>(readOnlySequence);
+            this.reader = new SequenceReader<byte>(readOnlySequence);
         }
 
         /// <summary>
         /// Checks whether the reader position is pointing at a nil value.
         /// </summary>
-        public bool IsNil => this.sequenceReader.TryPeek(out byte code) && code == MessagePackCode.Nil;
+        public bool IsNil => this.reader.TryPeek(out byte code) && code == MessagePackCode.Nil;
 
         /// <summary>
         /// Reads a <see cref="MessagePackCode.Nil"/> value.
@@ -35,7 +35,7 @@ namespace MessagePack
         /// <returns>A nil value.</returns>
         public Nil ReadNil()
         {
-            ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte code));
+            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
 
             return code == MessagePackCode.Nil
                 ? Nil.Default
@@ -50,15 +50,15 @@ namespace MessagePack
         /// </summary>
         public uint ReadArrayHeader()
         {
-            ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte code));
+            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
 
             switch (code)
             {
                 case MessagePackCode.Array16:
-                    ThrowInsufficientBufferUnless(this.sequenceReader.TryReadBigEndian(out short shortValue));
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out short shortValue));
                     return (uint)shortValue;
                 case MessagePackCode.Array32:
-                    ThrowInsufficientBufferUnless(this.sequenceReader.TryReadBigEndian(out int intValue));
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out int intValue));
                     return (uint)intValue;
                 default:
                     if (code >= MessagePackCode.MinFixArray && code <= MessagePackCode.MaxFixArray)
@@ -82,17 +82,17 @@ namespace MessagePack
         /// <returns>A 16-bit integer.</returns>
         public short ReadInt16()
         {
-            ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte code));
+            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
 
             switch (code)
             {
                 case MessagePackCode.UInt8:
                 case MessagePackCode.Int8:
-                    ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte byteValue));
+                    ThrowInsufficientBufferUnless(this.reader.TryRead(out byte byteValue));
                     return byteValue;
                 case MessagePackCode.UInt16:
                 case MessagePackCode.Int16:
-                    ThrowInsufficientBufferUnless(this.sequenceReader.TryReadBigEndian(out short shortValue));
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out short shortValue));
                     return shortValue;
                 default:
                     if (code >= MessagePackCode.MinNegativeFixInt && code <= MessagePackCode.MaxNegativeFixInt)
@@ -114,7 +114,7 @@ namespace MessagePack
         /// <returns>The value.</returns>
         public bool ReadBoolean()
         {
-            ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte code));
+            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
             switch (code)
             {
                 case MessagePackCode.True:
@@ -134,11 +134,11 @@ namespace MessagePack
         /// <returns>The value.</returns>
         public byte ReadByte()
         {
-            ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte code));
+            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
             switch (code)
             {
                 case MessagePackCode.UInt8:
-                    ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte result));
+                    ThrowInsufficientBufferUnless(this.reader.TryRead(out byte result));
                     return result;
                 default:
                     if (code >= MessagePackCode.MinFixInt && code <= MessagePackCode.MaxFixInt)
@@ -159,11 +159,11 @@ namespace MessagePack
         /// <returns>The value.</returns>
         public sbyte ReadSByte()
         {
-            ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte code));
+            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
             switch (code)
             {
                 case MessagePackCode.Int8:
-                    ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte result));
+                    ThrowInsufficientBufferUnless(this.reader.TryRead(out byte result));
                     return unchecked((sbyte)result);
                 default:
                     if (code >= MessagePackCode.MinNegativeFixInt && code <= MessagePackCode.MaxNegativeFixInt)
@@ -196,39 +196,39 @@ namespace MessagePack
         /// <returns>The value.</returns>
         public unsafe float ReadSingle()
         {
-            ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte code));
+            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
 
             switch (code)
             {
                 case MessagePackCode.Float32:
                     byte* pScratch = stackalloc byte[4];
                     Span<byte> scratch = new Span<byte>(pScratch, 4);
-                    ThrowInsufficientBufferUnless(this.sequenceReader.TryCopyTo(scratch));
+                    ThrowInsufficientBufferUnless(this.reader.TryCopyTo(scratch));
                     var floatValue = new Float32Bits(scratch);
                     return floatValue.Value;
                 case MessagePackCode.Int8:
-                    ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte byteValue));
+                    ThrowInsufficientBufferUnless(this.reader.TryRead(out byte byteValue));
                     return unchecked((sbyte)byteValue);
                 case MessagePackCode.Int16:
-                    ThrowInsufficientBufferUnless(this.sequenceReader.TryReadBigEndian(out short shortValue));
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out short shortValue));
                     return shortValue;
                 case MessagePackCode.Int32:
-                    ThrowInsufficientBufferUnless(this.sequenceReader.TryReadBigEndian(out int intValue));
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out int intValue));
                     return intValue;
                 case MessagePackCode.Int64:
-                    ThrowInsufficientBufferUnless(this.sequenceReader.TryReadBigEndian(out long longValue));
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out long longValue));
                     return longValue;
                 case MessagePackCode.UInt8:
-                    ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byteValue));
+                    ThrowInsufficientBufferUnless(this.reader.TryRead(out byteValue));
                     return byteValue;
                 case MessagePackCode.UInt16:
-                    ThrowInsufficientBufferUnless(this.sequenceReader.TryReadBigEndian(out shortValue));
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out shortValue));
                     return (ushort)shortValue;
                 case MessagePackCode.UInt32:
-                    ThrowInsufficientBufferUnless(this.sequenceReader.TryReadBigEndian(out intValue));
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out intValue));
                     return (uint)intValue;
                 case MessagePackCode.UInt64:
-                    ThrowInsufficientBufferUnless(this.sequenceReader.TryReadBigEndian(out longValue));
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out longValue));
                     return (ulong)longValue;
                 default:
                     if (code >= MessagePackCode.MinNegativeFixInt && code <= MessagePackCode.MaxNegativeFixInt)
@@ -253,30 +253,30 @@ namespace MessagePack
         /// <returns>A span of bytes.</returns>
         public ReadOnlySpan<byte> ReadBytes()
         {
-            ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte code));
+            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
 
             int length;
             switch (code)
             {
                 case MessagePackCode.Bin8:
-                    ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte byteLength));
+                    ThrowInsufficientBufferUnless(this.reader.TryRead(out byte byteLength));
                     length = byteLength;
                     break;
                 case MessagePackCode.Bin16:
-                    ThrowInsufficientBufferUnless(this.sequenceReader.TryReadBigEndian(out short shortLength));
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out short shortLength));
                     length = (ushort)shortLength;
                     break;
                 case MessagePackCode.Bin32:
-                    ThrowInsufficientBufferUnless(this.sequenceReader.TryReadBigEndian(out length));
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out length));
                     break;
                 default:
                     throw ThrowInvalidCode(code);
             }
 
             // Check that we have enough bytes before allocating memory to copy it in.
-            ThrowInsufficientBufferUnless(this.sequenceReader.Remaining >= length);
+            ThrowInsufficientBufferUnless(this.reader.Remaining >= length);
             var result = new byte[length];
-            ThrowInsufficientBufferUnless(this.sequenceReader.TryCopyTo(result));
+            ThrowInsufficientBufferUnless(this.reader.TryCopyTo(result));
             return result;
         }
 
