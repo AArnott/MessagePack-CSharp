@@ -10,6 +10,9 @@ using Microsoft;
 
 namespace MessagePack
 {
+    /// <summary>
+    /// A primitive types reader for the MessagePack format.
+    /// </summary>
     public ref struct MessagePackReader
     {
         /// <summary>
