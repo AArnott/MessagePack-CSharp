@@ -27,7 +27,7 @@ namespace MessagePack
         }
 
         /// <summary>
-        /// Writes a nil value.
+        /// Writes a <see cref="MessagePackCode.Nil"/> value.
         /// </summary>
         public void WriteNil()
         {
@@ -43,7 +43,10 @@ namespace MessagePack
         public void WriteRaw(ReadOnlySpan<byte> rawMessagePackBlock) => writer.Write(rawMessagePackBlock);
 
         /// <summary>
-        /// Write the length of the next array to be written.
+        /// Write the length of the next array to be written in the most compact form of
+        /// <see cref="MessagePackCode.MinFixArray"/>,
+        /// <see cref="MessagePackCode.Array16"/>, or
+        /// <see cref="MessagePackCode.Array32"/>
         /// </summary>
         public void WriteArrayHeader(uint count)
         {
@@ -80,7 +83,12 @@ namespace MessagePack
         }
 
         /// <summary>
-        /// Writes a 16-bit integer.
+        /// Writes a 16-bit integer using a built-in 1-byte code when within specific MessagePack-supported ranges,
+        /// or the most compact of
+        /// <see cref="MessagePackCode.UInt8"/>,
+        /// <see cref="MessagePackCode.UInt16"/>,
+        /// <see cref="MessagePackCode.Int8"/>, or
+        /// <see cref="MessagePackCode.Int16"/>
         /// </summary>
         /// <param name="value">The value to write.</param>
         public void WriteInt16(short value)
@@ -138,7 +146,7 @@ namespace MessagePack
         }
 
         /// <summary>
-        /// Writes a boolean value.
+        /// Writes a boolean value using either <see cref="MessagePackCode.True"/> or <see cref="MessagePackCode.False"/>.
         /// </summary>
         /// <param name="value">The value.</param>
         public void WriteBoolean(bool value)
@@ -149,7 +157,7 @@ namespace MessagePack
         }
 
         /// <summary>
-        /// Writes an 8-bit value.
+        /// Writes an 8-bit value using a 1-byte code when possible, otherwise as <see cref="MessagePackCode.UInt8"/>.
         /// </summary>
         /// <param name="value">The value.</param>
         public void WriteByte(byte value)
@@ -170,7 +178,7 @@ namespace MessagePack
         }
 
         /// <summary>
-        /// Writes an 8-bit value.
+        /// Writes an 8-bit value using a 1-byte code when possible, otherwise as <see cref="MessagePackCode.Int8"/>.
         /// </summary>
         /// <param name="value">The value.</param>
         public void WriteSByte(sbyte value)
@@ -191,7 +199,39 @@ namespace MessagePack
         }
 
         /// <summary>
-        /// Writes a span of bytes, prefixed with a length.
+        /// Writes a <see cref="MessagePackCode.Float32"/> value.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        public void WriteSingle(float value)
+        {
+            var span = writer.GetSpan(5);
+
+            span[0] = MessagePackCode.Float32;
+
+            var num = new Float32Bits(value);
+            if (BitConverter.IsLittleEndian)
+            {
+                span[1] = num.Byte3;
+                span[2] = num.Byte2;
+                span[3] = num.Byte1;
+                span[4] = num.Byte0;
+            }
+            else
+            {
+                span[1] = num.Byte0;
+                span[2] = num.Byte1;
+                span[3] = num.Byte2;
+                span[4] = num.Byte3;
+            }
+
+            writer.Advance(5);
+        }
+
+        /// <summary>
+        /// Writes a span of bytes, prefixed with a length encoded as the smallest fitting from:
+        /// <see cref="MessagePackCode.Bin8"/>,
+        /// <see cref="MessagePackCode.Bin16"/>, or
+        /// <see cref="MessagePackCode.Bin32"/>,
         /// </summary>
         /// <param name="src">The span of bytes to write.</param>
         public void WriteBytes(ReadOnlySpan<byte> src)

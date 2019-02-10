@@ -30,7 +30,7 @@ namespace MessagePack
         public bool IsNil => this.sequenceReader.TryPeek(out byte code) && code == MessagePackCode.Nil;
 
         /// <summary>
-        /// Reads a nil value.
+        /// Reads a <see cref="MessagePackCode.Nil"/> value.
         /// </summary>
         /// <returns>A nil value.</returns>
         public Nil ReadNil()
@@ -43,7 +43,10 @@ namespace MessagePack
         }
 
         /// <summary>
-        /// Read the length of the next array.
+        /// Read an array header from
+        /// <see cref="MessagePackCode.Array16"/>,
+        /// <see cref="MessagePackCode.Array32"/>, or
+        /// some built-in code between <see cref="MessagePackCode.MinFixArray"/> and <see cref="MessagePackCode.MaxFixArray"/>.
         /// </summary>
         public uint ReadArrayHeader()
         {
@@ -68,7 +71,13 @@ namespace MessagePack
         }
 
         /// <summary>
-        /// Reads a 16-bit integer.
+        /// Reads a <see cref="short"/> from any of:
+        /// <see cref="MessagePackCode.UInt8"/>,
+        /// <see cref="MessagePackCode.Int8"/>,
+        /// <see cref="MessagePackCode.UInt16"/>,
+        /// <see cref="MessagePackCode.Int16"/>,
+        /// or anything between <see cref="MessagePackCode.MinNegativeFixInt"/> and <see cref="MessagePackCode.MaxNegativeFixInt"/>,
+        /// or anything between <see cref="MessagePackCode.MinFixInt"/> and <see cref="MessagePackCode.MaxFixInt"/>.
         /// </summary>
         /// <returns>A 16-bit integer.</returns>
         public short ReadInt16()
@@ -100,7 +109,7 @@ namespace MessagePack
         }
 
         /// <summary>
-        /// Reads a boolean value.
+        /// Reads a boolean value from either a <see cref="MessagePackCode.False"/> or <see cref="MessagePackCode.True"/>.
         /// </summary>
         /// <returns>The value.</returns>
         public bool ReadBoolean()
@@ -118,23 +127,34 @@ namespace MessagePack
         }
 
         /// <summary>
-        /// Reads a <see cref="byte"/> value.
+        /// Reads a <see cref="byte"/> value either from
+        /// a built-in code between <see cref="MessagePackCode.MinFixInt"/> and <see cref="MessagePackCode.MaxFixInt"/>,
+        /// or a <see cref="MessagePackCode.UInt8"/>.
         /// </summary>
         /// <returns>The value.</returns>
         public byte ReadByte()
         {
             ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte code));
-            if (code >= MessagePackCode.MinFixInt && code <= MessagePackCode.MaxFixInt)
+            switch (code)
             {
-                return code;
-            }
+                case MessagePackCode.UInt8:
+                    ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte result));
+                    return result;
+                default:
+                    if (code >= MessagePackCode.MinFixInt && code <= MessagePackCode.MaxFixInt)
+                    {
+                        return code;
+                    }
 
-            ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte result));
-            return result;
+                    throw ThrowInvalidCode(code);
+            }
         }
 
         /// <summary>
-        /// Reads an <see cref="sbyte"/> value.
+        /// Reads an <see cref="sbyte"/> value from:
+        /// <see cref="MessagePackCode.Int8"/>,
+        /// or some value between <see cref="MessagePackCode.MinNegativeFixInt"/> and <see cref="MessagePackCode.MaxNegativeFixInt"/>,
+        /// or some value between <see cref="MessagePackCode.MinFixInt"/> and <see cref="MessagePackCode.MaxFixInt"/>.
         /// </summary>
         /// <returns>The value.</returns>
         public sbyte ReadSByte()
@@ -160,7 +180,75 @@ namespace MessagePack
         }
 
         /// <summary>
-        /// Reads a span of bytes, whose length is determined by a header.
+        /// Reads an <see cref="float"/> value from any value encoded with:
+        /// <see cref="MessagePackCode.Float32"/>,
+        /// <see cref="MessagePackCode.Int8"/>,
+        /// <see cref="MessagePackCode.Int16"/>,
+        /// <see cref="MessagePackCode.Int32"/>,
+        /// <see cref="MessagePackCode.Int64"/>,
+        /// <see cref="MessagePackCode.UInt8"/>,
+        /// <see cref="MessagePackCode.UInt16"/>,
+        /// <see cref="MessagePackCode.UInt32"/>,
+        /// <see cref="MessagePackCode.UInt64"/>,
+        /// or some value between <see cref="MessagePackCode.MinNegativeFixInt"/> and <see cref="MessagePackCode.MaxNegativeFixInt"/>,
+        /// or some value between <see cref="MessagePackCode.MinFixInt"/> and <see cref="MessagePackCode.MaxFixInt"/>.
+        /// </summary>
+        /// <returns>The value.</returns>
+        public unsafe float ReadSingle()
+        {
+            ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte code));
+
+            switch (code)
+            {
+                case MessagePackCode.Float32:
+                    byte* pScratch = stackalloc byte[4];
+                    Span<byte> scratch = new Span<byte>(pScratch, 4);
+                    ThrowInsufficientBufferUnless(this.sequenceReader.TryCopyTo(scratch));
+                    var floatValue = new Float32Bits(scratch);
+                    return floatValue.Value;
+                case MessagePackCode.Int8:
+                    ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte byteValue));
+                    return unchecked((sbyte)byteValue);
+                case MessagePackCode.Int16:
+                    ThrowInsufficientBufferUnless(this.sequenceReader.TryReadBigEndian(out short shortValue));
+                    return shortValue;
+                case MessagePackCode.Int32:
+                    ThrowInsufficientBufferUnless(this.sequenceReader.TryReadBigEndian(out int intValue));
+                    return intValue;
+                case MessagePackCode.Int64:
+                    ThrowInsufficientBufferUnless(this.sequenceReader.TryReadBigEndian(out long longValue));
+                    return longValue;
+                case MessagePackCode.UInt8:
+                    ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byteValue));
+                    return byteValue;
+                case MessagePackCode.UInt16:
+                    ThrowInsufficientBufferUnless(this.sequenceReader.TryReadBigEndian(out shortValue));
+                    return (ushort)shortValue;
+                case MessagePackCode.UInt32:
+                    ThrowInsufficientBufferUnless(this.sequenceReader.TryReadBigEndian(out intValue));
+                    return (uint)intValue;
+                case MessagePackCode.UInt64:
+                    ThrowInsufficientBufferUnless(this.sequenceReader.TryReadBigEndian(out longValue));
+                    return (ulong)longValue;
+                default:
+                    if (code >= MessagePackCode.MinNegativeFixInt && code <= MessagePackCode.MaxNegativeFixInt)
+                    {
+                        return code;
+                    }
+                    else if (code >= MessagePackCode.MinFixInt && code <= MessagePackCode.MaxFixInt)
+                    {
+                        return code;
+                    }
+
+                    throw ThrowInvalidCode(code);
+            }
+        }
+
+        /// <summary>
+        /// Reads a span of bytes, whose length is determined by a header of one of these types:
+        /// <see cref="MessagePackCode.Bin8"/>,
+        /// <see cref="MessagePackCode.Bin16"/>,
+        /// <see cref="MessagePackCode.Bin32"/>.
         /// </summary>
         /// <returns>A span of bytes.</returns>
         public ReadOnlySpan<byte> ReadBytes()
