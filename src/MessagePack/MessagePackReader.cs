@@ -117,6 +117,22 @@ namespace MessagePack
             }
         }
 
+        /// <summary>
+        /// Reads a byte value.
+        /// </summary>
+        /// <returns>The value.</returns>
+        public byte ReadByte()
+        {
+            ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte code));
+            if (code >= MessagePackCode.MinFixInt && code <= MessagePackCode.MaxFixInt)
+            {
+                return code;
+            }
+
+            ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte result));
+            return result;
+        }
+
         private static Exception ThrowInvalidCode(byte code)
         {
             throw new InvalidOperationException(string.Format("code is invalid. code: {0} format: {1}", code, MessagePackCode.ToFormatName(code)));

@@ -147,5 +147,26 @@ namespace MessagePack
             span[0] = value ? MessagePackCode.True : MessagePackCode.False;
             writer.Advance(1);
         }
+
+        /// <summary>
+        /// Writes an 8-bit value.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        public void WriteByte(byte value)
+        {
+            if (value <= MessagePackCode.MaxFixInt)
+            {
+                var span = writer.GetSpan(1);
+                span[0] = value;
+                writer.Advance(1);
+            }
+            else
+            {
+                var span = writer.GetSpan(2);
+                span[0] = MessagePackCode.UInt8;
+                span[1] = value;
+                writer.Advance(2);
+            }
+        }
     }
 }
