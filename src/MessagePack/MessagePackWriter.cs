@@ -66,25 +66,15 @@ namespace MessagePack
             else if (count <= ushort.MaxValue)
             {
                 var span = writer.GetSpan(3);
-                unchecked
-                {
-                    span[0] = MessagePackCode.Array16;
-                    span[1] = (byte)(count >> 8);
-                    span[2] = (byte)count;
-                }
+                span[0] = MessagePackCode.Array16;
+                WriteBigEndian((ushort)count, span.Slice(1));
                 writer.Advance(3);
             }
             else
             {
                 var span = writer.GetSpan(5);
-                unchecked
-                {
-                    span[0] = MessagePackCode.Array32;
-                    span[1] = (byte)(count >> 24);
-                    span[2] = (byte)(count >> 16);
-                    span[3] = (byte)(count >> 8);
-                    span[4] = (byte)count;
-                }
+                span[0] = MessagePackCode.Array32;
+                WriteBigEndian(count, span.Slice(1));
                 writer.Advance(5);
             }
         }
@@ -154,8 +144,7 @@ namespace MessagePack
             {
                 var span = writer.GetSpan(3);
                 span[0] = MessagePackCode.UInt16;
-                span[1] = unchecked((byte)(value >> 8));
-                span[2] = unchecked((byte)value);
+                WriteBigEndian(value, span.Slice(1));
                 writer.Advance(3);
             }
         }
@@ -195,8 +184,7 @@ namespace MessagePack
                 {
                     var span = writer.GetSpan(3);
                     span[0] = MessagePackCode.Int16;
-                    span[1] = unchecked((byte)(value >> 8));
-                    span[2] = unchecked((byte)value);
+                    WriteBigEndian(value, span.Slice(1));
                     writer.Advance(3);
                 }
             }
@@ -229,18 +217,14 @@ namespace MessagePack
             {
                 var span = writer.GetSpan(3);
                 span[0] = MessagePackCode.UInt16;
-                span[1] = unchecked((byte)(value >> 8));
-                span[2] = unchecked((byte)value);
+                WriteBigEndian((ushort)value, span.Slice(1));
                 writer.Advance(3);
             }
             else
             {
                 var span = writer.GetSpan(5);
                 span[0] = MessagePackCode.UInt32;
-                span[1] = unchecked((byte)(value >> 24));
-                span[2] = unchecked((byte)(value >> 16));
-                span[3] = unchecked((byte)(value >> 8));
-                span[4] = unchecked((byte)value);
+                WriteBigEndian(value, span.Slice(1));
                 writer.Advance(5);
             }
         }
@@ -282,18 +266,14 @@ namespace MessagePack
                 {
                     var span = writer.GetSpan(3);
                     span[0] = MessagePackCode.Int16;
-                    span[1] = unchecked((byte)(value >> 8));
-                    span[2] = unchecked((byte)value);
+                    WriteBigEndian((ushort)value, span.Slice(1));
                     writer.Advance(3);
                 }
                 else
                 {
                     var span = writer.GetSpan(5);
                     span[0] = MessagePackCode.Int32;
-                    span[1] = unchecked((byte)(value >> 24));
-                    span[2] = unchecked((byte)(value >> 16));
-                    span[3] = unchecked((byte)(value >> 8));
-                    span[4] = unchecked((byte)value);
+                    WriteBigEndian(value, span.Slice(1));
                     writer.Advance(5);
                 }
             }
@@ -329,32 +309,21 @@ namespace MessagePack
             {
                 var span = writer.GetSpan(3);
                 span[0] = MessagePackCode.UInt16;
-                span[1] = unchecked((byte)(value >> 8));
-                span[2] = unchecked((byte)value);
+                WriteBigEndian((ushort)value, span.Slice(1));
                 writer.Advance(3);
             }
             else if (value <= uint.MaxValue)
             {
                 var span = writer.GetSpan(5);
                 span[0] = MessagePackCode.UInt32;
-                span[1] = unchecked((byte)(value >> 24));
-                span[2] = unchecked((byte)(value >> 16));
-                span[3] = unchecked((byte)(value >> 8));
-                span[4] = unchecked((byte)value);
+                WriteBigEndian((uint)value, span.Slice(1));
                 writer.Advance(5);
             }
             else
             {
                 var span = writer.GetSpan(9);
                 span[0] = MessagePackCode.UInt64;
-                span[1] = unchecked((byte)(value >> 56));
-                span[2] = unchecked((byte)(value >> 48));
-                span[3] = unchecked((byte)(value >> 40));
-                span[4] = unchecked((byte)(value >> 32));
-                span[5] = unchecked((byte)(value >> 24));
-                span[6] = unchecked((byte)(value >> 16));
-                span[7] = unchecked((byte)(value >> 8));
-                span[8] = unchecked((byte)value);
+                WriteBigEndian(value, span.Slice(1));
                 writer.Advance(9);
             }
         }
@@ -398,32 +367,21 @@ namespace MessagePack
                 {
                     var span = writer.GetSpan(3);
                     span[0] = MessagePackCode.Int16;
-                    span[1] = unchecked((byte)(value >> 8));
-                    span[2] = unchecked((byte)value);
+                    WriteBigEndian((short)value, span.Slice(1));
                     writer.Advance(3);
                 }
                 else if (int.MinValue <= value)
                 {
                     var span = writer.GetSpan(5);
                     span[0] = MessagePackCode.Int32;
-                    span[1] = unchecked((byte)(value >> 24));
-                    span[2] = unchecked((byte)(value >> 16));
-                    span[3] = unchecked((byte)(value >> 8));
-                    span[4] = unchecked((byte)value);
+                    WriteBigEndian((int)value, span.Slice(1));
                     writer.Advance(5);
                 }
                 else
                 {
                     var span = writer.GetSpan(9);
                     span[0] = MessagePackCode.Int64;
-                    span[1] = unchecked((byte)(value >> 56));
-                    span[2] = unchecked((byte)(value >> 48));
-                    span[3] = unchecked((byte)(value >> 40));
-                    span[4] = unchecked((byte)(value >> 32));
-                    span[5] = unchecked((byte)(value >> 24));
-                    span[6] = unchecked((byte)(value >> 16));
-                    span[7] = unchecked((byte)(value >> 8));
-                    span[8] = unchecked((byte)value);
+                    WriteBigEndian(value, span.Slice(1));
                     writer.Advance(9);
                 }
             }
@@ -567,10 +525,7 @@ namespace MessagePack
                     var span = writer.GetSpan(6);
                     span[0] = MessagePackCode.FixExt4;
                     span[1] = unchecked((byte)ReservedMessagePackExtensionTypeCode.DateTime);
-                    span[2] = unchecked((byte)(data32 >> 24));
-                    span[3] = unchecked((byte)(data32 >> 16));
-                    span[4] = unchecked((byte)(data32 >> 8));
-                    span[5] = unchecked((byte)data32);
+                    WriteBigEndian(data32, span.Slice(2));
                     writer.Advance(6);
                 }
                 else
@@ -579,14 +534,7 @@ namespace MessagePack
                     var span = writer.GetSpan(10);
                     span[0] = MessagePackCode.FixExt8;
                     span[1] = unchecked((byte)ReservedMessagePackExtensionTypeCode.DateTime);
-                    span[2] = unchecked((byte)(data64 >> 56));
-                    span[3] = unchecked((byte)(data64 >> 48));
-                    span[4] = unchecked((byte)(data64 >> 40));
-                    span[5] = unchecked((byte)(data64 >> 32));
-                    span[6] = unchecked((byte)(data64 >> 24));
-                    span[7] = unchecked((byte)(data64 >> 16));
-                    span[8] = unchecked((byte)(data64 >> 8));
-                    span[9] = unchecked((byte)data64);
+                    WriteBigEndian(data64, span.Slice(2));
                     writer.Advance(10);
                 }
             }
@@ -597,18 +545,8 @@ namespace MessagePack
                 span[0] = MessagePackCode.Ext8;
                 span[1] = 12;
                 span[2] = unchecked((byte)ReservedMessagePackExtensionTypeCode.DateTime);
-                span[3] = unchecked((byte)(nanoseconds >> 24));
-                span[4] = unchecked((byte)(nanoseconds >> 16));
-                span[5] = unchecked((byte)(nanoseconds >> 8));
-                span[6] = unchecked((byte)nanoseconds);
-                span[7] = unchecked((byte)(seconds >> 56));
-                span[8] = unchecked((byte)(seconds >> 48));
-                span[9] = unchecked((byte)(seconds >> 40));
-                span[10] = unchecked((byte)(seconds >> 32));
-                span[11] = unchecked((byte)(seconds >> 24));
-                span[12] = unchecked((byte)(seconds >> 16));
-                span[13] = unchecked((byte)(seconds >> 8));
-                span[14] = unchecked((byte)seconds);
+                WriteBigEndian((uint)nanoseconds, span.Slice(3));
+                WriteBigEndian(seconds, span.Slice(7));
                 writer.Advance(15);
             }
         }
@@ -638,12 +576,8 @@ namespace MessagePack
                 var size = src.Length + 3;
                 var span = writer.GetSpan(size);
 
-                unchecked
-                {
-                    span[0] = MessagePackCode.Bin16;
-                    span[1] = (byte)(src.Length >> 8);
-                    span[2] = (byte)src.Length;
-                }
+                span[0] = MessagePackCode.Bin16;
+                WriteBigEndian((ushort)src.Length, span.Slice(1));
 
                 src.CopyTo(span.Slice(3));
                 writer.Advance(size);
@@ -653,14 +587,8 @@ namespace MessagePack
                 var size = src.Length + 5;
                 var span = writer.GetSpan(size);
 
-                unchecked
-                {
-                    span[0] = MessagePackCode.Bin32;
-                    span[1] = (byte)(src.Length >> 24);
-                    span[2] = (byte)(src.Length >> 16);
-                    span[3] = (byte)(src.Length >> 8);
-                    span[4] = (byte)src.Length;
-                }
+                span[0] = MessagePackCode.Bin32;
+                WriteBigEndian(src.Length, span.Slice(1));
 
                 src.CopyTo(span.Slice(5));
                 writer.Advance(size);
@@ -697,8 +625,7 @@ namespace MessagePack
             {
                 var span = writer.GetSpan(byteCount + 3);
                 span[0] = MessagePackCode.Str16;
-                span[1] = unchecked((byte)(byteCount >> 8));
-                span[2] = unchecked((byte)byteCount);
+                WriteBigEndian((ushort)byteCount, span.Slice(1));
                 utf8stringBytes.CopyTo(span.Slice(3));
                 writer.Advance(byteCount + 3);
             }
@@ -706,10 +633,7 @@ namespace MessagePack
             {
                 var span = writer.GetSpan(byteCount + 5);
                 span[0] = MessagePackCode.Str32;
-                span[1] = unchecked((byte)(byteCount >> 24));
-                span[2] = unchecked((byte)(byteCount >> 16));
-                span[3] = unchecked((byte)(byteCount >> 8));
-                span[4] = unchecked((byte)byteCount);
+                WriteBigEndian(byteCount, span.Slice(1));
                 utf8stringBytes.CopyTo(span.Slice(5));
                 writer.Advance(byteCount + 5);
             }
@@ -801,8 +725,7 @@ namespace MessagePack
                 }
 
                 span[0] = MessagePackCode.Str16;
-                span[1] = unchecked((byte)(byteCount >> 8));
-                span[2] = unchecked((byte)byteCount);
+                WriteBigEndian((ushort)byteCount, span.Slice(1));
                 writer.Advance(byteCount + 3);
             }
             else
@@ -813,10 +736,7 @@ namespace MessagePack
                 }
 
                 span[0] = MessagePackCode.Str32;
-                span[1] = unchecked((byte)(byteCount >> 24));
-                span[2] = unchecked((byte)(byteCount >> 16));
-                span[3] = unchecked((byte)(byteCount >> 8));
-                span[4] = unchecked((byte)byteCount);
+                WriteBigEndian(byteCount, span.Slice(1));
                 writer.Advance(byteCount + 5);
             }
         }
@@ -884,8 +804,7 @@ namespace MessagePack
                         {
                             span = writer.GetSpan(dataLength + 4);
                             span[0] = MessagePackCode.Ext16;
-                            span[1] = unchecked((byte)(dataLength >> 8));
-                            span[2] = unchecked((byte)dataLength);
+                            WriteBigEndian((ushort)dataLength, span.Slice(1));
                             span[3] = unchecked(typeCode);
                             writer.Advance(4);
                         }
@@ -893,10 +812,7 @@ namespace MessagePack
                         {
                             span = writer.GetSpan(dataLength + 6);
                             span[0] = MessagePackCode.Ext32;
-                            span[1] = unchecked((byte)(dataLength >> 24));
-                            span[2] = unchecked((byte)(dataLength >> 16));
-                            span[3] = unchecked((byte)(dataLength >> 8));
-                            span[4] = unchecked((byte)dataLength);
+                            WriteBigEndian(dataLength, span.Slice(1));
                             span[5] = unchecked(typeCode);
                             writer.Advance(6);
                         }
@@ -922,6 +838,80 @@ namespace MessagePack
         {
             WriteExtensionFormatHeader(extensionData.Header);
             WriteRaw(extensionData.Data);
+        }
+
+        /// <summary>
+        /// Writes a 16-bit integer in big endian format.
+        /// </summary>
+        /// <param name="value">The integer.</param>
+        public void WriteBigEndian(ushort value)
+        {
+            var span = writer.GetSpan(2);
+            WriteBigEndian(value, span);
+            writer.Advance(2);
+        }
+
+        /// <summary>
+        /// Writes a 32-bit integer in big endian format.
+        /// </summary>
+        /// <param name="value">The integer.</param>
+        public void WriteBigEndian(uint value)
+        {
+            var span = writer.GetSpan(4);
+            WriteBigEndian(value, span);
+            writer.Advance(4);
+        }
+
+        /// <summary>
+        /// Writes a 64-bit integer in big endian format.
+        /// </summary>
+        /// <param name="value">The integer.</param>
+        public void WriteBigEndian(ulong value)
+        {
+            var span = writer.GetSpan(8);
+            WriteBigEndian(value, span);
+            writer.Advance(8);
+        }
+
+        private static void WriteBigEndian(short value, Span<byte> span) => WriteBigEndian(unchecked((ushort)value), span);
+
+        private static void WriteBigEndian(int value, Span<byte> span) => WriteBigEndian(unchecked((uint)value), span);
+
+        private static void WriteBigEndian(long value, Span<byte> span) => WriteBigEndian(unchecked((ulong)value), span);
+
+        private static void WriteBigEndian(ushort value, Span<byte> span)
+        {
+            unchecked
+            {
+                span[0] = (byte)(value >> 8);
+                span[1] = (byte)value;
+            }
+        }
+
+        private static void WriteBigEndian(uint value, Span<byte> span)
+        {
+            unchecked
+            {
+                span[0] = (byte)(value >> 24);
+                span[1] = (byte)(value >> 16);
+                span[2] = (byte)(value >> 8);
+                span[3] = (byte)value;
+            }
+        }
+
+        private static void WriteBigEndian(ulong value, Span<byte> span)
+        {
+            unchecked
+            {
+                span[0] = (byte)(value >> 56);
+                span[1] = (byte)(value >> 48);
+                span[2] = (byte)(value >> 40);
+                span[3] = (byte)(value >> 32);
+                span[4] = (byte)(value >> 24);
+                span[5] = (byte)(value >> 16);
+                span[6] = (byte)(value >> 8);
+                span[7] = (byte)value;
+            }
         }
     }
 }
