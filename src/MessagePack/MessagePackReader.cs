@@ -133,6 +133,39 @@ namespace MessagePack
             return result;
         }
 
+        /// <summary>
+        /// Reads a span of bytes, whose length is determined by a header.
+        /// </summary>
+        /// <returns>A span of bytes.</returns>
+        public ReadOnlySpan<byte> ReadBytes()
+        {
+            ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte code));
+
+            int length;
+            switch (code)
+            {
+                case MessagePackCode.Bin8:
+                    ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte byteLength));
+                    length = byteLength;
+                    break;
+                case MessagePackCode.Bin16:
+                    ThrowInsufficientBufferUnless(this.sequenceReader.TryReadBigEndian(out short shortLength));
+                    length = (ushort)shortLength;
+                    break;
+                case MessagePackCode.Bin32:
+                    ThrowInsufficientBufferUnless(this.sequenceReader.TryReadBigEndian(out length));
+                    break;
+                default:
+                    throw ThrowInvalidCode(code);
+            }
+
+            // Check that we have enough bytes before allocating memory to copy it in.
+            ThrowInsufficientBufferUnless(this.sequenceReader.Remaining >= length);
+            var result = new byte[length];
+            ThrowInsufficientBufferUnless(this.sequenceReader.TryCopyTo(result));
+            return result;
+        }
+
         private static Exception ThrowInvalidCode(byte code)
         {
             throw new InvalidOperationException(string.Format("code is invalid. code: {0} format: {1}", code, MessagePackCode.ToFormatName(code)));

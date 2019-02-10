@@ -25,7 +25,7 @@ namespace MessagePack
         {
             this.writer = new BufferWriter(writer);
         }
-        
+
         /// <summary>
         /// Writes a nil value.
         /// </summary>
@@ -166,6 +166,57 @@ namespace MessagePack
                 span[0] = MessagePackCode.UInt8;
                 span[1] = value;
                 writer.Advance(2);
+            }
+        }
+
+        /// <summary>
+        /// Writes a span of bytes, prefixed with a length.
+        /// </summary>
+        /// <param name="src">The span of bytes to write.</param>
+        public void WriteBytes(ReadOnlySpan<byte> src)
+        {
+            if (src.Length <= byte.MaxValue)
+            {
+                var size = src.Length + 2;
+                var span = writer.GetSpan(size);
+
+                span[0] = MessagePackCode.Bin8;
+                span[1] = (byte)src.Length;
+
+                src.CopyTo(span.Slice(2));
+                writer.Advance(size);
+            }
+            else if (src.Length <= UInt16.MaxValue)
+            {
+                var size = src.Length + 3;
+                var span = writer.GetSpan(size);
+
+                unchecked
+                {
+                    span[0] = MessagePackCode.Bin16;
+                    span[1] = (byte)(src.Length >> 8);
+                    span[2] = (byte)(src.Length);
+                }
+
+                src.CopyTo(span.Slice(3));
+                writer.Advance(size);
+            }
+            else
+            {
+                var size = src.Length + 5;
+                var span = writer.GetSpan(size);
+
+                unchecked
+                {
+                    span[0] = MessagePackCode.Bin32;
+                    span[1] = (byte)(src.Length >> 24);
+                    span[2] = (byte)(src.Length >> 16);
+                    span[3] = (byte)(src.Length >> 8);
+                    span[4] = (byte)(src.Length);
+                }
+
+                src.CopyTo(span.Slice(5));
+                writer.Advance(size);
             }
         }
     }
