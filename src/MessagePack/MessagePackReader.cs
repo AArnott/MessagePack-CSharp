@@ -274,6 +274,43 @@ namespace MessagePack
         }
 
         /// <summary>
+        /// Reads a <see cref="ulong"/> from any of:
+        /// <see cref="MessagePackCode.UInt8"/>,
+        /// <see cref="MessagePackCode.UInt16"/>,
+        /// <see cref="MessagePackCode.UInt32"/>,
+        /// <see cref="MessagePackCode.UInt64"/>,
+        /// or anything between <see cref="MessagePackCode.MinFixInt"/> and <see cref="MessagePackCode.MaxFixInt"/>.
+        /// </summary>
+        /// <returns>A 64-bit integer.</returns>
+        public ulong ReadUInt64()
+        {
+            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
+
+            switch (code)
+            {
+                case MessagePackCode.UInt8:
+                    ThrowInsufficientBufferUnless(this.reader.TryRead(out byte byteValue));
+                    return byteValue;
+                case MessagePackCode.UInt16:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out short shortValue));
+                    return (ushort)shortValue;
+                case MessagePackCode.UInt32:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out int intValue));
+                    return (uint)intValue;
+                case MessagePackCode.UInt64:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out long longValue));
+                    return (ulong)longValue;
+                default:
+                    if (code >= MessagePackCode.MinFixInt && code <= MessagePackCode.MaxFixInt)
+                    {
+                        return code;
+                    }
+
+                    throw ThrowInvalidCode(code);
+            }
+        }
+
+        /// <summary>
         /// Reads a <see cref="long"/> from any of:
         /// <see cref="MessagePackCode.UInt8"/>,
         /// <see cref="MessagePackCode.Int8"/>,
@@ -286,7 +323,7 @@ namespace MessagePack
         /// or anything between <see cref="MessagePackCode.MinNegativeFixInt"/> and <see cref="MessagePackCode.MaxNegativeFixInt"/>,
         /// or anything between <see cref="MessagePackCode.MinFixInt"/> and <see cref="MessagePackCode.MaxFixInt"/>.
         /// </summary>
-        /// <returns>A 32-bit integer.</returns>
+        /// <returns>A 64-bit integer.</returns>
         public long ReadInt64()
         {
             ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));

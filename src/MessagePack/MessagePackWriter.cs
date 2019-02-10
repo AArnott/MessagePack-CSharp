@@ -292,56 +292,84 @@ namespace MessagePack
             }
         }
 
+        /// <summary>
+        /// Writes an <see cref="ulong"/> using a built-in 1-byte code when within specific MessagePack-supported ranges,
+        /// or the most compact of
+        /// <see cref="MessagePackCode.UInt8"/>,
+        /// <see cref="MessagePackCode.UInt16"/>,
+        /// <see cref="MessagePackCode.UInt32"/>,
+        /// <see cref="MessagePackCode.Int8"/>,
+        /// <see cref="MessagePackCode.Int16"/>,
+        /// <see cref="MessagePackCode.Int32"/>
+        /// </summary>
+        /// <param name="value">The value to write.</param>
+        public void WriteUInt64(ulong value)
+        {
+            if (value <= MessagePackRange.MaxFixPositiveInt)
+            {
+                var span = writer.GetSpan(1);
+                span[0] = unchecked((byte)value);
+                writer.Advance(1);
+            }
+            else if (value <= byte.MaxValue)
+            {
+                var span = writer.GetSpan(2);
+                span[0] = MessagePackCode.UInt8;
+                span[1] = unchecked((byte)value);
+                writer.Advance(2);
+            }
+            else if (value <= ushort.MaxValue)
+            {
+                var span = writer.GetSpan(3);
+                span[0] = MessagePackCode.UInt16;
+                span[1] = unchecked((byte)(value >> 8));
+                span[2] = unchecked((byte)value);
+                writer.Advance(3);
+            }
+            else if (value <= uint.MaxValue)
+            {
+                var span = writer.GetSpan(5);
+                span[0] = MessagePackCode.UInt32;
+                span[1] = unchecked((byte)(value >> 24));
+                span[2] = unchecked((byte)(value >> 16));
+                span[3] = unchecked((byte)(value >> 8));
+                span[4] = unchecked((byte)value);
+                writer.Advance(5);
+            }
+            else
+            {
+                var span = writer.GetSpan(9);
+                span[0] = MessagePackCode.UInt64;
+                span[1] = unchecked((byte)(value >> 56));
+                span[2] = unchecked((byte)(value >> 48));
+                span[3] = unchecked((byte)(value >> 40));
+                span[4] = unchecked((byte)(value >> 32));
+                span[5] = unchecked((byte)(value >> 24));
+                span[6] = unchecked((byte)(value >> 16));
+                span[7] = unchecked((byte)(value >> 8));
+                span[8] = unchecked((byte)value);
+                writer.Advance(9);
+            }
+        }
+
+        /// <summary>
+        /// Writes an <see cref="long"/> using a built-in 1-byte code when within specific MessagePack-supported ranges,
+        /// or the most compact of
+        /// <see cref="MessagePackCode.UInt8"/>,
+        /// <see cref="MessagePackCode.UInt16"/>,
+        /// <see cref="MessagePackCode.UInt32"/>,
+        /// <see cref="MessagePackCode.UInt64"/>,
+        /// <see cref="MessagePackCode.Int8"/>,
+        /// <see cref="MessagePackCode.Int16"/>,
+        /// <see cref="MessagePackCode.Int32"/>,
+        /// <see cref="MessagePackCode.Int64"/>
+        /// </summary>
+        /// <param name="value">The value to write.</param>
         public void WriteInt64(long value)
         {
             if (value >= 0)
             {
-                // positive int(use uint)
-                if (value <= MessagePackRange.MaxFixPositiveInt)
-                {
-                    var span = writer.GetSpan(1);
-                    span[0] = unchecked((byte)value);
-                    writer.Advance(1);
-                }
-                else if (value <= byte.MaxValue)
-                {
-                    var span = writer.GetSpan(2);
-                    span[0] = MessagePackCode.UInt8;
-                    span[1] = unchecked((byte)value);
-                    writer.Advance(2);
-                }
-                else if (value <= ushort.MaxValue)
-                {
-                    var span = writer.GetSpan(3);
-                    span[0] = MessagePackCode.UInt16;
-                    span[1] = unchecked((byte)(value >> 8));
-                    span[2] = unchecked((byte)value);
-                    writer.Advance(3);
-                }
-                else if (value <= uint.MaxValue)
-                {
-                    var span = writer.GetSpan(5);
-                    span[0] = MessagePackCode.UInt32;
-                    span[1] = unchecked((byte)(value >> 24));
-                    span[2] = unchecked((byte)(value >> 16));
-                    span[3] = unchecked((byte)(value >> 8));
-                    span[4] = unchecked((byte)value);
-                    writer.Advance(5);
-                }
-                else
-                {
-                    var span = writer.GetSpan(9);
-                    span[0] = MessagePackCode.UInt64;
-                    span[1] = unchecked((byte)(value >> 56));
-                    span[2] = unchecked((byte)(value >> 48));
-                    span[3] = unchecked((byte)(value >> 40));
-                    span[4] = unchecked((byte)(value >> 32));
-                    span[5] = unchecked((byte)(value >> 24));
-                    span[6] = unchecked((byte)(value >> 16));
-                    span[7] = unchecked((byte)(value >> 8));
-                    span[8] = unchecked((byte)value);
-                    writer.Advance(9);
-                }
+                WriteUInt64((ulong)value);
             }
             else
             {
