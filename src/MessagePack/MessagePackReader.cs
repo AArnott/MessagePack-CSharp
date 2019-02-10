@@ -30,6 +30,19 @@ namespace MessagePack
         public bool IsNil => this.sequenceReader.TryPeek(out byte code) && code == MessagePackCode.Nil;
 
         /// <summary>
+        /// Reads a nil value.
+        /// </summary>
+        /// <returns>A nil value.</returns>
+        public Nil ReadNil()
+        {
+            ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte code));
+
+            return code == MessagePackCode.Nil
+                ? Nil.Default
+                : throw ThrowInvalidCode(code);
+        }
+
+        /// <summary>
         /// Read the length of the next array.
         /// </summary>
         public uint ReadArrayHeader()
@@ -50,21 +63,8 @@ namespace MessagePack
                         return (uint)code & 0xF;
                     }
 
-                    throw this.ThrowInvalidCode(code);
+                    throw ThrowInvalidCode(code);
             }
-        }
-
-        /// <summary>
-        /// Reads a nil value.
-        /// </summary>
-        /// <returns>A nil value.</returns>
-        public Nil ReadNil()
-        {
-            ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte code));
-
-            return code == MessagePackCode.Nil
-                ? Nil.Default
-                : throw ThrowInvalidCode(code);
         }
 
         /// <summary>
@@ -99,7 +99,25 @@ namespace MessagePack
             }
         }
 
-        private Exception ThrowInvalidCode(byte code)
+        /// <summary>
+        /// Reads a boolean value.
+        /// </summary>
+        /// <returns>The value.</returns>
+        public bool ReadBoolean()
+        {
+            ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte code));
+            switch (code)
+            {
+                case MessagePackCode.True:
+                    return true;
+                case MessagePackCode.False:
+                    return false;
+                default:
+                    throw ThrowInvalidCode(code);
+            }
+        }
+
+        private static Exception ThrowInvalidCode(byte code)
         {
             throw new InvalidOperationException(string.Format("code is invalid. code: {0} format: {1}", code, MessagePackCode.ToFormatName(code)));
         }

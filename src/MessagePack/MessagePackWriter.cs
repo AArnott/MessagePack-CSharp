@@ -25,6 +25,22 @@ namespace MessagePack
         {
             this.writer = new BufferWriter(writer);
         }
+        
+        /// <summary>
+        /// Writes a nil value.
+        /// </summary>
+        public void WriteNil()
+        {
+            var span = writer.GetSpan(1);
+            span[0] = MessagePackCode.Nil;
+            writer.Advance(1);
+        }
+
+        /// <summary>
+        /// Copies bytes directly into the message pack writer.
+        /// </summary>
+        /// <param name="rawMessagePackBlock">The span of bytes to copy from.</param>
+        public void WriteRaw(ReadOnlySpan<byte> rawMessagePackBlock) => writer.Write(rawMessagePackBlock);
 
         /// <summary>
         /// Write the length of the next array to be written.
@@ -62,22 +78,6 @@ namespace MessagePack
                 writer.Advance(5);
             }
         }
-        
-        /// <summary>
-        /// Writes a nil value.
-        /// </summary>
-        public void WriteNil()
-        {
-            var span = writer.GetSpan(1);
-            span[0] = MessagePackCode.Nil;
-            writer.Advance(1);
-        }
-
-        /// <summary>
-        /// Copies bytes directly into the message pack writer.
-        /// </summary>
-        /// <param name="rawMessagePackBlock">The span of bytes to copy from.</param>
-        public void WriteRaw(ReadOnlySpan<byte> rawMessagePackBlock) => writer.Write(rawMessagePackBlock);
 
         /// <summary>
         /// Writes a 16-bit integer.
@@ -135,6 +135,17 @@ namespace MessagePack
                     writer.Advance(3);
                 }
             }
+        }
+
+        /// <summary>
+        /// Writes a boolean value.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        public void WriteBoolean(bool value)
+        {
+            var span = writer.GetSpan(1);
+            span[0] = value ? MessagePackCode.True : MessagePackCode.False;
+            writer.Advance(1);
         }
     }
 }
