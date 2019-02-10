@@ -71,6 +71,59 @@ namespace MessagePack
         }
 
         /// <summary>
+        /// Reads a <see cref="byte"/> value either from
+        /// a built-in code between <see cref="MessagePackCode.MinFixInt"/> and <see cref="MessagePackCode.MaxFixInt"/>,
+        /// or a <see cref="MessagePackCode.UInt8"/>.
+        /// </summary>
+        /// <returns>The value.</returns>
+        public byte ReadByte()
+        {
+            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
+            switch (code)
+            {
+                case MessagePackCode.UInt8:
+                    ThrowInsufficientBufferUnless(this.reader.TryRead(out byte result));
+                    return result;
+                default:
+                    if (code >= MessagePackCode.MinFixInt && code <= MessagePackCode.MaxFixInt)
+                    {
+                        return code;
+                    }
+
+                    throw ThrowInvalidCode(code);
+            }
+        }
+
+        /// <summary>
+        /// Reads an <see cref="sbyte"/> value from:
+        /// <see cref="MessagePackCode.Int8"/>,
+        /// or some value between <see cref="MessagePackCode.MinNegativeFixInt"/> and <see cref="MessagePackCode.MaxNegativeFixInt"/>,
+        /// or some value between <see cref="MessagePackCode.MinFixInt"/> and <see cref="MessagePackCode.MaxFixInt"/>.
+        /// </summary>
+        /// <returns>The value.</returns>
+        public sbyte ReadSByte()
+        {
+            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
+            switch (code)
+            {
+                case MessagePackCode.Int8:
+                    ThrowInsufficientBufferUnless(this.reader.TryRead(out byte result));
+                    return unchecked((sbyte)result);
+                default:
+                    if (code >= MessagePackCode.MinNegativeFixInt && code <= MessagePackCode.MaxNegativeFixInt)
+                    {
+                        return (sbyte)code;
+                    }
+                    else if (code >= MessagePackCode.MinFixInt && code <= MessagePackCode.MaxFixInt)
+                    {
+                        return (sbyte)code;
+                    }
+
+                    throw ThrowInvalidCode(code);
+            }
+        }
+
+        /// <summary>
         /// Reads a <see cref="short"/> from any of:
         /// <see cref="MessagePackCode.UInt8"/>,
         /// <see cref="MessagePackCode.Int8"/>,
@@ -228,59 +281,6 @@ namespace MessagePack
                 case MessagePackCode.False:
                     return false;
                 default:
-                    throw ThrowInvalidCode(code);
-            }
-        }
-
-        /// <summary>
-        /// Reads a <see cref="byte"/> value either from
-        /// a built-in code between <see cref="MessagePackCode.MinFixInt"/> and <see cref="MessagePackCode.MaxFixInt"/>,
-        /// or a <see cref="MessagePackCode.UInt8"/>.
-        /// </summary>
-        /// <returns>The value.</returns>
-        public byte ReadByte()
-        {
-            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
-            switch (code)
-            {
-                case MessagePackCode.UInt8:
-                    ThrowInsufficientBufferUnless(this.reader.TryRead(out byte result));
-                    return result;
-                default:
-                    if (code >= MessagePackCode.MinFixInt && code <= MessagePackCode.MaxFixInt)
-                    {
-                        return code;
-                    }
-
-                    throw ThrowInvalidCode(code);
-            }
-        }
-
-        /// <summary>
-        /// Reads an <see cref="sbyte"/> value from:
-        /// <see cref="MessagePackCode.Int8"/>,
-        /// or some value between <see cref="MessagePackCode.MinNegativeFixInt"/> and <see cref="MessagePackCode.MaxNegativeFixInt"/>,
-        /// or some value between <see cref="MessagePackCode.MinFixInt"/> and <see cref="MessagePackCode.MaxFixInt"/>.
-        /// </summary>
-        /// <returns>The value.</returns>
-        public sbyte ReadSByte()
-        {
-            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
-            switch (code)
-            {
-                case MessagePackCode.Int8:
-                    ThrowInsufficientBufferUnless(this.reader.TryRead(out byte result));
-                    return unchecked((sbyte)result);
-                default:
-                    if (code >= MessagePackCode.MinNegativeFixInt && code <= MessagePackCode.MaxNegativeFixInt)
-                    {
-                        return (sbyte)code;
-                    }
-                    else if (code >= MessagePackCode.MinFixInt && code <= MessagePackCode.MaxFixInt)
-                    {
-                        return (sbyte)code;
-                    }
-
                     throw ThrowInvalidCode(code);
             }
         }

@@ -83,6 +83,48 @@ namespace MessagePack
         }
 
         /// <summary>
+        /// Writes a <see cref="byte"/> value using a 1-byte code when possible, otherwise as <see cref="MessagePackCode.UInt8"/>.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        public void WriteByte(byte value)
+        {
+            if (value <= MessagePackCode.MaxFixInt)
+            {
+                var span = writer.GetSpan(1);
+                span[0] = value;
+                writer.Advance(1);
+            }
+            else
+            {
+                var span = writer.GetSpan(2);
+                span[0] = MessagePackCode.UInt8;
+                span[1] = value;
+                writer.Advance(2);
+            }
+        }
+
+        /// <summary>
+        /// Writes an 8-bit value using a 1-byte code when possible, otherwise as <see cref="MessagePackCode.Int8"/>.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        public void WriteSByte(sbyte value)
+        {
+            if (value < MessagePackRange.MinFixNegativeInt)
+            {
+                var span = writer.GetSpan(2);
+                span[0] = MessagePackCode.Int8;
+                span[1] = unchecked((byte)(value));
+                writer.Advance(2);
+            }
+            else
+            {
+                var span = writer.GetSpan(1);
+                span[0] = unchecked((byte)value);
+                writer.Advance(1);
+            }
+        }
+
+        /// <summary>
         /// Writes a <see cref="short"/> using a built-in 1-byte code when within specific MessagePack-supported ranges,
         /// or the most compact of
         /// <see cref="MessagePackCode.UInt8"/>,
@@ -341,48 +383,6 @@ namespace MessagePack
             var span = writer.GetSpan(1);
             span[0] = value ? MessagePackCode.True : MessagePackCode.False;
             writer.Advance(1);
-        }
-
-        /// <summary>
-        /// Writes a <see cref="byte"/> value using a 1-byte code when possible, otherwise as <see cref="MessagePackCode.UInt8"/>.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        public void WriteByte(byte value)
-        {
-            if (value <= MessagePackCode.MaxFixInt)
-            {
-                var span = writer.GetSpan(1);
-                span[0] = value;
-                writer.Advance(1);
-            }
-            else
-            {
-                var span = writer.GetSpan(2);
-                span[0] = MessagePackCode.UInt8;
-                span[1] = value;
-                writer.Advance(2);
-            }
-        }
-
-        /// <summary>
-        /// Writes an 8-bit value using a 1-byte code when possible, otherwise as <see cref="MessagePackCode.Int8"/>.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        public void WriteSByte(sbyte value)
-        {
-            if (value < MessagePackRange.MinFixNegativeInt)
-            {
-                var span = writer.GetSpan(2);
-                span[0] = MessagePackCode.Int8;
-                span[1] = unchecked((byte)(value));
-                writer.Advance(2);
-            }
-            else
-            {
-                var span = writer.GetSpan(1);
-                span[0] = unchecked((byte)value);
-                writer.Advance(1);
-            }
         }
 
         /// <summary>
