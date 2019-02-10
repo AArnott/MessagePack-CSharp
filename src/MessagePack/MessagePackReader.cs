@@ -385,6 +385,15 @@ namespace MessagePack
         }
 
         /// <summary>
+        /// Reads a <see cref="char"/> from any of:
+        /// <see cref="MessagePackCode.UInt8"/>,
+        /// <see cref="MessagePackCode.UInt16"/>,
+        /// or anything between <see cref="MessagePackCode.MinFixInt"/> and <see cref="MessagePackCode.MaxFixInt"/>.
+        /// </summary>
+        /// <returns>A character.</returns>
+        public char ReadChar() => (char)this.ReadUInt16();
+
+        /// <summary>
         /// Reads an <see cref="float"/> value from any value encoded with:
         /// <see cref="MessagePackCode.Float32"/>,
         /// <see cref="MessagePackCode.Int8"/>,

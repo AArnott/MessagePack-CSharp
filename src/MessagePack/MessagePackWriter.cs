@@ -434,6 +434,12 @@ namespace MessagePack
         }
 
         /// <summary>
+        /// Writes a <see cref="char"/> value using a 1-byte code when possible, otherwise as <see cref="MessagePackCode.UInt8"/> or <see cref="MessagePackCode.UInt16"/>.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        public void WriteChar(char value) => WriteUInt16(value);
+
+        /// <summary>
         /// Writes a <see cref="MessagePackCode.Float32"/> value.
         /// </summary>
         /// <param name="value">The value.</param>
