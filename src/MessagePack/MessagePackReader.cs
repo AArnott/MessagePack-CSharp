@@ -233,7 +233,79 @@ namespace MessagePack
                 default:
                     if (code >= MessagePackCode.MinNegativeFixInt && code <= MessagePackCode.MaxNegativeFixInt)
                     {
+                        return (sbyte)code;
+                    }
+                    else if (code >= MessagePackCode.MinFixInt && code <= MessagePackCode.MaxFixInt)
+                    {
                         return code;
+                    }
+
+                    throw ThrowInvalidCode(code);
+            }
+        }
+
+        /// <summary>
+        /// Reads an <see cref="double"/> value from any value encoded with:
+        /// <see cref="MessagePackCode.Float64"/>,
+        /// <see cref="MessagePackCode.Float32"/>,
+        /// <see cref="MessagePackCode.Int8"/>,
+        /// <see cref="MessagePackCode.Int16"/>,
+        /// <see cref="MessagePackCode.Int32"/>,
+        /// <see cref="MessagePackCode.Int64"/>,
+        /// <see cref="MessagePackCode.UInt8"/>,
+        /// <see cref="MessagePackCode.UInt16"/>,
+        /// <see cref="MessagePackCode.UInt32"/>,
+        /// <see cref="MessagePackCode.UInt64"/>,
+        /// or some value between <see cref="MessagePackCode.MinNegativeFixInt"/> and <see cref="MessagePackCode.MaxNegativeFixInt"/>,
+        /// or some value between <see cref="MessagePackCode.MinFixInt"/> and <see cref="MessagePackCode.MaxFixInt"/>.
+        /// </summary>
+        /// <returns>The value.</returns>
+        public unsafe double ReadDouble()
+        {
+            ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
+
+            switch (code)
+            {
+                case MessagePackCode.Float64:
+                    byte* pScratch8 = stackalloc byte[8];
+                    Span<byte> scratch8 = new Span<byte>(pScratch8, 8);
+                    ThrowInsufficientBufferUnless(this.reader.TryCopyTo(scratch8));
+                    var doubleValue = new Float64Bits(scratch8);
+                    return doubleValue.Value;
+                case MessagePackCode.Float32:
+                    byte* pScratch4 = stackalloc byte[4];
+                    Span<byte> scratch4 = new Span<byte>(pScratch4, 4);
+                    ThrowInsufficientBufferUnless(this.reader.TryCopyTo(scratch4));
+                    var floatValue = new Float32Bits(scratch4);
+                    return floatValue.Value;
+                case MessagePackCode.Int8:
+                    ThrowInsufficientBufferUnless(this.reader.TryRead(out byte byteValue));
+                    return unchecked((sbyte)byteValue);
+                case MessagePackCode.Int16:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out short shortValue));
+                    return shortValue;
+                case MessagePackCode.Int32:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out int intValue));
+                    return intValue;
+                case MessagePackCode.Int64:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out long longValue));
+                    return longValue;
+                case MessagePackCode.UInt8:
+                    ThrowInsufficientBufferUnless(this.reader.TryRead(out byteValue));
+                    return byteValue;
+                case MessagePackCode.UInt16:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out shortValue));
+                    return (ushort)shortValue;
+                case MessagePackCode.UInt32:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out intValue));
+                    return (uint)intValue;
+                case MessagePackCode.UInt64:
+                    ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out longValue));
+                    return (ulong)longValue;
+                default:
+                    if (code >= MessagePackCode.MinNegativeFixInt && code <= MessagePackCode.MaxNegativeFixInt)
+                    {
+                        return (sbyte)code;
                     }
                     else if (code >= MessagePackCode.MinFixInt && code <= MessagePackCode.MaxFixInt)
                     {

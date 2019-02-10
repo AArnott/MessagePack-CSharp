@@ -228,6 +228,43 @@ namespace MessagePack
         }
 
         /// <summary>
+        /// Writes a <see cref="MessagePackCode.Float64"/> value.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        public void WriteDouble(double value)
+        {
+            var span = writer.GetSpan(9);
+
+            span[0] = MessagePackCode.Float64;
+
+            var num = new Float64Bits(value);
+            if (BitConverter.IsLittleEndian)
+            {
+                span[1] = num.Byte7;
+                span[2] = num.Byte6;
+                span[3] = num.Byte5;
+                span[4] = num.Byte4;
+                span[5] = num.Byte3;
+                span[6] = num.Byte2;
+                span[7] = num.Byte1;
+                span[8] = num.Byte0;
+            }
+            else
+            {
+                span[1] = num.Byte0;
+                span[2] = num.Byte1;
+                span[3] = num.Byte2;
+                span[4] = num.Byte3;
+                span[5] = num.Byte4;
+                span[6] = num.Byte5;
+                span[7] = num.Byte6;
+                span[8] = num.Byte7;
+            }
+
+            writer.Advance(9);
+        }
+
+        /// <summary>
         /// Writes a span of bytes, prefixed with a length encoded as the smallest fitting from:
         /// <see cref="MessagePackCode.Bin8"/>,
         /// <see cref="MessagePackCode.Bin16"/>, or
