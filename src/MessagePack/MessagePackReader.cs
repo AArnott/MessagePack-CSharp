@@ -118,7 +118,7 @@ namespace MessagePack
         }
 
         /// <summary>
-        /// Reads a byte value.
+        /// Reads a <see cref="byte"/> value.
         /// </summary>
         /// <returns>The value.</returns>
         public byte ReadByte()
@@ -131,6 +131,32 @@ namespace MessagePack
 
             ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte result));
             return result;
+        }
+
+        /// <summary>
+        /// Reads an <see cref="sbyte"/> value.
+        /// </summary>
+        /// <returns>The value.</returns>
+        public sbyte ReadSByte()
+        {
+            ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte code));
+            switch (code)
+            {
+                case MessagePackCode.Int8:
+                    ThrowInsufficientBufferUnless(this.sequenceReader.TryRead(out byte result));
+                    return unchecked((sbyte)result);
+                default:
+                    if (code >= MessagePackCode.MinNegativeFixInt && code <= MessagePackCode.MaxNegativeFixInt)
+                    {
+                        return (sbyte)code;
+                    }
+                    else if (code >= MessagePackCode.MinFixInt && code <= MessagePackCode.MaxFixInt)
+                    {
+                        return (sbyte)code;
+                    }
+
+                    throw ThrowInvalidCode(code);
+            }
         }
 
         /// <summary>

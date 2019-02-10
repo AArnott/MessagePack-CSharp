@@ -170,6 +170,27 @@ namespace MessagePack
         }
 
         /// <summary>
+        /// Writes an 8-bit value.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        public void WriteSByte(sbyte value)
+        {
+            if (value < MessagePackRange.MinFixNegativeInt)
+            {
+                var span = writer.GetSpan(2);
+                span[0] = MessagePackCode.Int8;
+                span[1] = unchecked((byte)(value));
+                writer.Advance(2);
+            }
+            else
+            {
+                var span = writer.GetSpan(1);
+                span[0] = unchecked((byte)value);
+                writer.Advance(1);
+            }
+        }
+
+        /// <summary>
         /// Writes a span of bytes, prefixed with a length.
         /// </summary>
         /// <param name="src">The span of bytes to write.</param>
