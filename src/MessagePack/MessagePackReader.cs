@@ -1,12 +1,11 @@
-﻿using System;
+﻿// Copyright (c) Andrew Arnott. All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+
+using System;
 using System.Buffers;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
-using MessagePack.Decoders;
-using MessagePack.Formatters;
 using MessagePack.Internal;
-using Microsoft;
 
 namespace MessagePack
 {
@@ -31,6 +30,11 @@ namespace MessagePack
         {
             this.reader = new SequenceReader<byte>(readOnlySequence);
         }
+
+        /// <summary>
+        /// Gets the current position in the original <see cref="ReadOnlySequence{T}"/> passed to the constructor.
+        /// </summary>
+        public SequencePosition Position => this.reader.Position;
 
         /// <summary>
         /// Checks whether the reader position is pointing at a nil value.

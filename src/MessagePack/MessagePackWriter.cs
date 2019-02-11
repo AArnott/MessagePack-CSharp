@@ -1,4 +1,7 @@
-﻿using MessagePack.Formatters;
+﻿// Copyright (c) Andrew Arnott. All rights reserved.
+// Licensed under the MIT license. See LICENSE.txt file in the project root for full license information.
+
+using MessagePack.Formatters;
 using MessagePack.Internal;
 using System;
 using System.Buffers;
@@ -10,25 +13,29 @@ namespace MessagePack
     /// <summary>
     /// A primitive types writer for the MessagePack format.
     /// </summary>
-    /// <typeparam name="T">The type of buffer writer in use. Use of a concrete type avoids cost of interface dispatch.</typeparam>
     /// <remarks>
     /// <see href="https://github.com/msgpack/msgpack/blob/master/spec.md">The MessagePack spec.</see>
     /// </remarks>
-    public ref struct MessagePackWriter<T> where T : IBufferWriter<byte>
+    public ref struct MessagePackWriter
     {
         /// <summary>
         /// The writer to use.
         /// </summary>
-        private BufferWriter writer;
+        private BufferWriter<IBufferWriter<byte>> writer;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MessagePackWriter{T}"/> struct.
+        /// Initializes a new instance of the <see cref="MessagePackWriter"/> struct.
         /// </summary>
         /// <param name="writer">The writer to use.</param>
         public MessagePackWriter(IBufferWriter<byte> writer)
         {
-            this.writer = new BufferWriter(writer);
+            this.writer = new BufferWriter<IBufferWriter<byte>>(writer);
         }
+
+        /// <summary>
+        /// Gets the underlying buffer writer behind this instance.
+        /// </summary>
+        internal BufferWriter<IBufferWriter<byte>> UnderlyingWriter => this.writer;
 
         /// <summary>
         /// Ensures everything previously written has been flushed to the underlying <see cref="IBufferWriter{T}"/>.
@@ -649,8 +656,53 @@ namespace MessagePack
             }
         }
 
+
         /// <summary>
-        /// Writes out an array of bytes that represent a UTF-8 encoded string, prefixed with the length using one of these message codes:
+        /// Writes a sequence of bytes, prefixed with a length encoded as the smallest fitting from:
+        /// <see cref="MessagePackCode.Bin8"/>,
+        /// <see cref="MessagePackCode.Bin16"/>, or
+        /// <see cref="MessagePackCode.Bin32"/>,
+        /// </summary>
+        /// <param name="src">The span of bytes to write.</param>
+        public void WriteBytes(ReadOnlySequence<byte> src)
+        {
+            if (src.Length <= byte.MaxValue)
+            {
+                var size = (int)src.Length + 2;
+                var span = writer.GetSpan(size);
+
+                span[0] = MessagePackCode.Bin8;
+                span[1] = (byte)src.Length;
+
+                src.CopyTo(span.Slice(2));
+                writer.Advance(size);
+            }
+            else if (src.Length <= UInt16.MaxValue)
+            {
+                var size = (int)src.Length + 3;
+                var span = writer.GetSpan(size);
+
+                span[0] = MessagePackCode.Bin16;
+                WriteBigEndian((ushort)src.Length, span.Slice(1));
+
+                src.CopyTo(span.Slice(3));
+                writer.Advance(size);
+            }
+            else
+            {
+                var size = (int)src.Length + 5;
+                var span = writer.GetSpan(size);
+
+                span[0] = MessagePackCode.Bin32;
+                WriteBigEndian(src.Length, span.Slice(1));
+
+                src.CopyTo(span.Slice(5));
+                writer.Advance(size);
+            }
+        }
+
+        /// <summary>
+        /// Writes out an array of bytes that (may) represent a UTF-8 encoded string, prefixed with the length using one of these message codes:
         /// <see cref="MessagePackCode.MinFixStr"/>,
         /// <see cref="MessagePackCode.Str8"/>,
         /// <see cref="MessagePackCode.Str16"/>,
