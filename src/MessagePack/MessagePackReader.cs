@@ -41,7 +41,7 @@ namespace MessagePack
         /// <summary>
         /// Gets the next message pack type to be read.
         /// </summary>
-        private MessagePackType NextMessagePackType => MessagePackCode.ToMessagePackType(NextCode);
+        public MessagePackType NextMessagePackType => MessagePackCode.ToMessagePackType(NextCode);
 
         /// <summary>
         /// Gets the type of the next MessagePack block.
@@ -50,7 +50,7 @@ namespace MessagePack
         /// <remarks>
         /// See <see cref="MessagePackCode"/> for valid message pack codes and ranges.
         /// </remarks>
-        private byte NextCode
+        public byte NextCode
         {
             get
             {
@@ -171,12 +171,27 @@ namespace MessagePack
         }
 
         /// <summary>
+        /// Reads nil if it is the next token.
+        /// </summary>
+        /// <returns><c>true</c> if the next token was nil; <c>false</c> otherwise.</returns>
+        public bool TryReadNil()
+        {
+            if (NextCode == MessagePackCode.Nil)
+            {
+                this.reader.Advance(1);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Read an array header from
         /// <see cref="MessagePackCode.Array16"/>,
         /// <see cref="MessagePackCode.Array32"/>, or
         /// some built-in code between <see cref="MessagePackCode.MinFixArray"/> and <see cref="MessagePackCode.MaxFixArray"/>.
         /// </summary>
-        public uint ReadArrayHeader()
+        public int ReadArrayHeader()
         {
             ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
 
@@ -184,14 +199,14 @@ namespace MessagePack
             {
                 case MessagePackCode.Array16:
                     ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out short shortValue));
-                    return (uint)shortValue;
+                    return (ushort)shortValue;
                 case MessagePackCode.Array32:
                     ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out int intValue));
-                    return (uint)intValue;
+                    return intValue;
                 default:
                     if (code >= MessagePackCode.MinFixArray && code <= MessagePackCode.MaxFixArray)
                     {
-                        return (uint)code & 0xF;
+                        return (byte)code & 0xF;
                     }
 
                     throw ThrowInvalidCode(code);
@@ -204,7 +219,7 @@ namespace MessagePack
         /// <see cref="MessagePackCode.Map32"/>, or
         /// some built-in code between <see cref="MessagePackCode.MinFixMap"/> and <see cref="MessagePackCode.MaxFixMap"/>.
         /// </summary>
-        public uint ReadMapHeader()
+        public int ReadMapHeader()
         {
             ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
 
@@ -215,11 +230,11 @@ namespace MessagePack
                     return (ushort)shortValue;
                 case MessagePackCode.Map32:
                     ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out int intValue));
-                    return (uint)intValue;
+                    return intValue;
                 default:
                     if (code >= MessagePackCode.MinFixMap && code <= MessagePackCode.MaxFixMap)
                     {
-                        return (uint)(code & 0xF);
+                        return (byte)(code & 0xF);
                     }
 
                     throw ThrowInvalidCode(code);
@@ -690,16 +705,26 @@ namespace MessagePack
         }
 
         /// <summary>
-        /// Reads a <see cref="DateTime"/> from a value encoded with 
+        /// Reads a <see cref="DateTime"/> from a value encoded with
         /// <see cref="MessagePackCode.FixExt4"/>,
         /// <see cref="MessagePackCode.FixExt8"/>, or
         /// <see cref="MessagePackCode.Ext8"/>.
         /// Expects extension type code <see cref="ReservedMessagePackExtensionTypeCode.DateTime"/>.
         /// </summary>
         /// <returns>The value.</returns>
-        public DateTime ReadDateTime()
+        public DateTime ReadDateTime() => ReadDateTime(ReadExtensionFormatHeader());
+
+        /// <summary>
+        /// Reads a <see cref="DateTime"/> from a value encoded with
+        /// <see cref="MessagePackCode.FixExt4"/>,
+        /// <see cref="MessagePackCode.FixExt8"/>, or
+        /// <see cref="MessagePackCode.Ext8"/>.
+        /// Expects extension type code <see cref="ReservedMessagePackExtensionTypeCode.DateTime"/>.
+        /// </summary>
+        /// <param name="header">The extension header that was already read.</param>
+        /// <returns>The value.</returns>
+        public DateTime ReadDateTime(ExtensionHeader header)
         {
-            var header = ReadExtensionFormatHeader();
             if (header.TypeCode != ReservedMessagePackExtensionTypeCode.DateTime)
             {
                 throw new InvalidOperationException(string.Format("Extension TypeCode is invalid. typeCode: {0}", header.TypeCode));
@@ -971,7 +996,7 @@ namespace MessagePack
 
         private void ReadNextArray()
         {
-            uint count = ReadArrayHeader();
+            int count = ReadArrayHeader();
             for (int i = 0; i < count; i++)
             {
                 ReadNext();
@@ -980,7 +1005,7 @@ namespace MessagePack
 
         private void ReadNextMap()
         {
-            uint count = ReadMapHeader();
+            int count = ReadMapHeader();
             for (int i = 0; i < count; i++)
             {
                 ReadNext(); // key

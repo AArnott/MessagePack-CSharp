@@ -31,6 +31,11 @@ namespace MessagePack
         }
 
         /// <summary>
+        /// Ensures everything previously written has been flushed to the underlying <see cref="IBufferWriter{T}"/>.
+        /// </summary>
+        public void Flush() => this.writer.Commit();
+
+        /// <summary>
         /// Writes a <see cref="MessagePackCode.Nil"/> value.
         /// </summary>
         public void WriteNil()
@@ -51,6 +56,14 @@ namespace MessagePack
         /// </summary>
         /// <param name="rawMessagePackBlock">The span of bytes to copy from.</param>
         public void WriteRaw(ReadOnlySequence<byte> rawMessagePackBlock) => rawMessagePackBlock.CopyTo(ref writer);
+
+        /// <summary>
+        /// Write the length of the next array to be written in the most compact form of
+        /// <see cref="MessagePackCode.MinFixArray"/>,
+        /// <see cref="MessagePackCode.Array16"/>, or
+        /// <see cref="MessagePackCode.Array32"/>
+        /// </summary>
+        public void WriteArrayHeader(int count) => WriteArrayHeader((uint)count);
 
         /// <summary>
         /// Write the length of the next array to be written in the most compact form of
@@ -81,6 +94,14 @@ namespace MessagePack
                 writer.Advance(5);
             }
         }
+
+        /// <summary>
+        /// Write the length of the next map to be written in the most compact form of
+        /// <see cref="MessagePackCode.MinFixMap"/>,
+        /// <see cref="MessagePackCode.Map16"/>, or
+        /// <see cref="MessagePackCode.Map32"/>
+        /// </summary>
+        public void WriteMapHeader(int count) => WriteMapHeader((uint)count);
 
         /// <summary>
         /// Write the length of the next map to be written in the most compact form of
