@@ -21,7 +21,7 @@ namespace MessagePack
         /// <summary>
         /// The writer to use.
         /// </summary>
-        private BufferWriter<IBufferWriter<byte>> writer;
+        private BufferWriter writer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MessagePackWriter"/> struct.
@@ -29,13 +29,13 @@ namespace MessagePack
         /// <param name="writer">The writer to use.</param>
         public MessagePackWriter(IBufferWriter<byte> writer)
         {
-            this.writer = new BufferWriter<IBufferWriter<byte>>(writer);
+            this.writer = new BufferWriter(writer);
         }
 
         /// <summary>
         /// Gets the underlying buffer writer behind this instance.
         /// </summary>
-        internal BufferWriter<IBufferWriter<byte>> UnderlyingWriter => this.writer;
+        internal BufferWriter UnderlyingWriter => this.writer;
 
         /// <summary>
         /// Ensures everything previously written has been flushed to the underlying <see cref="IBufferWriter{T}"/>.

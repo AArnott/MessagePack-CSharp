@@ -17,7 +17,7 @@ namespace MessagePack.Formatters
         /// <summary>
         /// The underlying <see cref="IBufferWriter{T}"/>.
         /// </summary>
-        private Sequence<byte> _output;
+        private IBufferWriter<byte> _output;
 
         /// <summary>
         /// The result of the last call to <see cref="IBufferWriter{T}.GetSpan(int)"/>, less any bytes already "consumed" with <see cref="Advance(int)"/>.
@@ -44,7 +44,7 @@ namespace MessagePack.Formatters
         {
             _buffered = 0;
             _bytesCommitted = 0;
-            _output = (Sequence<byte>) output;
+            _output = output;
             _span = _output.GetSpan(0);
         }
 
