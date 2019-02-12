@@ -29,12 +29,28 @@ namespace MessagePack
         public MessagePackReader(ReadOnlySequence<byte> readOnlySequence)
         {
             this.reader = new SequenceReader<byte>(readOnlySequence);
+            this.OldSpec = false;
         }
 
         /// <summary>
-        /// Gets the current position in the original <see cref="ReadOnlySequence{T}"/> passed to the constructor.
+        /// Gets or sets a value indicating whether to read in <see href="https://github.com/msgpack/msgpack/blob/master/spec-old.md">old spec</see> compatibility mode.
+        /// </summary>
+        public bool OldSpec { get; set; }
+
+        /// <summary>
+        /// Gets the <see cref="ReadOnlySequence{T}"/> originally supplied to the constructor.
+        /// </summary>
+        public ReadOnlySequence<byte> Sequence => this.reader.Sequence;
+
+        /// <summary>
+        /// Gets the current position of the reader within <see cref="Sequence"/>.
         /// </summary>
         public SequencePosition Position => this.reader.Position;
+
+        /// <summary>
+        /// Gets a value indicating whether the reader is at the end of the sequence.
+        /// </summary>
+        public bool End => this.reader.End;
 
         /// <summary>
         /// Checks whether the reader position is pointing at a nil value.
@@ -64,12 +80,30 @@ namespace MessagePack
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="MessagePackReader"/> struct,
+        /// with the same settings as this one, but with its own buffer to read from.
+        /// </summary>
+        /// <param name="readOnlySequence">The sequence to read from.</param>
+        /// <returns>The new reader.</returns>
+        public MessagePackReader Clone(ReadOnlySequence<byte> readOnlySequence) => new MessagePackReader(readOnlySequence)
+        {
+            OldSpec = this.OldSpec,
+        };
+
+        /// <summary>
+        /// Creates a new <see cref="MessagePackReader"/> at this reader's current position.
+        /// The two readers may then be used independently without impacting each other.
+        /// </summary>
+        /// <returns>A new <see cref="MessagePackReader"/>.</returns>
+        public MessagePackReader CreatePeekReader() => this.Clone(this.reader.Sequence.Slice(this.reader.Position));
+
+        /// <summary>
         /// Advances the reader to the next MessagePack primitive to be read.
         /// </summary>
         /// <remarks>
         /// The entire primitive is skipped, including content of maps or arrays, or any other type with payloads.
         /// </remarks>
-        public void ReadNext()
+        public void Skip()
         {
             byte code = NextCode;
             switch (code)
@@ -952,6 +986,7 @@ namespace MessagePack
         {
             ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
 
+            // In OldSpec mode, Bin didn't exist, so Str was used. Str8 didn't exist either.
             int length;
             switch (code)
             {
@@ -960,13 +995,21 @@ namespace MessagePack
                     length = byteLength;
                     break;
                 case MessagePackCode.Bin16:
+                case MessagePackCode.Str16 when this.OldSpec: // OldSpec compatibility
                     ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out short shortLength));
                     length = (ushort)shortLength;
                     break;
                 case MessagePackCode.Bin32:
+                case MessagePackCode.Str32 when this.OldSpec: // OldSpec compatibility
                     ThrowInsufficientBufferUnless(this.reader.TryReadBigEndian(out length));
                     break;
                 default:
+                    if (this.OldSpec && code >= MessagePackCode.MinFixStr && code <= MessagePackCode.MaxFixStr)
+                    {
+                        length = code & 0x1F;
+                        break;
+                    }
+
                     throw ThrowInvalidCode(code);
             }
 
@@ -1003,7 +1046,7 @@ namespace MessagePack
             int count = ReadArrayHeader();
             for (int i = 0; i < count; i++)
             {
-                ReadNext();
+                Skip();
             }
         }
 
@@ -1012,8 +1055,8 @@ namespace MessagePack
             int count = ReadMapHeader();
             for (int i = 0; i < count; i++)
             {
-                ReadNext(); // key
-                ReadNext(); // value
+                Skip(); // key
+                Skip(); // value
             }
         }
     }
