@@ -21,18 +21,30 @@ namespace MessagePack.Formatters
 
         ByteArrayFormatter()
         {
-
         }
 
         public void Serialize(ref MessagePackWriter writer, byte[] value, IFormatterResolver resolver)
         {
-            writer.WriteBytes(value);
-            return;
+            if (value == null)
+            {
+                writer.WriteNil();
+            }
+            else
+            {
+                writer.Write(value);
+            }
         }
 
         public byte[] Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            return reader.ReadBytes().ToArray();
+            if (reader.TryReadNil())
+            {
+                return null;
+            }
+            else
+            {
+                return reader.ReadBytes().ToArray();
+            }
         }
     }
 
@@ -42,17 +54,30 @@ namespace MessagePack.Formatters
 
         NullableStringFormatter()
         {
-
         }
 
         public void Serialize(ref MessagePackWriter writer, String value, IFormatterResolver typeResolver)
         {
-            writer.WriteString(value);
+            if (value == null)
+            {
+                writer.WriteNil();
+            }
+            else
+            {
+                writer.Write(value);
+            }
         }
 
         public String Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            return reader.ReadString();
+            if (reader.TryReadNil())
+            {
+                return null;
+            }
+            else
+            {
+                return reader.ReadString();
+            }
         }
     }
 
@@ -76,7 +101,7 @@ namespace MessagePack.Formatters
                 writer.WriteArrayHeader(value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    writer.WriteString(value[i]);
+                    writer.Write(value[i]);
                 }
             }
         }
@@ -111,7 +136,7 @@ namespace MessagePack.Formatters
 
         public void Serialize(ref MessagePackWriter writer, decimal value, IFormatterResolver resolver)
         {
-            writer.WriteString(value.ToString(CultureInfo.InvariantCulture));
+            writer.Write(value.ToString(CultureInfo.InvariantCulture));
             return;
         }
 
@@ -132,7 +157,7 @@ namespace MessagePack.Formatters
 
         public void Serialize(ref MessagePackWriter writer, TimeSpan value, IFormatterResolver resolver)
         {
-            writer.WriteInt64(value.Ticks);
+            writer.Write(value.Ticks);
             return;
         }
 
@@ -154,8 +179,8 @@ namespace MessagePack.Formatters
         public void Serialize(ref MessagePackWriter writer, DateTimeOffset value, IFormatterResolver resolver)
         {
             writer.WriteArrayHeader(2);
-            writer.WriteDateTime(new DateTime(value.Ticks, DateTimeKind.Utc)); // current ticks as is
-            writer.WriteInt16((short)value.Offset.TotalMinutes); // offset is normalized in minutes
+            writer.Write(new DateTime(value.Ticks, DateTimeKind.Utc)); // current ticks as is
+            writer.Write((short)value.Offset.TotalMinutes); // offset is normalized in minutes
             return;
         }
 
@@ -187,7 +212,7 @@ namespace MessagePack.Formatters
             byte* pBytes = stackalloc byte[36];
             Span<byte> bytes = new Span<byte>(pBytes, 36);
             new GuidBits(ref value).Write(bytes);
-            writer.WriteStringBytes(bytes);
+            writer.WriteString(bytes);
         }
 
         public Guid Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
@@ -232,7 +257,7 @@ namespace MessagePack.Formatters
             }
             else
             {
-                writer.WriteString(value.ToString());
+                writer.Write(value.ToString());
             }
         }
 
@@ -266,7 +291,7 @@ namespace MessagePack.Formatters
             }
             else
             {
-                writer.WriteString(value.ToString());
+                writer.Write(value.ToString());
             }
         }
 
@@ -322,7 +347,7 @@ namespace MessagePack.Formatters
             }
             else
             {
-                writer.WriteString(value.ToString());
+                writer.Write(value.ToString());
             }
         }
 
@@ -360,7 +385,7 @@ namespace MessagePack.Formatters
                 writer.WriteArrayHeader(len);
                 for (int i = 0; i < len; i++)
                 {
-                    writer.WriteBoolean(value.Get(i));
+                    writer.Write(value.Get(i));
                 }
 
                 return;
@@ -401,7 +426,7 @@ namespace MessagePack.Formatters
 
         public void Serialize(ref MessagePackWriter writer, System.Numerics.BigInteger value, IFormatterResolver resolver)
         {
-            writer.WriteBytes(value.ToByteArray());
+            writer.Write(value.ToByteArray());
             return;
         }
 
@@ -444,8 +469,8 @@ namespace MessagePack.Formatters
         public void Serialize(ref MessagePackWriter writer, System.Numerics.Complex value, IFormatterResolver resolver)
         {
             writer.WriteArrayHeader(2);
-            writer.WriteDouble(value.Real);
-            writer.WriteDouble(value.Imaginary);
+            writer.Write(value.Real);
+            writer.Write(value.Imaginary);
             return;
         }
 

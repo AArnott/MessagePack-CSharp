@@ -97,7 +97,7 @@ namespace MessagePack.Resolvers
                 var il = method.GetILGenerator();
                 il.Emit(OpCodes.Ldarg_1);
                 il.Emit(OpCodes.Ldarg_2);
-                il.Emit(OpCodes.Call, typeof(MessagePackWriter).GetRuntimeMethod("Write" + underlyingType.Name, new[] { underlyingType }));
+                il.Emit(OpCodes.Call, typeof(MessagePackWriter).GetRuntimeMethod(nameof(MessagePackWriter.Write), new[] { underlyingType }));
                 il.Emit(OpCodes.Ret);
             }
 

@@ -15,8 +15,8 @@ namespace MessagePack.Unity
         public void Serialize(ref MessagePackWriter writer, global::UnityEngine.Vector2 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             writer.WriteFixedArrayHeaderUnsafe(2);
-            writer.WriteSingle(value.x);
-            writer.WriteSingle(value.y);
+            writer.Write(value.x);
+            writer.Write(value.y);
         }
         public global::UnityEngine.Vector2 Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
@@ -54,9 +54,9 @@ namespace MessagePack.Unity
         public void Serialize(ref MessagePackWriter writer, global::UnityEngine.Vector3 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             writer.WriteFixedArrayHeaderUnsafe(3);
-            writer.WriteSingle(value.x);
-            writer.WriteSingle(value.y);
-            writer.WriteSingle(value.z);
+            writer.Write(value.x);
+            writer.Write(value.y);
+            writer.Write(value.z);
         }
         public global::UnityEngine.Vector3 Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
@@ -98,10 +98,10 @@ namespace MessagePack.Unity
         public void Serialize(ref MessagePackWriter writer, global::UnityEngine.Vector4 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             writer.WriteFixedArrayHeaderUnsafe(4);
-            writer.WriteSingle(value.x);
-            writer.WriteSingle(value.y);
-            writer.WriteSingle(value.z);
-            writer.WriteSingle(value.w);
+            writer.Write(value.x);
+            writer.Write(value.y);
+            writer.Write(value.z);
+            writer.Write(value.w);
         }
         public global::UnityEngine.Vector4 Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
@@ -147,10 +147,10 @@ namespace MessagePack.Unity
         public void Serialize(ref MessagePackWriter writer, global::UnityEngine.Quaternion value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             writer.WriteFixedArrayHeaderUnsafe(4);
-            writer.WriteSingle(value.x);
-            writer.WriteSingle(value.y);
-            writer.WriteSingle(value.z);
-            writer.WriteSingle(value.w);
+            writer.Write(value.x);
+            writer.Write(value.y);
+            writer.Write(value.z);
+            writer.Write(value.w);
         }
         public global::UnityEngine.Quaternion Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
@@ -196,10 +196,10 @@ namespace MessagePack.Unity
         public void Serialize(ref MessagePackWriter writer, global::UnityEngine.Color value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             writer.WriteFixedArrayHeaderUnsafe(4);
-            writer.WriteSingle(value.r);
-            writer.WriteSingle(value.g);
-            writer.WriteSingle(value.b);
-            writer.WriteSingle(value.a);
+            writer.Write(value.r);
+            writer.Write(value.g);
+            writer.Write(value.b);
+            writer.Write(value.a);
         }
         public global::UnityEngine.Color Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
@@ -284,10 +284,10 @@ namespace MessagePack.Unity
         public void Serialize(ref MessagePackWriter writer, global::UnityEngine.Rect value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             writer.WriteFixedArrayHeaderUnsafe(4);
-            writer.WriteSingle(value.x);
-            writer.WriteSingle(value.y);
-            writer.WriteSingle(value.width);
-            writer.WriteSingle(value.height);
+            writer.Write(value.x);
+            writer.Write(value.y);
+            writer.Write(value.width);
+            writer.Write(value.height);
         }
         public global::UnityEngine.Rect Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
@@ -332,7 +332,7 @@ namespace MessagePack.Unity
     {
         public void Serialize(ref MessagePackWriter writer, global::UnityEngine.WrapMode value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            writer.WriteInt32((Int32)value);
+            writer.Write((Int32)value);
         }
         public global::UnityEngine.WrapMode Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
@@ -343,7 +343,7 @@ namespace MessagePack.Unity
     {
         public void Serialize(ref MessagePackWriter writer, global::UnityEngine.GradientMode value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            writer.WriteInt32((Int32)value);
+            writer.Write((Int32)value);
         }
         public global::UnityEngine.GradientMode Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
@@ -355,10 +355,10 @@ namespace MessagePack.Unity
         public void Serialize(ref MessagePackWriter writer, global::UnityEngine.Keyframe value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             writer.WriteFixedArrayHeaderUnsafe(4);
-            writer.WriteSingle(value.time);
-            writer.WriteSingle(value.value);
-            writer.WriteSingle(value.inTangent);
-            writer.WriteSingle(value.outTangent);
+            writer.Write(value.time);
+            writer.Write(value.value);
+            writer.Write(value.inTangent);
+            writer.Write(value.outTangent);
         }
         public global::UnityEngine.Keyframe Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
@@ -459,22 +459,22 @@ namespace MessagePack.Unity
         public void Serialize(ref MessagePackWriter writer, global::UnityEngine.Matrix4x4 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             writer.WriteArrayHeader(16);
-            writer.WriteSingle(value.m00);
-            writer.WriteSingle(value.m10);
-            writer.WriteSingle(value.m20);
-            writer.WriteSingle(value.m30);
-            writer.WriteSingle(value.m01);
-            writer.WriteSingle(value.m11);
-            writer.WriteSingle(value.m21);
-            writer.WriteSingle(value.m31);
-            writer.WriteSingle(value.m02);
-            writer.WriteSingle(value.m12);
-            writer.WriteSingle(value.m22);
-            writer.WriteSingle(value.m32);
-            writer.WriteSingle(value.m03);
-            writer.WriteSingle(value.m13);
-            writer.WriteSingle(value.m23);
-            writer.WriteSingle(value.m33);
+            writer.Write(value.m00);
+            writer.Write(value.m10);
+            writer.Write(value.m20);
+            writer.Write(value.m30);
+            writer.Write(value.m01);
+            writer.Write(value.m11);
+            writer.Write(value.m21);
+            writer.Write(value.m31);
+            writer.Write(value.m02);
+            writer.Write(value.m12);
+            writer.Write(value.m22);
+            writer.Write(value.m32);
+            writer.Write(value.m03);
+            writer.Write(value.m13);
+            writer.Write(value.m23);
+            writer.Write(value.m33);
         }
         public global::UnityEngine.Matrix4x4 Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
@@ -585,7 +585,7 @@ namespace MessagePack.Unity
         {
             writer.WriteFixedArrayHeaderUnsafe(2);
             formatterResolver.GetFormatterWithVerify<global::UnityEngine.Color>().Serialize(ref writer, value.color, formatterResolver);
-            writer.WriteSingle(value.time);
+            writer.Write(value.time);
         }
         public global::UnityEngine.GradientColorKey Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
@@ -625,8 +625,8 @@ namespace MessagePack.Unity
         public void Serialize(ref MessagePackWriter writer, global::UnityEngine.GradientAlphaKey value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             writer.WriteFixedArrayHeaderUnsafe(2);
-            writer.WriteSingle(value.alpha);
-            writer.WriteSingle(value.time);
+            writer.Write(value.alpha);
+            writer.Write(value.time);
         }
         public global::UnityEngine.GradientAlphaKey Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
@@ -718,10 +718,10 @@ namespace MessagePack.Unity
         public void Serialize(ref MessagePackWriter writer, global::UnityEngine.Color32 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             writer.WriteFixedArrayHeaderUnsafe(4);
-            writer.WriteByte(value.r);
-            writer.WriteByte(value.g);
-            writer.WriteByte(value.b);
-            writer.WriteByte(value.a);
+            writer.Write(value.r);
+            writer.Write(value.g);
+            writer.Write(value.b);
+            writer.Write(value.a);
         }
         public global::UnityEngine.Color32 Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
@@ -776,10 +776,10 @@ namespace MessagePack.Unity
                 return;
             }
             writer.WriteFixedArrayHeaderUnsafe(4);
-            writer.WriteInt32(value.left);
-            writer.WriteInt32(value.right);
-            writer.WriteInt32(value.top);
-            writer.WriteInt32(value.bottom);
+            writer.Write(value.left);
+            writer.Write(value.right);
+            writer.Write(value.top);
+            writer.Write(value.bottom);
         }
         public global::UnityEngine.RectOffset Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
@@ -829,7 +829,7 @@ namespace MessagePack.Unity
         public void Serialize(ref MessagePackWriter writer, global::UnityEngine.LayerMask value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             writer.WriteFixedArrayHeaderUnsafe(1);
-            writer.WriteInt32(value.value);
+            writer.Write(value.value);
         }
         public global::UnityEngine.LayerMask Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {

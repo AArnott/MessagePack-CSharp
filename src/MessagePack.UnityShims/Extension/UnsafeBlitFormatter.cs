@@ -46,8 +46,8 @@ namespace MessagePack.Unity.Extension
             var byteLen = value.Length * Marshal.SizeOf<T>();
 
             writer.WriteExtensionFormatHeader(new ExtensionHeader(TypeCode, byteLen));
-            writer.WriteInt32(byteLen); // write original header(not array header)
-            writer.WriteBoolean(BitConverter.IsLittleEndian);
+            writer.Write(byteLen); // write original header(not array header)
+            writer.Write(BitConverter.IsLittleEndian);
             writer.WriteRaw(MemoryMarshal.Cast<T, byte>(value));
         }
 

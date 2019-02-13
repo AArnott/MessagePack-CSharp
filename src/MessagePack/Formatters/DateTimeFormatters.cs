@@ -13,7 +13,7 @@ namespace MessagePack.Formatters
         public void Serialize(ref MessagePackWriter writer, DateTime value, IFormatterResolver resolver)
         {
             var dateData = value.ToBinary();
-            writer.WriteInt64(dateData);
+            writer.Write(dateData);
         }
 
         public DateTime Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
@@ -43,7 +43,7 @@ namespace MessagePack.Formatters
                 writer.WriteArrayHeader(value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    writer.WriteInt64(value[i].ToBinary());
+                    writer.Write(value[i].ToBinary());
                 }
             }
         }

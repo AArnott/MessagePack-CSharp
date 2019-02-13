@@ -38,7 +38,7 @@ namespace MessagePack.Tests
 
                 public void Serialize(ref MessagePackWriter writer, CustomClassObject value, IFormatterResolver formatterResolver)
                 {
-                    writer.WriteInt32(value.X);
+                    writer.Write(value.X);
                 }
             }
         }
@@ -68,7 +68,7 @@ namespace MessagePack.Tests
 
                 public void Serialize(ref MessagePackWriter writer, CustomStructObject value, IFormatterResolver formatterResolver)
                 {
-                    writer.WriteInt32(value.X);
+                    writer.Write(value.X);
                 }
             }
         }
@@ -97,7 +97,7 @@ namespace MessagePack.Tests
 
             public void Serialize(ref MessagePackWriter writer, CustomyEnumObject value, IFormatterResolver formatterResolver)
             {
-                writer.WriteInt32((int)value);
+                writer.Write((int)value);
             }
         }
 
@@ -117,7 +117,7 @@ namespace MessagePack.Tests
 
             public void Serialize(ref MessagePackWriter writer, ICustomInterfaceObject value, IFormatterResolver formatterResolver)
             {
-                writer.WriteInt32(value.A);
+                writer.Write(value.A);
             }
         }
 
@@ -169,7 +169,7 @@ namespace MessagePack.Tests
 
                 public void Serialize(ref MessagePackWriter writer, CustomClassObjectWithArgument value, IFormatterResolver formatterResolver)
                 {
-                    writer.WriteInt32(value.X * (int)x);
+                    writer.Write(value.X * (int)x);
                 }
             }
         }

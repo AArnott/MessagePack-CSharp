@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Text;
 
@@ -45,6 +46,16 @@ namespace MessagePack.Internal
                 StringEncoding.UTF8.GetBytes(value, 0, value.Length, bytes, 5);
                 return bytes;
             }
+        }
+
+        public static ReadOnlySpan<byte> GetSpanFromSequence(ReadOnlySequence<byte> sequence)
+        {
+            if (sequence.IsSingleSegment)
+            {
+                return sequence.First.Span;
+            }
+
+            return sequence.ToArray();
         }
     }
 }

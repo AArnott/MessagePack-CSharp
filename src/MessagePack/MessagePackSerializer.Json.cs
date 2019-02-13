@@ -57,6 +57,11 @@ namespace MessagePack
         /// </summary>
         public virtual void ConvertToJson(ref MessagePackReader reader, TextWriter jsonWriter)
         {
+            if (reader.End)
+            {
+                return;
+            }
+
             ToJsonCore(ref reader, jsonWriter);
         }
 
@@ -128,15 +133,15 @@ namespace MessagePack
                         var v = jr.ValueType;
                         if (v == ValueType.Double)
                         {
-                            writer.WriteDouble(jr.DoubleValue);
+                            writer.Write(jr.DoubleValue);
                         }
                         else if (v == ValueType.Long)
                         {
-                            writer.WriteInt64(jr.LongValue);
+                            writer.Write(jr.LongValue);
                         }
                         else if (v == ValueType.ULong)
                         {
-                            writer.WriteUInt64(jr.ULongValue);
+                            writer.Write(jr.ULongValue);
                         }
                         else if (v == ValueType.Decimal)
                         {
@@ -145,15 +150,15 @@ namespace MessagePack
                         count++;
                         break;
                     case TinyJsonToken.String:
-                        writer.WriteString(jr.StringValue);
+                        writer.Write(jr.StringValue);
                         count++;
                         break;
                     case TinyJsonToken.True:
-                        writer.WriteBoolean(true);
+                        writer.Write(true);
                         count++;
                         break;
                     case TinyJsonToken.False:
-                        writer.WriteBoolean(false);
+                        writer.Write(false);
                         count++;
                         break;
                     case TinyJsonToken.Null:
@@ -169,11 +174,6 @@ namespace MessagePack
 
         private static void ToJsonCore(ref MessagePackReader reader, TextWriter writer)
         {
-            if (reader.End)
-            {
-                return;
-            }
-
             var type = reader.NextMessagePackType;
             switch (type)
             {
@@ -192,7 +192,15 @@ namespace MessagePack
                     writer.Write(reader.ReadBoolean() ? "true" : "false");
                     break;
                 case MessagePackType.Float:
-                    writer.Write(reader.ReadDouble().ToString(CultureInfo.InvariantCulture));
+                    if (reader.NextCode == MessagePackCode.Float32)
+                    {
+                        writer.Write(reader.ReadSingle().ToString(CultureInfo.InvariantCulture));
+                    }
+                    else
+                    {
+                        writer.Write(reader.ReadDouble().ToString(CultureInfo.InvariantCulture));
+                    }
+
                     break;
                 case MessagePackType.String:
                     WriteJsonString(reader.ReadString(), writer);

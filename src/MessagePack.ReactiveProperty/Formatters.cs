@@ -114,8 +114,8 @@ namespace MessagePack.ReactivePropertyExtension
             {
                 writer.WriteArrayHeader(3);
 
-                writer.WriteInt32(ReactivePropertySchedulerMapper.ToReactivePropertyModeInt(value));
-                writer.WriteInt32(ReactivePropertySchedulerMapper.GetSchedulerId(value.RaiseEventScheduler));
+                writer.Write(ReactivePropertySchedulerMapper.ToReactivePropertyModeInt(value));
+                writer.Write(ReactivePropertySchedulerMapper.GetSchedulerId(value.RaiseEventScheduler));
                 formatterResolver.GetFormatterWithVerify<T>().Serialize(ref writer, value.Value, formatterResolver);
             }
         }
@@ -313,7 +313,7 @@ namespace MessagePack.ReactivePropertyExtension
             {
                 writer.WriteArrayHeader(2);
 
-                writer.WriteInt32(ReactivePropertySchedulerMapper.ToReactivePropertySlimModeInt(value));
+                writer.Write(ReactivePropertySchedulerMapper.ToReactivePropertySlimModeInt(value));
                 formatterResolver.GetFormatterWithVerify<T>().Serialize(ref writer, value.Value, formatterResolver);
             }
         }

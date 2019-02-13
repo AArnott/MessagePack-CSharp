@@ -13,7 +13,7 @@ namespace MessagePack.Tests
         private MessagePackSerializer serializer = new MessagePackSerializer();
 
         [Fact]
-        public void SerializeAndToJson()
+        public void SerializeAndConvertToJson()
         {
             var testData = new { Hoge = 100, Huga = true, Yaki = new { Rec = 1, T = 10 }, Nano = "nanoanno" };
 

@@ -200,9 +200,9 @@ namespace MessagePack.Formatters
             using (var scratch = new Nerdbank.Streams.Sequence<byte>())
             {
                 var scratchWriter = writer.Clone(scratch);
-                scratchWriter.WriteStringBytes(typeName);
-                scratchWriter.Flush();
+                scratchWriter.WriteString(typeName);
                 formatterAndDelegate.Value(formatterAndDelegate.Key, ref scratchWriter, value, resolver);
+                scratchWriter.Flush();
 
                 // mark as extension with code 100
                 writer.WriteExtensionFormat(new ExtensionResult((sbyte)TypelessFormatter.ExtensionTypeCode, scratch.AsReadOnlySequence));
@@ -298,10 +298,10 @@ namespace MessagePack.Formatters
 
                         var formatterType = typeof(IMessagePackFormatter<>).MakeGenericType(type);
                         var param0 = Expression.Parameter(typeof(object), "formatter");
-                        var param1 = Expression.Parameter(typeof(ReadOnlySequence<byte>).MakeByRefType(), "byteSequence");
+                        var param1 = Expression.Parameter(typeof(MessagePackReader).MakeByRefType(), "reader");
                         var param2 = Expression.Parameter(typeof(IFormatterResolver), "resolver");
 
-                        var deserializeMethodInfo = formatterType.GetRuntimeMethod("Deserialize", new[] { typeof(ReadOnlySequence<byte>).MakeByRefType(), typeof(IFormatterResolver) });
+                        var deserializeMethodInfo = formatterType.GetRuntimeMethod("Deserialize", new[] { typeof(MessagePackReader).MakeByRefType(), typeof(IFormatterResolver) });
 
                         var deserialize = Expression.Call(
                             Expression.Convert(param0, formatterType),

@@ -24,7 +24,7 @@ namespace MessagePack.Formatters
             if (!BitConverter.IsLittleEndian) throw new Exception("BinaryGuidFormatter only allows on little endian env.");
 
             var valueSpan = new ReadOnlySpan<byte>(&value, sizeof(Guid));
-            writer.WriteBytes(valueSpan);
+            writer.Write(valueSpan);
         }
 
         public unsafe Guid Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
@@ -63,7 +63,7 @@ namespace MessagePack.Formatters
             if (!BitConverter.IsLittleEndian) throw new Exception("BinaryGuidFormatter only allows on little endian env.");
 
             var valueSpan = new ReadOnlySpan<byte>(&value, sizeof(Decimal));
-            writer.WriteBytes(valueSpan);
+            writer.Write(valueSpan);
         }
 
         public unsafe Decimal Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)

@@ -3,6 +3,7 @@
 
 using MessagePack.Formatters;
 using MessagePack.Internal;
+using Microsoft;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
@@ -44,11 +45,6 @@ namespace MessagePack
         /////// in their longest form instead of their most compact form.
         /////// </summary>
         ////public bool ForceFullHeaderLength { get; set; }
-
-        /// <summary>
-        /// Gets the underlying <see cref="BufferWriter"/> behind this instance.
-        /// </summary>
-        internal BufferWriter UnderlyingWriter => this.writer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MessagePackWriter"/> struct,
@@ -177,10 +173,9 @@ namespace MessagePack
         /// Writes a <see cref="byte"/> value using a 1-byte code when possible, otherwise as <see cref="MessagePackCode.UInt8"/>.
         /// </summary>
         /// <param name="value">The value.</param>
-        /// <param name="forceFullHeaderLength"><c>true</c> to force the maximum length header to be written; <c>false</c> to allow the most compact form possible to be used.</param>
-        public void WriteByte(byte value, bool forceFullHeaderLength = false)
+        public void Write(byte value)
         {
-            if (value <= MessagePackCode.MaxFixInt && !forceFullHeaderLength)
+            if (value <= MessagePackCode.MaxFixInt)
             {
                 var span = writer.GetSpan(1);
                 span[0] = value;
@@ -188,26 +183,31 @@ namespace MessagePack
             }
             else
             {
-                var span = writer.GetSpan(2);
-                span[0] = MessagePackCode.UInt8;
-                span[1] = value;
-                writer.Advance(2);
+                WriteUInt8(value);
             }
+        }
+
+        /// <summary>
+        /// Writes a <see cref="byte"/> value using <see cref="MessagePackCode.UInt8"/>.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        public void WriteUInt8(byte value)
+        {
+            var span = writer.GetSpan(2);
+            span[0] = MessagePackCode.UInt8;
+            span[1] = value;
+            writer.Advance(2);
         }
 
         /// <summary>
         /// Writes an 8-bit value using a 1-byte code when possible, otherwise as <see cref="MessagePackCode.Int8"/>.
         /// </summary>
         /// <param name="value">The value.</param>
-        /// <param name="forceFullHeaderLength"><c>true</c> to force the maximum length header to be written; <c>false</c> to allow the most compact form possible to be used.</param>
-        public void WriteSByte(sbyte value, bool forceFullHeaderLength = false)
+        public void Write(sbyte value)
         {
-            if (value < MessagePackRange.MinFixNegativeInt && !forceFullHeaderLength)
+            if (value < MessagePackRange.MinFixNegativeInt)
             {
-                var span = writer.GetSpan(2);
-                span[0] = MessagePackCode.Int8;
-                span[1] = unchecked((byte)value);
-                writer.Advance(2);
+                WriteInt8(value);
             }
             else
             {
@@ -218,19 +218,30 @@ namespace MessagePack
         }
 
         /// <summary>
+        /// Writes an 8-bit value using <see cref="MessagePackCode.Int8"/>.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        public void WriteInt8(sbyte value)
+        {
+            var span = writer.GetSpan(2);
+            span[0] = MessagePackCode.Int8;
+            span[1] = unchecked((byte)value);
+            writer.Advance(2);
+        }
+
+        /// <summary>
         /// Writes a <see cref="ushort"/> value using a 1-byte code when possible, otherwise as <see cref="MessagePackCode.UInt8"/> or <see cref="MessagePackCode.UInt16"/>.
         /// </summary>
         /// <param name="value">The value.</param>
-        /// <param name="forceFullHeaderLength"><c>true</c> to force the maximum length header to be written; <c>false</c> to allow the most compact form possible to be used.</param>
-        public void WriteUInt16(ushort value, bool forceFullHeaderLength = false)
+        public void Write(ushort value)
         {
-            if (value <= MessagePackRange.MaxFixPositiveInt && !forceFullHeaderLength)
+            if (value <= MessagePackRange.MaxFixPositiveInt)
             {
                 var span = writer.GetSpan(1);
                 span[0] = unchecked((byte)value);
                 writer.Advance(1);
             }
-            else if (value <= byte.MaxValue && !forceFullHeaderLength)
+            else if (value <= byte.MaxValue)
             {
                 var span = writer.GetSpan(2);
                 span[0] = MessagePackCode.UInt8;
@@ -239,11 +250,20 @@ namespace MessagePack
             }
             else
             {
-                var span = writer.GetSpan(3);
-                span[0] = MessagePackCode.UInt16;
-                WriteBigEndian(value, span.Slice(1));
-                writer.Advance(3);
+                WriteUInt16(value);
             }
+        }
+
+        /// <summary>
+        /// Writes a <see cref="ushort"/> value using <see cref="MessagePackCode.UInt16"/>.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        public void WriteUInt16(ushort value)
+        {
+            var span = writer.GetSpan(3);
+            span[0] = MessagePackCode.UInt16;
+            WriteBigEndian(value, span.Slice(1));
+            writer.Advance(3);
         }
 
         /// <summary>
@@ -255,23 +275,22 @@ namespace MessagePack
         /// <see cref="MessagePackCode.Int16"/>
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <param name="forceFullHeaderLength"><c>true</c> to force the maximum length header to be written; <c>false</c> to allow the most compact form possible to be used.</param>
-        public void WriteInt16(short value, bool forceFullHeaderLength = false)
+        public void Write(short value)
         {
             if (value >= 0)
             {
-                WriteUInt16((ushort)value, forceFullHeaderLength);
+                Write((ushort)value);
             }
             else
             {
                 // negative int(use int)
-                if (MessagePackRange.MinFixNegativeInt <= value && !forceFullHeaderLength)
+                if (MessagePackRange.MinFixNegativeInt <= value)
                 {
                     var span = writer.GetSpan(1);
                     span[0] = unchecked((byte)value);
                     writer.Advance(1);
                 }
-                else if (sbyte.MinValue <= value && !forceFullHeaderLength)
+                else if (sbyte.MinValue <= value)
                 {
                     var span = writer.GetSpan(2);
                     span[0] = MessagePackCode.Int8;
@@ -280,12 +299,21 @@ namespace MessagePack
                 }
                 else
                 {
-                    var span = writer.GetSpan(3);
-                    span[0] = MessagePackCode.Int16;
-                    WriteBigEndian(value, span.Slice(1));
-                    writer.Advance(3);
+                    WriteInt16(value);
                 }
             }
+        }
+
+        /// <summary>
+        /// Writes a <see cref="short"/> using <see cref="MessagePackCode.Int16"/>.
+        /// </summary>
+        /// <param name="value">The value to write.</param>
+        public void WriteInt16(short value)
+        {
+            var span = writer.GetSpan(3);
+            span[0] = MessagePackCode.Int16;
+            WriteBigEndian(value, span.Slice(1));
+            writer.Advance(3);
         }
 
         /// <summary>
@@ -296,23 +324,22 @@ namespace MessagePack
         /// <see cref="MessagePackCode.UInt32"/>
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <param name="forceFullHeaderLength"><c>true</c> to force the maximum length header to be written; <c>false</c> to allow the most compact form possible to be used.</param>
-        public void WriteUInt32(uint value, bool forceFullHeaderLength = false)
+        public void Write(uint value)
         {
-            if (value <= MessagePackRange.MaxFixPositiveInt && !forceFullHeaderLength)
+            if (value <= MessagePackRange.MaxFixPositiveInt)
             {
                 var span = writer.GetSpan(1);
                 span[0] = unchecked((byte)value);
                 writer.Advance(1);
             }
-            else if (value <= byte.MaxValue && !forceFullHeaderLength)
+            else if (value <= byte.MaxValue)
             {
                 var span = writer.GetSpan(2);
                 span[0] = MessagePackCode.UInt8;
                 span[1] = unchecked((byte)value);
                 writer.Advance(2);
             }
-            else if (value <= ushort.MaxValue && !forceFullHeaderLength)
+            else if (value <= ushort.MaxValue)
             {
                 var span = writer.GetSpan(3);
                 span[0] = MessagePackCode.UInt16;
@@ -321,11 +348,20 @@ namespace MessagePack
             }
             else
             {
-                var span = writer.GetSpan(5);
-                span[0] = MessagePackCode.UInt32;
-                WriteBigEndian(value, span.Slice(1));
-                writer.Advance(5);
+                WriteUInt32(value);
             }
+        }
+
+        /// <summary>
+        /// Writes an <see cref="uint"/> using <see cref="MessagePackCode.UInt32"/>.
+        /// </summary>
+        /// <param name="value">The value to write.</param>
+        public void WriteUInt32(uint value)
+        {
+            var span = writer.GetSpan(5);
+            span[0] = MessagePackCode.UInt32;
+            WriteBigEndian(value, span.Slice(1));
+            writer.Advance(5);
         }
 
         /// <summary>
@@ -339,44 +375,52 @@ namespace MessagePack
         /// <see cref="MessagePackCode.Int32"/>
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <param name="forceFullHeaderLength"><c>true</c> to force the maximum length header to be written; <c>false</c> to allow the most compact form possible to be used.</param>
-        public void WriteInt32(int value, bool forceFullHeaderLength = false)
+        public void Write(int value)
         {
             if (value >= 0)
             {
-                WriteUInt32((uint)value, forceFullHeaderLength);
+                Write((uint)value);
             }
             else
             {
                 // negative int(use int)
-                if (MessagePackRange.MinFixNegativeInt <= value && !forceFullHeaderLength)
+                if (MessagePackRange.MinFixNegativeInt <= value)
                 {
                     var span = writer.GetSpan(1);
                     span[0] = unchecked((byte)value);
                     writer.Advance(1);
                 }
-                else if (sbyte.MinValue <= value && !forceFullHeaderLength)
+                else if (sbyte.MinValue <= value)
                 {
                     var span = writer.GetSpan(2);
                     span[0] = MessagePackCode.Int8;
                     span[1] = unchecked((byte)value);
                     writer.Advance(2);
                 }
-                else if (short.MinValue <= value && !forceFullHeaderLength)
+                else if (short.MinValue <= value)
                 {
                     var span = writer.GetSpan(3);
                     span[0] = MessagePackCode.Int16;
-                    WriteBigEndian((ushort)value, span.Slice(1));
+                    WriteBigEndian((short)value, span.Slice(1));
                     writer.Advance(3);
                 }
                 else
                 {
-                    var span = writer.GetSpan(5);
-                    span[0] = MessagePackCode.Int32;
-                    WriteBigEndian(value, span.Slice(1));
-                    writer.Advance(5);
+                    WriteInt32(value);
                 }
             }
+        }
+
+        /// <summary>
+        /// Writes an <see cref="int"/> using <see cref="MessagePackCode.Int32"/>.
+        /// </summary>
+        /// <param name="value">The value to write.</param>
+        public void WriteInt32(int value)
+        {
+            var span = writer.GetSpan(5);
+            span[0] = MessagePackCode.Int32;
+            WriteBigEndian(value, span.Slice(1));
+            writer.Advance(5);
         }
 
         /// <summary>
@@ -390,30 +434,29 @@ namespace MessagePack
         /// <see cref="MessagePackCode.Int32"/>
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <param name="forceFullHeaderLength"><c>true</c> to force the maximum length header to be written; <c>false</c> to allow the most compact form possible to be used.</param>
-        public void WriteUInt64(ulong value, bool forceFullHeaderLength = false)
+        public void Write(ulong value)
         {
-            if (value <= MessagePackRange.MaxFixPositiveInt && !forceFullHeaderLength)
+            if (value <= MessagePackRange.MaxFixPositiveInt)
             {
                 var span = writer.GetSpan(1);
                 span[0] = unchecked((byte)value);
                 writer.Advance(1);
             }
-            else if (value <= byte.MaxValue && !forceFullHeaderLength)
+            else if (value <= byte.MaxValue)
             {
                 var span = writer.GetSpan(2);
                 span[0] = MessagePackCode.UInt8;
                 span[1] = unchecked((byte)value);
                 writer.Advance(2);
             }
-            else if (value <= ushort.MaxValue && !forceFullHeaderLength)
+            else if (value <= ushort.MaxValue)
             {
                 var span = writer.GetSpan(3);
                 span[0] = MessagePackCode.UInt16;
                 WriteBigEndian((ushort)value, span.Slice(1));
                 writer.Advance(3);
             }
-            else if (value <= uint.MaxValue && !forceFullHeaderLength)
+            else if (value <= uint.MaxValue)
             {
                 var span = writer.GetSpan(5);
                 span[0] = MessagePackCode.UInt32;
@@ -422,10 +465,75 @@ namespace MessagePack
             }
             else
             {
-                var span = writer.GetSpan(9);
-                span[0] = MessagePackCode.UInt64;
-                WriteBigEndian(value, span.Slice(1));
-                writer.Advance(9);
+                WriteUInt64(value);
+            }
+        }
+
+        /// <summary>
+        /// Writes an <see cref="ulong"/> using <see cref="MessagePackCode.Int32"/>.
+        /// </summary>
+        /// <param name="value">The value to write.</param>
+        public void WriteUInt64(ulong value)
+        {
+            var span = writer.GetSpan(9);
+            span[0] = MessagePackCode.UInt64;
+            WriteBigEndian(value, span.Slice(1));
+            writer.Advance(9);
+        }
+
+        /// <summary>
+        /// Writes an <see cref="long"/> using a built-in 1-byte code when within specific MessagePack-supported ranges,
+        /// or the most compact of
+        /// <see cref="MessagePackCode.UInt8"/>,
+        /// <see cref="MessagePackCode.UInt16"/>,
+        /// <see cref="MessagePackCode.UInt32"/>,
+        /// <see cref="MessagePackCode.UInt64"/>,
+        /// <see cref="MessagePackCode.Int8"/>,
+        /// <see cref="MessagePackCode.Int16"/>,
+        /// <see cref="MessagePackCode.Int32"/>,
+        /// <see cref="MessagePackCode.Int64"/>
+        /// </summary>
+        /// <param name="value">The value to write.</param>
+        public void Write(long value)
+        {
+            if (value >= 0)
+            {
+                Write((ulong)value);
+            }
+            else
+            {
+                // negative int(use int)
+                if (MessagePackRange.MinFixNegativeInt <= value)
+                {
+                    var span = writer.GetSpan(1);
+                    span[0] = unchecked((byte)value);
+                    writer.Advance(1);
+                }
+                else if (sbyte.MinValue <= value)
+                {
+                    var span = writer.GetSpan(2);
+                    span[0] = MessagePackCode.Int8;
+                    span[1] = unchecked((byte)value);
+                    writer.Advance(2);
+                }
+                else if (short.MinValue <= value)
+                {
+                    var span = writer.GetSpan(3);
+                    span[0] = MessagePackCode.Int16;
+                    WriteBigEndian((short)value, span.Slice(1));
+                    writer.Advance(3);
+                }
+                else if (int.MinValue <= value)
+                {
+                    var span = writer.GetSpan(5);
+                    span[0] = MessagePackCode.Int32;
+                    WriteBigEndian((int)value, span.Slice(1));
+                    writer.Advance(5);
+                }
+                else
+                {
+                    WriteInt64(value);
+                }
             }
         }
 
@@ -442,58 +550,19 @@ namespace MessagePack
         /// <see cref="MessagePackCode.Int64"/>
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <param name="forceFullHeaderLength"><c>true</c> to force the maximum length header to be written; <c>false</c> to allow the most compact form possible to be used.</param>
-        public void WriteInt64(long value, bool forceFullHeaderLength = false)
+        public void WriteInt64(long value)
         {
-            if (value >= 0)
-            {
-                WriteUInt64((ulong)value, forceFullHeaderLength);
-            }
-            else
-            {
-                // negative int(use int)
-                if (MessagePackRange.MinFixNegativeInt <= value && !forceFullHeaderLength)
-                {
-                    var span = writer.GetSpan(1);
-                    span[0] = unchecked((byte)value);
-                    writer.Advance(1);
-                }
-                else if (sbyte.MinValue <= value && !forceFullHeaderLength)
-                {
-                    var span = writer.GetSpan(2);
-                    span[0] = MessagePackCode.Int8;
-                    span[1] = unchecked((byte)value);
-                    writer.Advance(2);
-                }
-                else if (short.MinValue <= value && !forceFullHeaderLength)
-                {
-                    var span = writer.GetSpan(3);
-                    span[0] = MessagePackCode.Int16;
-                    WriteBigEndian((short)value, span.Slice(1));
-                    writer.Advance(3);
-                }
-                else if (int.MinValue <= value && !forceFullHeaderLength)
-                {
-                    var span = writer.GetSpan(5);
-                    span[0] = MessagePackCode.Int32;
-                    WriteBigEndian((int)value, span.Slice(1));
-                    writer.Advance(5);
-                }
-                else
-                {
-                    var span = writer.GetSpan(9);
-                    span[0] = MessagePackCode.Int64;
-                    WriteBigEndian(value, span.Slice(1));
-                    writer.Advance(9);
-                }
-            }
+            var span = writer.GetSpan(9);
+            span[0] = MessagePackCode.Int64;
+            WriteBigEndian(value, span.Slice(1));
+            writer.Advance(9);
         }
 
         /// <summary>
         /// Writes a <see cref="bool"/> value using either <see cref="MessagePackCode.True"/> or <see cref="MessagePackCode.False"/>.
         /// </summary>
         /// <param name="value">The value.</param>
-        public void WriteBoolean(bool value)
+        public void Write(bool value)
         {
             var span = writer.GetSpan(1);
             span[0] = value ? MessagePackCode.True : MessagePackCode.False;
@@ -504,13 +573,13 @@ namespace MessagePack
         /// Writes a <see cref="char"/> value using a 1-byte code when possible, otherwise as <see cref="MessagePackCode.UInt8"/> or <see cref="MessagePackCode.UInt16"/>.
         /// </summary>
         /// <param name="value">The value.</param>
-        public void WriteChar(char value) => WriteUInt16(value);
+        public void Write(char value) => this.Write((ushort)value);
 
         /// <summary>
         /// Writes a <see cref="MessagePackCode.Float32"/> value.
         /// </summary>
         /// <param name="value">The value.</param>
-        public void WriteSingle(float value)
+        public void Write(float value)
         {
             var span = writer.GetSpan(5);
 
@@ -539,7 +608,7 @@ namespace MessagePack
         /// Writes a <see cref="MessagePackCode.Float64"/> value.
         /// </summary>
         /// <param name="value">The value.</param>
-        public void WriteDouble(double value)
+        public void Write(double value)
         {
             var span = writer.GetSpan(9);
 
@@ -576,7 +645,7 @@ namespace MessagePack
         /// Writes a <see cref="DateTime"/> using the message code <see cref="ReservedMessagePackExtensionTypeCode.DateTime"/>.
         /// </summary>
         /// <param name="dateTime">The value to write.</param>
-        public void WriteDateTime(DateTime dateTime)
+        public void Write(DateTime dateTime)
         {
             // Timestamp spec
             // https://github.com/msgpack/msgpack/pull/209
@@ -661,11 +730,11 @@ namespace MessagePack
         /// </summary>
         /// <param name="src">The span of bytes to write.</param>
         /// <param name="forceFullHeaderLength"><c>true</c> to force the maximum length header to be written; <c>false</c> to allow the most compact form possible to be used.</param>
-        public void WriteBytes(ReadOnlySpan<byte> src, bool forceFullHeaderLength = false)
+        public void Write(ReadOnlySpan<byte> src, bool forceFullHeaderLength = false)
         {
             if (this.OldSpec)
             {
-                WriteStringBytes(src, forceFullHeaderLength);
+                WriteString(src, forceFullHeaderLength);
                 return;
             }
 
@@ -712,11 +781,11 @@ namespace MessagePack
         /// </summary>
         /// <param name="src">The span of bytes to write.</param>
         /// <param name="forceFullHeaderLength"><c>true</c> to force the maximum length header to be written; <c>false</c> to allow the most compact form possible to be used.</param>
-        public void WriteBytes(ReadOnlySequence<byte> src, bool forceFullHeaderLength = false)
+        public void Write(ReadOnlySequence<byte> src, bool forceFullHeaderLength = false)
         {
             if (this.OldSpec)
             {
-                WriteStringBytes(src, forceFullHeaderLength);
+                WriteString(src, forceFullHeaderLength);
                 return;
             }
 
@@ -764,7 +833,7 @@ namespace MessagePack
         /// </summary>
         /// <param name="utf8stringBytes">The bytes to write.</param>
         /// <param name="forceFullHeaderLength"><c>true</c> to force the maximum length header to be written; <c>false</c> to allow the most compact form possible to be used.</param>
-        public void WriteStringBytes(ReadOnlySequence<byte> utf8stringBytes, bool forceFullHeaderLength = false)
+        public void WriteString(ReadOnlySequence<byte> utf8stringBytes, bool forceFullHeaderLength = false)
         {
             var byteCount = (int)utf8stringBytes.Length;
             if (byteCount <= MessagePackRange.MaxFixStringLength && !forceFullHeaderLength)
@@ -809,7 +878,7 @@ namespace MessagePack
         /// </summary>
         /// <param name="utf8stringBytes">The bytes to write.</param>
         /// <param name="forceFullHeaderLength"><c>true</c> to force the maximum length header to be written; <c>false</c> to allow the most compact form possible to be used.</param>
-        public void WriteStringBytes(ReadOnlySpan<byte> utf8stringBytes, bool forceFullHeaderLength = false)
+        public void WriteString(ReadOnlySpan<byte> utf8stringBytes, bool forceFullHeaderLength = false)
         {
             var byteCount = utf8stringBytes.Length;
             if (byteCount <= MessagePackRange.MaxFixStringLength && !forceFullHeaderLength)
@@ -853,17 +922,12 @@ namespace MessagePack
         /// <see cref="MessagePackCode.Str16"/>,
         /// <see cref="MessagePackCode.Str32"/>,
         /// </summary>
-        /// <param name="value">The value to write.</param>
+        /// <param name="value">The value to write. Must not be null.</param>
         /// <param name="forceFullHeaderLength"><c>true</c> to force the maximum length header to be written; <c>false</c> to allow the most compact form possible to be used.</param>
-        public void WriteString(string value, bool forceFullHeaderLength = false)
+        public void Write(string value, bool forceFullHeaderLength = false)
         {
-            if (value == null)
-            {
-                WriteNil();
-                return;
-            }
-
-            WriteString(value.AsSpan(), forceFullHeaderLength);
+            Requires.NotNull(value, nameof(value));
+            Write(value.AsSpan(), forceFullHeaderLength);
         }
 
         /// <summary>
@@ -875,7 +939,7 @@ namespace MessagePack
         /// </summary>
         /// <param name="value">The value to write.</param>
         /// <param name="forceFullHeaderLength"><c>true</c> to force the maximum length header to be written; <c>false</c> to allow the most compact form possible to be used.</param>
-        public void WriteString(ReadOnlySpan<char> value, bool forceFullHeaderLength = false)
+        public void Write(ReadOnlySpan<char> value, bool forceFullHeaderLength = false)
         {
             // MaxByteCount -> WritePrefix -> GetBytes has some overheads of `MaxByteCount`
             // solves heuristic length check
@@ -1054,7 +1118,7 @@ namespace MessagePack
         /// Writes a 16-bit integer in big endian format.
         /// </summary>
         /// <param name="value">The integer.</param>
-        public void WriteBigEndian(ushort value)
+        internal void WriteBigEndian(ushort value)
         {
             var span = writer.GetSpan(2);
             WriteBigEndian(value, span);
@@ -1065,7 +1129,7 @@ namespace MessagePack
         /// Writes a 32-bit integer in big endian format.
         /// </summary>
         /// <param name="value">The integer.</param>
-        public void WriteBigEndian(uint value)
+        internal void WriteBigEndian(uint value)
         {
             var span = writer.GetSpan(4);
             WriteBigEndian(value, span);
@@ -1076,12 +1140,16 @@ namespace MessagePack
         /// Writes a 64-bit integer in big endian format.
         /// </summary>
         /// <param name="value">The integer.</param>
-        public void WriteBigEndian(ulong value)
+        internal void WriteBigEndian(ulong value)
         {
             var span = writer.GetSpan(8);
             WriteBigEndian(value, span);
             writer.Advance(8);
         }
+
+        internal Span<byte> GetSpan(int length) => writer.GetSpan(length);
+
+        internal void Advance(int length) => writer.Advance(length);
 
         private static void WriteBigEndian(short value, Span<byte> span) => WriteBigEndian(unchecked((ushort)value), span);
 

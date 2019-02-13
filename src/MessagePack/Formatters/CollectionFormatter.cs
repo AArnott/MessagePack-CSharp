@@ -70,7 +70,7 @@ namespace MessagePack.Formatters
             }
             else
             {
-                writer.WriteBytes(value);
+                writer.Write(value);
             }
         }
 

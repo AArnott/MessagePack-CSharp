@@ -33,7 +33,7 @@ namespace MessagePack.Formatters
                 name = value.ToString(); // fallback for flags etc, But Enum.ToString is too slow.
             }
 
-            writer.WriteString(name);
+            writer.Write(name);
         }
 
         public T Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)

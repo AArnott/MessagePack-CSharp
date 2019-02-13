@@ -53,7 +53,7 @@ namespace MessagePack.Tests
 
             public void Serialize(ref MessagePackWriter writer, int value, IFormatterResolver formatterResolver)
             {
-                writer.WriteInt32(value * 10);
+                writer.Write(value * 10);
             }
         }
 
@@ -67,7 +67,7 @@ namespace MessagePack.Tests
 
             public void Serialize(ref MessagePackWriter writer, string value, IFormatterResolver formatterResolver)
             {
-                writer.WriteString(value + value);
+                writer.Write(value + value);
             }
         }
 

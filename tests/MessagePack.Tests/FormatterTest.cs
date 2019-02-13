@@ -214,25 +214,25 @@ namespace MessagePack.Tests
 
             var sequenceA = new Sequence<byte>();
             var sequenceAWriter = new MessagePackWriter(sequenceA);
-            sequenceAWriter.WriteString(a);
+            sequenceAWriter.Write(a);
             sequenceAWriter.Flush();
             sequenceA.Length.Is(Encoding.UTF8.GetByteCount(a) + 1);
 
             var sequenceB = new Sequence<byte>();
             var sequenceBWriter = new MessagePackWriter(sequenceB);
-            sequenceBWriter.WriteString(b);
+            sequenceBWriter.Write(b);
             sequenceBWriter.Flush();
             sequenceB.Length.Is(Encoding.UTF8.GetByteCount(b) + 2);
 
             var sequenceC = new Sequence<byte>();
             var sequenceCWriter = new MessagePackWriter(sequenceC);
-            sequenceCWriter.WriteString(c);
+            sequenceCWriter.Write(c);
             sequenceCWriter.Flush();
             sequenceC.Length.Is(Encoding.UTF8.GetByteCount(c) + 3);
 
             var sequenceD = new Sequence<byte>();
             var sequenceDWriter = new MessagePackWriter(sequenceD);
-            sequenceDWriter.WriteString(d);
+            sequenceDWriter.Write(d);
             sequenceDWriter.Flush();
             sequenceD.Length.Is(Encoding.UTF8.GetByteCount(d) + 5);
 

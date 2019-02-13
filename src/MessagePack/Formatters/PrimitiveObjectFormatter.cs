@@ -65,49 +65,49 @@ namespace MessagePack.Formatters
                 switch (code)
                 {
                     case 0:
-                        writer.WriteBoolean((bool)value);
+                        writer.Write((bool)value);
                         return;
                     case 1:
-                        writer.WriteChar((char)value);
+                        writer.Write((char)value);
                         return;
                     case 2:
-                        writer.WriteSByte((sbyte)value);
+                        writer.Write((sbyte)value);
                         return;
                     case 3:
-                        writer.WriteByte((byte)value);
+                        writer.Write((byte)value);
                         return;
                     case 4:
-                        writer.WriteInt16((Int16)value);
+                        writer.Write((Int16)value);
                         return;
                     case 5:
-                        writer.WriteUInt16((UInt16)value);
+                        writer.Write((UInt16)value);
                         return;
                     case 6:
-                        writer.WriteInt32((Int32)value);
+                        writer.Write((Int32)value);
                         return;
                     case 7:
-                        writer.WriteUInt32((UInt32)value);
+                        writer.Write((UInt32)value);
                         return;
                     case 8:
-                        writer.WriteInt64((Int64)value);
+                        writer.Write((Int64)value);
                         return;
                     case 9:
-                        writer.WriteUInt64((UInt64)value);
+                        writer.Write((UInt64)value);
                         return;
                     case 10:
-                        writer.WriteSingle((Single)value);
+                        writer.Write((Single)value);
                         return;
                     case 11:
-                        writer.WriteDouble((double)value);
+                        writer.Write((double)value);
                         return;
                     case 12:
-                        writer.WriteDateTime((DateTime)value);
+                        writer.Write((DateTime)value);
                         return;
                     case 13:
-                        writer.WriteString((string)value);
+                        writer.Write((string)value);
                         return;
                     case 14:
-                        writer.WriteBytes((byte[])value);
+                        writer.Write((byte[])value);
                         return;
                     default:
                         throw new InvalidOperationException("Not supported primitive object resolver. type:" + t.Name);
@@ -126,28 +126,28 @@ namespace MessagePack.Formatters
                     switch (code2)
                     {
                         case 2:
-                            writer.WriteSByte((sbyte)value);
+                            writer.Write((sbyte)value);
                             return;
                         case 3:
-                            writer.WriteByte((byte)value);
+                            writer.Write((byte)value);
                             return;
                         case 4:
-                            writer.WriteInt16((Int16)value);
+                            writer.Write((Int16)value);
                             return;
                         case 5:
-                            writer.WriteUInt16((UInt16)value);
+                            writer.Write((UInt16)value);
                             return;
                         case 6:
-                            writer.WriteInt32((Int32)value);
+                            writer.Write((Int32)value);
                             return;
                         case 7:
-                            writer.WriteUInt32((UInt32)value);
+                            writer.Write((UInt32)value);
                             return;
                         case 8:
-                            writer.WriteInt64((Int64)value);
+                            writer.Write((Int64)value);
                             return;
                         case 9:
-                            writer.WriteUInt64((UInt64)value);
+                            writer.Write((UInt64)value);
                             return;
                         default:
                             break;

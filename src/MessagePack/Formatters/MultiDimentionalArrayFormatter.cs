@@ -25,8 +25,8 @@ namespace MessagePack.Formatters
                 var formatter = resolver.GetFormatterWithVerify<T>();
 
                 writer.WriteArrayHeader(ArrayLength);
-                writer.WriteInt32(i);
-                writer.WriteInt32(j);
+                writer.Write(i);
+                writer.Write(j);
 
                 writer.WriteArrayHeader(value.Length);
                 foreach (var item in value)
@@ -96,9 +96,9 @@ namespace MessagePack.Formatters
                 var formatter = resolver.GetFormatterWithVerify<T>();
 
                 writer.WriteArrayHeader(ArrayLength);
-                writer.WriteInt32(i);
-                writer.WriteInt32(j);
-                writer.WriteInt32(k);
+                writer.Write(i);
+                writer.Write(j);
+                writer.Write(k);
 
                 writer.WriteArrayHeader(value.Length);
                 foreach (var item in value)
@@ -177,10 +177,10 @@ namespace MessagePack.Formatters
                 var formatter = resolver.GetFormatterWithVerify<T>();
 
                 writer.WriteArrayHeader(ArrayLength);
-                writer.WriteInt32(i);
-                writer.WriteInt32(j);
-                writer.WriteInt32(k);
-                writer.WriteInt32(l);
+                writer.Write(i);
+                writer.Write(j);
+                writer.Write(k);
+                writer.Write(l);
 
                 writer.WriteArrayHeader(value.Length);
                 foreach (var item in value)

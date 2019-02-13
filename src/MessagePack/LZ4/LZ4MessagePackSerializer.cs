@@ -153,7 +153,7 @@ namespace MessagePack
 
                     const int LengthOfUncompressedDataSizeHeader = 5;
                     writer.WriteExtensionFormatHeader(new ExtensionHeader(ExtensionTypeCode, LengthOfUncompressedDataSizeHeader + (uint)lz4Length));
-                    writer.WriteInt32((int)msgpackUncompressedData.Length, forceFullHeaderLength: true);
+                    writer.WriteInt32((int)msgpackUncompressedData.Length);
                     writer.WriteRaw(lz4Span.AsSpan(0, lz4Length));
                 }
                 finally

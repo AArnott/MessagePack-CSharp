@@ -63,11 +63,11 @@ namespace MessagePack.Formatters
                         {
                             var formatterType = typeof(IMessagePackFormatter<>).MakeGenericType(t);
                             var param0 = Expression.Parameter(typeof(object), "formatter");
-                            var param1 = Expression.Parameter(typeof(BufferWriter).MakeByRefType(), "writer");
+                            var param1 = Expression.Parameter(typeof(MessagePackWriter).MakeByRefType(), "writer");
                             var param2 = Expression.Parameter(typeof(object), "value");
                             var param3 = Expression.Parameter(typeof(IFormatterResolver), "resolver");
 
-                            var serializeMethodInfo = formatterType.GetRuntimeMethod("Serialize", new[] { typeof(BufferWriter).MakeByRefType(), t, typeof(IFormatterResolver) });
+                            var serializeMethodInfo = formatterType.GetRuntimeMethod("Serialize", new[] { typeof(MessagePackWriter).MakeByRefType(), t, typeof(IFormatterResolver) });
 
                             var body = Expression.Call(
                                 Expression.Convert(param0, formatterType),

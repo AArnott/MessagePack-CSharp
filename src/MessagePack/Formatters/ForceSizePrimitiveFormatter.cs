@@ -13,7 +13,7 @@ namespace MessagePack.Formatters
 
         public void Serialize(ref MessagePackWriter writer, Int16 value, IFormatterResolver resolver)
         {
-            writer.WriteInt16(value, forceFullHeaderLength: true);
+            writer.WriteInt16(value);
         }
 
         public Int16 Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
@@ -38,7 +38,7 @@ namespace MessagePack.Formatters
             }
             else
             {
-                writer.WriteInt16(value.Value, forceFullHeaderLength: true);
+                writer.WriteInt16(value.Value);
             }
         }
 
@@ -75,7 +75,7 @@ namespace MessagePack.Formatters
                 writer.WriteArrayHeader(value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    writer.WriteInt16(value[i], forceFullHeaderLength: true);
+                    writer.WriteInt16(value[i]);
                 }
             }
         }
@@ -109,7 +109,7 @@ namespace MessagePack.Formatters
 
         public void Serialize(ref MessagePackWriter writer, Int32 value, IFormatterResolver resolver)
         {
-            writer.WriteInt32(value, forceFullHeaderLength: true);
+            writer.WriteInt32(value);
         }
 
         public Int32 Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
@@ -134,7 +134,7 @@ namespace MessagePack.Formatters
             }
             else
             {
-                writer.WriteInt32(value.Value, forceFullHeaderLength: true);
+                writer.WriteInt32(value.Value);
             }
         }
 
@@ -171,7 +171,7 @@ namespace MessagePack.Formatters
                 writer.WriteArrayHeader(value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    writer.WriteInt32(value[i], forceFullHeaderLength: true);
+                    writer.WriteInt32(value[i]);
                 }
             }
         }
@@ -205,7 +205,7 @@ namespace MessagePack.Formatters
 
         public void Serialize(ref MessagePackWriter writer, Int64 value, IFormatterResolver resolver)
         {
-            writer.WriteInt64(value, forceFullHeaderLength: true);
+            writer.WriteInt64(value);
         }
 
         public Int64 Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
@@ -230,7 +230,7 @@ namespace MessagePack.Formatters
             }
             else
             {
-                writer.WriteInt64(value.Value, forceFullHeaderLength: true);
+                writer.WriteInt64(value.Value);
             }
         }
 
@@ -267,7 +267,7 @@ namespace MessagePack.Formatters
                 writer.WriteArrayHeader(value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    writer.WriteInt64(value[i], forceFullHeaderLength: true);
+                    writer.WriteInt64(value[i]);
                 }
             }
         }
@@ -301,7 +301,7 @@ namespace MessagePack.Formatters
 
         public void Serialize(ref MessagePackWriter writer, UInt16 value, IFormatterResolver resolver)
         {
-            writer.WriteUInt16(value, forceFullHeaderLength: true);
+            writer.WriteUInt16(value);
         }
 
         public UInt16 Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
@@ -326,7 +326,7 @@ namespace MessagePack.Formatters
             }
             else
             {
-                writer.WriteUInt16(value.Value, forceFullHeaderLength: true);
+                writer.WriteUInt16(value.Value);
             }
         }
 
@@ -363,7 +363,7 @@ namespace MessagePack.Formatters
                 writer.WriteArrayHeader(value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    writer.WriteUInt16(value[i], forceFullHeaderLength: true);
+                    writer.WriteUInt16(value[i]);
                 }
             }
         }
@@ -397,7 +397,7 @@ namespace MessagePack.Formatters
 
         public void Serialize(ref MessagePackWriter writer, UInt32 value, IFormatterResolver resolver)
         {
-            writer.WriteUInt32(value, forceFullHeaderLength: true);
+            writer.WriteUInt32(value);
         }
 
         public UInt32 Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
@@ -422,7 +422,7 @@ namespace MessagePack.Formatters
             }
             else
             {
-                writer.WriteUInt32(value.Value, forceFullHeaderLength: true);
+                writer.WriteUInt32(value.Value);
             }
         }
 
@@ -459,7 +459,7 @@ namespace MessagePack.Formatters
                 writer.WriteArrayHeader(value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    writer.WriteUInt32(value[i], forceFullHeaderLength: true);
+                    writer.WriteUInt32(value[i]);
                 }
             }
         }
@@ -493,7 +493,7 @@ namespace MessagePack.Formatters
 
         public void Serialize(ref MessagePackWriter writer, UInt64 value, IFormatterResolver resolver)
         {
-            writer.WriteUInt64(value, forceFullHeaderLength: true);
+            writer.WriteUInt64(value);
         }
 
         public UInt64 Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
@@ -518,7 +518,7 @@ namespace MessagePack.Formatters
             }
             else
             {
-                writer.WriteUInt64(value.Value, forceFullHeaderLength: true);
+                writer.WriteUInt64(value.Value);
             }
         }
 
@@ -555,7 +555,7 @@ namespace MessagePack.Formatters
                 writer.WriteArrayHeader(value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    writer.WriteUInt64(value[i], forceFullHeaderLength: true);
+                    writer.WriteUInt64(value[i]);
                 }
             }
         }
@@ -589,7 +589,7 @@ namespace MessagePack.Formatters
 
         public void Serialize(ref MessagePackWriter writer, Byte value, IFormatterResolver resolver)
         {
-            writer.WriteByte(value, forceFullHeaderLength: true);
+            writer.WriteUInt8(value);
         }
 
         public Byte Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
@@ -614,7 +614,7 @@ namespace MessagePack.Formatters
             }
             else
             {
-                writer.WriteByte(value.Value, forceFullHeaderLength: true);
+                writer.WriteUInt8(value.Value);
             }
         }
 
@@ -642,7 +642,7 @@ namespace MessagePack.Formatters
 
         public void Serialize(ref MessagePackWriter writer, SByte value, IFormatterResolver resolver)
         {
-            writer.WriteSByte(value, forceFullHeaderLength: true);
+            writer.WriteInt8(value);
         }
 
         public SByte Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
@@ -667,7 +667,7 @@ namespace MessagePack.Formatters
             }
             else
             {
-                writer.WriteSByte(value.Value, forceFullHeaderLength: true);
+                writer.WriteInt8(value.Value);
             }
         }
 
@@ -704,7 +704,7 @@ namespace MessagePack.Formatters
                 writer.WriteArrayHeader(value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    writer.WriteSByte(value[i], forceFullHeaderLength: true);
+                    writer.WriteInt8(value[i]);
                 }
             }
         }

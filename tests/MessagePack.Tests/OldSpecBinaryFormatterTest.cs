@@ -102,8 +102,8 @@ namespace MessagePack.Tests
                 Value = Enumerable.Range(0, arrayLength).Select(i => unchecked((byte)i)).ToArray() // long byte array
             };
             var messagePackBytes = SerializeByClassicMsgPack(foo, MsgPack.Serialization.SerializationMethod.Map);
-
-            var deserializedFoo = serializer.Deserialize<Foo>(messagePackBytes);
+            var oldSpecReader = new MessagePackReader(messagePackBytes) { OldSpec = true };
+            var deserializedFoo = serializer.Deserialize<Foo>(ref oldSpecReader);
             Assert.NotNull(deserializedFoo);
             Assert.Equal(foo.Id, deserializedFoo.Id);
             Assert.Equal(foo.Value, deserializedFoo.Value);
