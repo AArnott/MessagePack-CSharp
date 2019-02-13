@@ -8,17 +8,17 @@ namespace MessagePack.ImmutableCollection
     // Immutablearray<T>.Enumerator is 'not' IEnumerator<T>, can't use abstraction layer.
     public class ImmutableArrayFormatter<T> : IMessagePackFormatter<ImmutableArray<T>>
     {
-        public void Serialize(ref BufferWriter writer, ImmutableArray<T> value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, ImmutableArray<T> value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
                 var formatter = formatterResolver.GetFormatterWithVerify<T>();
 
-                MessagePackBinary.WriteArrayHeader(ref writer, value.Length);
+                writer.WriteArrayHeader(value.Length);
 
                 foreach (var item in value)
                 {
@@ -27,23 +27,22 @@ namespace MessagePack.ImmutableCollection
             }
         }
 
-        public ImmutableArray<T> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public ImmutableArray<T> Deserialize(ref MessagePackReader reader, IFormatterResolver formatterResolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
                 return ImmutableArray<T>.Empty;
             }
             else
             {
                 var formatter = formatterResolver.GetFormatterWithVerify<T>();
 
-                var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
+                var len = reader.ReadArrayHeader();
 
                 var builder = ImmutableArray.CreateBuilder<T>(len);
                 for (int i = 0; i < len; i++)
                 {
-                    builder.Add(formatter.Deserialize(ref byteSequence, formatterResolver));
+                    builder.Add(formatter.Deserialize(ref reader, formatterResolver));
                 }
 
                 return builder.ToImmutable();

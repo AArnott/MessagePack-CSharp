@@ -25,7 +25,7 @@ namespace MessagePack.Unity.Extension
     }
 
     // use ext instead of ArrayFormatter to extremely boost up performance.
-    // Layout: [extHeader, byteSize(integer), isLittlEendian(bool), bytes()]
+    // Layout: [extHeader, byteSize(integer), isLittleEndian(bool), bytes()]
 
     // Used Ext:30~36
 
@@ -35,56 +35,52 @@ namespace MessagePack.Unity.Extension
         protected abstract sbyte TypeCode { get; }
         protected void CopyDeserializeUnsafe(ReadOnlySpan<byte> src, Span<T> dest) => src.CopyTo(MemoryMarshal.Cast<T, byte>(dest));
 
-        public void Serialize(ref BufferWriter writer, T[] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, T[] value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
                 return;
             }
 
             var byteLen = value.Length * Marshal.SizeOf<T>();
 
-            MessagePackBinary.WriteExtensionFormatHeader(ref writer, TypeCode, byteLen);
-            MessagePackBinary.WriteInt32(ref writer, byteLen); // write original header(not array header)
-            MessagePackBinary.WriteBoolean(ref writer, BitConverter.IsLittleEndian);
-
-            var span = writer.GetSpan(byteLen);
-            MemoryMarshal.Cast<T, byte>(value).CopyTo(span);
-            writer.Advance(byteLen);
+            writer.WriteExtensionFormatHeader(new ExtensionHeader(TypeCode, byteLen));
+            writer.WriteInt32(byteLen); // write original header(not array header)
+            writer.WriteBoolean(BitConverter.IsLittleEndian);
+            writer.WriteRaw(MemoryMarshal.Cast<T, byte>(value));
         }
 
-        public T[] Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public T[] Deserialize(ref MessagePackReader reader, IFormatterResolver formatterResolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
                 return null;
             }
 
-            var header = MessagePackBinary.ReadExtensionFormatHeader(ref byteSequence);
+            var header = reader.ReadExtensionFormatHeader();
             if (header.TypeCode != TypeCode) throw new InvalidOperationException("Invalid typeCode.");
 
-            var byteLength = MessagePackBinary.ReadInt32(ref byteSequence);
-            var isLittleEndian = MessagePackBinary.ReadBoolean(ref byteSequence);
+            var byteLength = reader.ReadInt32();
+            var isLittleEndian = reader.ReadBoolean();
 
-            return MessagePackBinary.Parse(ref byteSequence, byteLength, span =>
+            // Allocate a T[] that we will return. We'll then cast the T[] as byte[] so we can copy the byte sequence directly into it.
+            var result = new T[byteLength / Marshal.SizeOf<T>()];
+            var resultAsBytes = MemoryMarshal.Cast<T, byte>(result);
+            reader.ReadRaw(byteLength).CopyTo(resultAsBytes);
+
+            // Reverse the byte order if necessary.
+            if (isLittleEndian != BitConverter.IsLittleEndian)
             {
-                if (isLittleEndian != BitConverter.IsLittleEndian)
+                for (int i = 0, j = resultAsBytes.Length - 1; i < j; i++, j--)
                 {
-                    var span2 = new byte[span.Length];
-                    for (int i = 0; i < span.Length; i++)
-                    {
-                        span2[span.Length - i - 1] = span[i];
-                    }
-
-                    span = span2;
+                    byte tmp = resultAsBytes[i];
+                    resultAsBytes[i] = resultAsBytes[j];
+                    resultAsBytes[j] = tmp;
                 }
+            }
 
-                var result = new T[byteLength / Marshal.SizeOf<T>()];
-                MemoryMarshal.Cast<byte, T>(span).CopyTo(result);
-                return result;
-            });
+            return result;
         }
     }
 

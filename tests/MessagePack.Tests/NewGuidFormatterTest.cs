@@ -44,14 +44,14 @@ namespace MessagePack.Tests
             {
                 var original = Guid.NewGuid();
                 var sequence = new Sequence<byte>();
-                var sequenceWriter = new BufferWriter(sequence);
+                var sequenceWriter = new MessagePackWriter(sequence);
                 GuidFormatter.Instance.Serialize(ref sequenceWriter, original, null);
-                sequenceWriter.Commit();
+                sequenceWriter.Flush();
                 sequence.Length.Is(38);
 
-                var sequenceReader = sequence.AsReadOnlySequence;
+                var sequenceReader = new MessagePackReader(sequence.AsReadOnlySequence);
                 GuidFormatter.Instance.Deserialize(ref sequenceReader, null).Is(original);
-                (sequence.Length - sequenceReader.Length).Is(38);
+                sequenceReader.End.IsTrue();
             }
             {
                 var c = new InClass() { MyProperty = 3414141, Guid = Guid.NewGuid() };

@@ -36,12 +36,5 @@ namespace MessagePack
                 return sequence.AsReadOnlySequence.ToArray();
             }
         }
-
-        internal static PrefixingBufferWriter<byte> StartDeferredPrefixWrite(this ref MessagePackWriter writer, int prefixSize, int payloadSizeHint)
-        {
-            writer.Flush();
-            var prefixingBufferWriter = new PrefixingBufferWriter<byte>(writer.UnderlyingWriter.UnderlyingWriter, prefixSize, payloadSizeHint);
-            return prefixingBufferWriter;
-        }
     }
 }

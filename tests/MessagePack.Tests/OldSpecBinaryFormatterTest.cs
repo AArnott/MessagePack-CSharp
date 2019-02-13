@@ -24,9 +24,9 @@ namespace MessagePack.Tests
         {
             var sourceBytes = Enumerable.Range(0, arrayLength).Select(i => unchecked((byte)i)).ToArray(); // long byte array
             var messagePackBytes = new Sequence<byte>();
-            var messagePackBytesWriter = new BufferWriter(messagePackBytes);
-            OldSpecBinaryFormatter.Instance.Serialize(ref messagePackBytesWriter, sourceBytes, StandardResolver.Instance);
-            messagePackBytesWriter.Commit();
+            var messagePackBytesWriter = new MessagePackWriter(messagePackBytes) { OldSpec = true };
+            serializer.Serialize(ref messagePackBytesWriter, sourceBytes);
+            messagePackBytesWriter.Flush();
             Assert.NotEqual(0, messagePackBytes.Length);
 
             var deserializedBytes = DeserializeByClassicMsgPack<byte[]>(messagePackBytes.AsReadOnlySequence.ToArray(), MsgPack.Serialization.SerializationMethod.Array);
@@ -38,9 +38,9 @@ namespace MessagePack.Tests
         {
             byte[] sourceBytes = null;
             var messagePackBytes = new Sequence<byte>();
-            var messagePackBytesWriter = new BufferWriter(messagePackBytes);
-            OldSpecBinaryFormatter.Instance.Serialize(ref messagePackBytesWriter, sourceBytes, StandardResolver.Instance);
-            messagePackBytesWriter.Commit();
+            var messagePackBytesWriter = new MessagePackWriter(messagePackBytes) { OldSpec = true };
+            serializer.Serialize(ref messagePackBytesWriter, sourceBytes, StandardResolver.Instance);
+            messagePackBytesWriter.Flush();
             Assert.Equal(1, messagePackBytes.Length);
             Assert.Equal(MessagePackCode.Nil, messagePackBytes.AsReadOnlySequence.First.Span[0]); 
 
@@ -75,8 +75,8 @@ namespace MessagePack.Tests
         {
             var sourceBytes = Enumerable.Range(0, arrayLength).Select(i => unchecked((byte) i)).ToArray(); // long byte array
             var messagePackBytes = SerializeByClassicMsgPack(sourceBytes, MsgPack.Serialization.SerializationMethod.Array);
-            var messagePackBytesReader = new ReadOnlySequence<byte>(messagePackBytes);
-            var deserializedBytes = OldSpecBinaryFormatter.Instance.Deserialize(ref messagePackBytesReader, StandardResolver.Instance);
+            var messagePackBytesReader = new MessagePackReader(messagePackBytes) { OldSpec = true };
+            var deserializedBytes = serializer.Deserialize<byte[]>(ref messagePackBytesReader);
             Assert.NotNull(deserializedBytes);
             Assert.Equal(sourceBytes, deserializedBytes);
         }
@@ -84,9 +84,9 @@ namespace MessagePack.Tests
         [Fact]
         public void DeserializeNil()
         {
-            var messagePackBytes = new ReadOnlySequence<byte>(new byte[] { MessagePackCode.Nil });
+            var messagePackReader = new MessagePackReader(new byte[] { MessagePackCode.Nil });
 
-            var deserializedObj = OldSpecBinaryFormatter.Instance.Deserialize(ref messagePackBytes, StandardResolver.Instance);
+            var deserializedObj = serializer.Deserialize<byte[]>(ref messagePackReader);
             Assert.Null(deserializedObj);
         }
 
@@ -147,7 +147,6 @@ namespace MessagePack.Tests
             public int Id { get; set; }
 
             [DataMember(Name = "Value")]
-            [MessagePackFormatter(typeof(OldSpecBinaryFormatter))]
             public byte[] Value { get; set; }
         }
     }

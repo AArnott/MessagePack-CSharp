@@ -34,6 +34,9 @@
     <Compile Include="..\..\src\MessagePack\Internal\ByteArrayStringHashTable.cs">
       <Link>Code\ByteArrayStringHashTable.cs</Link>
     </Compile>
+    <Compile Include="..\..\src\MessagePack\Internal\CodeGenHelpers.cs">
+      <Link>Code\CodeGenHelpers.cs</Link>
+    </Compile>
     <Compile Include="..\..\src\MessagePack\Internal\DynamicAssembly.cs">
       <Link>Code\DynamicAssembly.cs</Link>
     </Compile>
@@ -55,14 +58,35 @@
     <Compile Include="..\..\src\MessagePack\Internal\UnsafeMemory.Low.cs">
       <Link>Code\UnsafeMemory.Low.cs</Link>
     </Compile>
-    <Compile Include="..\..\src\MessagePack\MessagePackBinary.cs">
-      <Link>Code\MessagePackBinary.cs</Link>
+    <Compile Include="..\..\src\MessagePack\ExtensionHeader.cs">
+      <Link>Code\ExtensionHeader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\MessagePack\ExtensionResult.cs">
+      <Link>Code\ExtensionResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\MessagePack\MessagePackReader.cs">
+      <Link>Code\MessagePackReader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\MessagePack\MessagePackWriter.cs">
+      <Link>Code\MessagePackWriter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\MessagePack\SequenceReader.cs">
+      <Link>Code\SequenceReader.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\MessagePack\SequenceReaderExtensions.cs">
+      <Link>Code\SequenceReaderExtensions.cs</Link>
     </Compile>
     <Compile Include="..\..\src\MessagePack\MessagePackCode.cs">
       <Link>Code\MessagePackCode.cs</Link>
     </Compile>
+    <Compile Include="..\..\src\MessagePack\Internal\DateTimeConstants.cs">
+      <Link>Code\Internal\DateTimeConstants.cs</Link>
+    </Compile>
     <Compile Include="..\..\src\MessagePack\Nil.cs">
       <Link>Code\Nil.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\MessagePack\Utilities.cs">
+      <Link>Code\Utilities.cs</Link>
     </Compile>
     <Compile Include="..\..\src\MessagePack\Resolvers\DynamicEnumResolver.cs">
       <Link>Code\DynamicEnumResolver.cs</Link>
@@ -84,5 +108,6 @@
     <PackageReference Include="Nerdbank.Streams" Version="2.0.214" />
     <PackageReference Include="System.Memory" Version="4.5.1" />
     <PackageReference Include="Microsoft.VisualStudio.Validation" Version="15.3.15" PrivateAssets="compile" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.2" />
   </ItemGroup>
 </Project>

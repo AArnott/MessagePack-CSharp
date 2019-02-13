@@ -62,9 +62,9 @@ namespace DynamicCodeDumper
 
                 using (var sequence = new Sequence<byte>())
                 {
-                    var sequenceWriter = new BufferWriter(sequence);
+                    var sequenceWriter = new MessagePackWriter(sequence);
                     f.Serialize(ref sequenceWriter, new MyClass { MyProperty1 = 100, MyProperty2 = "foo" }, null);
-                    sequenceWriter.Commit();
+                    sequenceWriter.Flush();
                 }
             }
             catch (Exception ex)
@@ -130,28 +130,28 @@ namespace DynamicCodeDumper
     }
     public class Int_x10Formatter : IMessagePackFormatter<int>
     {
-        public int Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public int Deserialize(ref MessagePackReader reader, IFormatterResolver formatterResolver)
         {
-            return MessagePackBinary.ReadInt32(ref byteSequence) * 10;
+            return reader.ReadInt32() * 10;
         }
 
-        public void Serialize(ref BufferWriter writer, int value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, int value, IFormatterResolver formatterResolver)
         {
-            MessagePackBinary.WriteInt32(ref writer, value * 10);
+            writer.WriteInt32(value * 10);
         }
     }
 
     public class String_x2Formatter : IMessagePackFormatter<string>
     {
-        public string Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public string Deserialize(ref MessagePackReader reader, IFormatterResolver formatterResolver)
         {
-            var s = MessagePackBinary.ReadString(ref byteSequence);
+            var s = reader.ReadString();
             return s + s;
         }
 
-        public void Serialize(ref BufferWriter writer, string value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, string value, IFormatterResolver formatterResolver)
         {
-            MessagePackBinary.WriteString(ref writer, value + value);
+            writer.WriteString(value + value);
         }
     }
 

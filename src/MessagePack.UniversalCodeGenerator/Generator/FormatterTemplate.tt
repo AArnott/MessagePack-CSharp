@@ -42,12 +42,12 @@ namespace <#= Namespace #>
 
 <# } #>
 
-        public void Serialize(ref BufferWriter writer, <#= objInfo.FullName #> value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, <#= objInfo.FullName #> value, global::MessagePack.IFormatterResolver formatterResolver)
         {
 <# if( objInfo.IsClass) { #>
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+                global::MessagePack.writer.WriteNil();
                 return;
             }
 <# } #>            
@@ -57,33 +57,32 @@ namespace <#= Namespace #>
             value.OnBeforeSerialize();
 <# } #>
 <# if( objInfo.IsIntKey) { if( (objInfo.MaxKey + 1) <= 15) { #>
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, <#= objInfo.MaxKey + 1 #>);
+            global::MessagePack.writer.WriteFixedArrayHeaderUnsafe(<#= objInfo.MaxKey + 1 #>);
 <# } else { #>
-            global::MessagePack.MessagePackBinary.WriteArrayHeader(ref writer, <#= objInfo.MaxKey + 1 #>);
+            global::MessagePack.writer.WriteArrayHeader(<#= objInfo.MaxKey + 1 #>);
 <# } } else if( objInfo.WriteCount <= 15) { #>
-            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(ref writer, <#= objInfo.WriteCount #>);
+            global::MessagePack.writer.WriteFixedMapHeaderUnsafe(<#= objInfo.WriteCount #>);
 <# } else { #>
-            global::MessagePack.MessagePackBinary.WriteMapHeader(ref writer, <#= objInfo.WriteCount #>);
+            global::MessagePack.writer.WriteMapHeader(<#= objInfo.WriteCount #>);
 <# } #>
 <# if(objInfo.IsIntKey) { #>
 <# for(var i =0; i<= objInfo.MaxKey; i++) { var member = objInfo.GetMember(i); #>
 <# if( member == null) { #>
-            global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+            global::MessagePack.writer.WriteNil();
 <# } else { #>
             <#= member.GetSerializeMethodString() #>;
 <# } } } else { #>
 <# var index = 0; foreach(var x in objInfo.Members) { #>
-            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____stringByteKeys[<#= index++ #>]);
+            global::MessagePack.writer.WriteRaw(this.____stringByteKeys[<#= index++ #>]);
             <#= x.GetSerializeMethodString() #>;
 <# } } #>
         }
 
-        public <#= objInfo.FullName #> Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+        public <#= objInfo.FullName #> Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
             {
 <# if( objInfo.IsClass) { #>
-                byteSequence = byteSequence.Slice(1);
                 return null;
 <# } else { #>
                 throw new InvalidOperationException("typecode is null, struct not supported");
@@ -91,9 +90,9 @@ namespace <#= Namespace #>
             }
 
 <# if(objInfo.IsStringKey) { #>
-            var length = global::MessagePack.MessagePackBinary.ReadMapHeader(ref byteSequence);
+            var length = global::MessagePack.reader.ReadMapHeader();
 <# } else { #>
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = global::MessagePack.reader.ReadArrayHeader();
 <# } #>
 
 <# foreach(var x in objInfo.Members) { #>
@@ -103,11 +102,11 @@ namespace <#= Namespace #>
             for (int i = 0; i < length; i++)
             {
 <# if(objInfo.IsStringKey) { #>
-                var stringKey = global::MessagePack.MessagePackBinary.ReadStringSegment(ref byteSequence);
+                var stringKey = global::MessagePack.reader.ReadStringSegment();
                 int key;
                 if (!____keyMapping.TryGetValue(stringKey, out key))
                 {
-                    global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                    global::MessagePack.reader.ReadNextBlock();
                     continue;
                 }
 <# } else { #>
@@ -122,7 +121,7 @@ namespace <#= Namespace #>
                         break;
 <# } #>
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        global::MessagePack.reader.ReadNextBlock();
                         break;
                 }
             }

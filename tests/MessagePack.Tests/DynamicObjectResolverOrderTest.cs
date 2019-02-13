@@ -45,13 +45,16 @@ namespace MessagePack.Tests
 
         IEnumerable<string> IteratePropertyNames(ReadOnlyMemory<byte> bytes)
         {
-            var byteSequence = new ReadOnlySequence<byte>(bytes);
-            var mapCount = MessagePackBinary.ReadMapHeader(ref byteSequence);
+            var reader = new MessagePackReader(bytes);
+            var mapCount = reader.ReadMapHeader();
+            var result = new string[mapCount];
             for (int i = 0; i < mapCount; i++)
             {
-                yield return MessagePackBinary.ReadString(ref byteSequence);
-                MessagePackBinary.ReadNext(ref byteSequence);
+                result[i] = reader.ReadString();
+                reader.Skip(); // skip the value
             }
+
+            return result;
         }
 
         [Fact]

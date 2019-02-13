@@ -16,14 +16,14 @@ namespace MessagePack.Tests
         {
             var guid = Guid.NewGuid();
             var sequence = new Sequence<byte>();
-            var sequenceWriter = new BufferWriter(sequence);
+            var sequenceWriter = new MessagePackWriter(sequence);
             BinaryGuidFormatter.Instance.Serialize(ref sequenceWriter, guid, null);
-            sequenceWriter.Commit();
+            sequenceWriter.Flush();
             sequence.Length.Is(18);
 
-            var sequenceReader = sequence.AsReadOnlySequence;
+            var sequenceReader = new MessagePackReader(sequence.AsReadOnlySequence);
             var nguid = BinaryGuidFormatter.Instance.Deserialize(ref sequenceReader, null);
-            (sequence.Length - sequenceReader.Length).Is(18);
+            Assert.True(sequenceReader.End);
 
             guid.Is(nguid);
         }
@@ -33,14 +33,14 @@ namespace MessagePack.Tests
         {
             var d = new Decimal(1341, 53156, 61, true, 3);
             var sequence = new Sequence<byte>();
-            var sequenceWriter = new BufferWriter(sequence);
+            var sequenceWriter = new MessagePackWriter(sequence);
             BinaryDecimalFormatter.Instance.Serialize(ref sequenceWriter, d, null);
-            sequenceWriter.Commit();
+            sequenceWriter.Flush();
             sequence.Length.Is(18);
 
-            var sequenceReader = sequence.AsReadOnlySequence;
+            var sequenceReader = new MessagePackReader(sequence.AsReadOnlySequence);
             var nd = BinaryDecimalFormatter.Instance.Deserialize(ref sequenceReader, null);
-            (sequence.Length - sequenceReader.Length).Is(18);
+            Assert.True(sequenceReader.End);
 
             d.Is(nd);
         }

@@ -19,7 +19,7 @@ namespace MessagePack.Tests
 
             var data = serializer.Serialize(testData, ContractlessStandardResolver.Instance);
 
-            serializer.ToJson(data).Is(@"{""Hoge"":100,""Huga"":true,""Yaki"":{""Rec"":1,""T"":10},""Nano"":""nanoanno""}");
+            serializer.ConvertToJson(data).Is(@"{""Hoge"":100,""Huga"":true,""Yaki"":{""Rec"":1,""T"":10},""Nano"":""nanoanno""}");
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
 
 namespace MessagePack
 {
@@ -8,7 +9,7 @@ namespace MessagePack
 
         public ReadOnlySequence<byte> Data { get; private set; }
 
-        public ExtensionResult(sbyte typeCode, byte[] data)
+        public ExtensionResult(sbyte typeCode, Memory<byte> data)
         {
             TypeCode = typeCode;
             Data = new ReadOnlySequence<byte>(data);

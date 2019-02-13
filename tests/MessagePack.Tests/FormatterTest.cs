@@ -213,37 +213,37 @@ namespace MessagePack.Tests
             var d = new String('あ', 40000);
 
             var sequenceA = new Sequence<byte>();
-            var sequenceAWriter = new BufferWriter(sequenceA);
-            MessagePackBinary.WriteString(ref sequenceAWriter, a);
-            sequenceAWriter.Commit();
+            var sequenceAWriter = new MessagePackWriter(sequenceA);
+            sequenceAWriter.WriteString(a);
+            sequenceAWriter.Flush();
             sequenceA.Length.Is(Encoding.UTF8.GetByteCount(a) + 1);
 
             var sequenceB = new Sequence<byte>();
-            var sequenceBWriter = new BufferWriter(sequenceB);
-            MessagePackBinary.WriteString(ref sequenceBWriter, b);
-            sequenceBWriter.Commit();
+            var sequenceBWriter = new MessagePackWriter(sequenceB);
+            sequenceBWriter.WriteString(b);
+            sequenceBWriter.Flush();
             sequenceB.Length.Is(Encoding.UTF8.GetByteCount(b) + 2);
 
             var sequenceC = new Sequence<byte>();
-            var sequenceCWriter = new BufferWriter(sequenceC);
-            MessagePackBinary.WriteString(ref sequenceCWriter, c);
-            sequenceCWriter.Commit();
+            var sequenceCWriter = new MessagePackWriter(sequenceC);
+            sequenceCWriter.WriteString(c);
+            sequenceCWriter.Flush();
             sequenceC.Length.Is(Encoding.UTF8.GetByteCount(c) + 3);
 
             var sequenceD = new Sequence<byte>();
-            var sequenceDWriter = new BufferWriter(sequenceD);
-            MessagePackBinary.WriteString(ref sequenceDWriter, d);
-            sequenceDWriter.Commit();
+            var sequenceDWriter = new MessagePackWriter(sequenceD);
+            sequenceDWriter.WriteString(d);
+            sequenceDWriter.Flush();
             sequenceD.Length.Is(Encoding.UTF8.GetByteCount(d) + 5);
 
-            var bytesA = sequenceA.AsReadOnlySequence;
-            var bytesB = sequenceB.AsReadOnlySequence;
-            var bytesC = sequenceC.AsReadOnlySequence;
-            var bytesD = sequenceD.AsReadOnlySequence;
-            MessagePackBinary.ReadString(ref bytesA).Is(a);
-            MessagePackBinary.ReadString(ref bytesB).Is(b);
-            MessagePackBinary.ReadString(ref bytesC).Is(c);
-            MessagePackBinary.ReadString(ref bytesD).Is(d);
+            var readerA = new MessagePackReader(sequenceA.AsReadOnlySequence);
+            var readerB = new MessagePackReader(sequenceB.AsReadOnlySequence);
+            var readerC = new MessagePackReader(sequenceC.AsReadOnlySequence);
+            var readerD = new MessagePackReader(sequenceD.AsReadOnlySequence);
+            readerA.ReadString().Is(a);
+            readerB.ReadString().Is(b);
+            readerC.ReadString().Is(c);
+            readerD.ReadString().Is(d);
         }
 
         // https://github.com/neuecc/MessagePack-CSharp/issues/22

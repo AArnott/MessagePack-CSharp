@@ -37,13 +37,13 @@ namespace <#= Namespace #>
             };
         }
 
-        public void Serialize(ref BufferWriter writer, <#= info.FullName #> value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, <#= info.FullName #> value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             KeyValuePair<int, int> keyValuePair;
             if (value != null && this.typeToKeyAndJumpMap.TryGetValue(value.GetType().TypeHandle, out keyValuePair))
             {
-                MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
-                MessagePackBinary.WriteInt32(ref writer, keyValuePair.Key);
+                writer.WriteFixedArrayHeaderUnsafe(2);
+                writer.WriteInt32(keyValuePair.Key);
                 switch (keyValuePair.Value)
                 {
 <# for(var i = 0; i < info.SubTypes.Length; i++) { var item = info.SubTypes[i]; #>
@@ -58,23 +58,22 @@ namespace <#= Namespace #>
                 return;
             }
 
-            MessagePackBinary.WriteNil(ref writer);
+            writer.WriteNil();
         }
         
-        public <#= info.FullName #> Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+        public <#= info.FullName #> Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
                 return null;
             }
 
-            if (MessagePackBinary.ReadArrayHeader(ref byteSequence) != 2)
+            if (reader.ReadArrayHeader() != 2)
             {
                 throw new InvalidOperationException("Invalid Union data was detected. Type:<#= info.FullName #>");
             }
 
-            var key = MessagePackBinary.ReadInt32(ref byteSequence);
+            var key = reader.ReadInt32();
 
             if (!this.keyToJumpMap.TryGetValue(key, out key))
             {
@@ -86,11 +85,11 @@ namespace <#= Namespace #>
             {
 <# for(var i = 0; i < info.SubTypes.Length; i++) { var item = info.SubTypes[i]; #>
                 case <#= i #>:
-                    result = (<#= info.FullName #>)formatterResolver.GetFormatterWithVerify<<#= item.Type #>>().Deserialize(ref byteSequence, formatterResolver);
+                    result = (<#= info.FullName #>)formatterResolver.GetFormatterWithVerify<<#= item.Type #>>().Deserialize(ref reader, formatterResolver);
                     break;
 <# } #>
                 default:
-                    MessagePackBinary.ReadNextBlock(ref byteSequence);
+                    reader.ReadNextBlock();
                     break;
             }
             

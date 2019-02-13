@@ -114,7 +114,7 @@ namespace MessagePack.CodeGenerator
             }
             else
             {
-                return $"formatterResolver.GetFormatterWithVerify<{Type}>().Deserialize(ref byteSequence, formatterResolver)";
+                return $"formatterResolver.GetFormatterWithVerify<{Type}>().Deserialize(ref reader, formatterResolver)";
             }
         }
     }

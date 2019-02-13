@@ -5,21 +5,26 @@ using MessagePack.Formatters;
 
 namespace MessagePack.Unity
 {
+    internal static class CompatibilityMethods
+    {
+        internal static void WriteFixedArrayHeaderUnsafe(this ref MessagePackWriter writer, int count) => writer.WriteArrayHeader(count);
+    }
+
     public sealed class Vector2Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::UnityEngine.Vector2>
     {
-        public void Serialize(ref BufferWriter writer, global::UnityEngine.Vector2 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, global::UnityEngine.Vector2 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
-            MessagePackBinary.WriteSingle(ref writer, value.x);
-            MessagePackBinary.WriteSingle(ref writer, value.y);
+            writer.WriteFixedArrayHeaderUnsafe(2);
+            writer.WriteSingle(value.x);
+            writer.WriteSingle(value.y);
         }
-        public global::UnityEngine.Vector2 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.Vector2 Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
                 throw new InvalidOperationException("typecode is null, struct not supported");
             }
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = reader.ReadArrayHeader();
             var x = default(float);
             var y = default(float);
             for (int i = 0; i < length; i++)
@@ -28,13 +33,13 @@ namespace MessagePack.Unity
                 switch (key)
                 {
                     case 0:
-                        x = MessagePackBinary.ReadSingle(ref byteSequence);
+                        x = reader.ReadSingle();
                         break;
                     case 1:
-                        y = MessagePackBinary.ReadSingle(ref byteSequence);
+                        y = reader.ReadSingle();
                         break;
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        reader.Skip();
                         break;
                 }
             }
@@ -46,20 +51,20 @@ namespace MessagePack.Unity
 
     public sealed class Vector3Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::UnityEngine.Vector3>
     {
-        public void Serialize(ref BufferWriter writer, global::UnityEngine.Vector3 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, global::UnityEngine.Vector3 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 3);
-            MessagePackBinary.WriteSingle(ref writer, value.x);
-            MessagePackBinary.WriteSingle(ref writer, value.y);
-            MessagePackBinary.WriteSingle(ref writer, value.z);
+            writer.WriteFixedArrayHeaderUnsafe(3);
+            writer.WriteSingle(value.x);
+            writer.WriteSingle(value.y);
+            writer.WriteSingle(value.z);
         }
-        public global::UnityEngine.Vector3 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.Vector3 Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
                 throw new InvalidOperationException("typecode is null, struct not supported");
             }
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = reader.ReadArrayHeader();
             var x = default(float);
             var y = default(float);
             var z = default(float);
@@ -69,16 +74,16 @@ namespace MessagePack.Unity
                 switch (key)
                 {
                     case 0:
-                        x = MessagePackBinary.ReadSingle(ref byteSequence);
+                        x = reader.ReadSingle();
                         break;
                     case 1:
-                        y = MessagePackBinary.ReadSingle(ref byteSequence);
+                        y = reader.ReadSingle();
                         break;
                     case 2:
-                        z = MessagePackBinary.ReadSingle(ref byteSequence);
+                        z = reader.ReadSingle();
                         break;
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        reader.Skip();
                         break;
                 }
             }
@@ -90,21 +95,21 @@ namespace MessagePack.Unity
 
     public sealed class Vector4Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::UnityEngine.Vector4>
     {
-        public void Serialize(ref BufferWriter writer, global::UnityEngine.Vector4 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, global::UnityEngine.Vector4 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 4);
-            MessagePackBinary.WriteSingle(ref writer, value.x);
-            MessagePackBinary.WriteSingle(ref writer, value.y);
-            MessagePackBinary.WriteSingle(ref writer, value.z);
-            MessagePackBinary.WriteSingle(ref writer, value.w);
+            writer.WriteFixedArrayHeaderUnsafe(4);
+            writer.WriteSingle(value.x);
+            writer.WriteSingle(value.y);
+            writer.WriteSingle(value.z);
+            writer.WriteSingle(value.w);
         }
-        public global::UnityEngine.Vector4 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.Vector4 Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
                 throw new InvalidOperationException("typecode is null, struct not supported");
             }
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = reader.ReadArrayHeader();
             var x = default(float);
             var y = default(float);
             var z = default(float);
@@ -115,19 +120,19 @@ namespace MessagePack.Unity
                 switch (key)
                 {
                     case 0:
-                        x = MessagePackBinary.ReadSingle(ref byteSequence);
+                        x = reader.ReadSingle();
                         break;
                     case 1:
-                        y = MessagePackBinary.ReadSingle(ref byteSequence);
+                        y = reader.ReadSingle();
                         break;
                     case 2:
-                        z = MessagePackBinary.ReadSingle(ref byteSequence);
+                        z = reader.ReadSingle();
                         break;
                     case 3:
-                        w = MessagePackBinary.ReadSingle(ref byteSequence);
+                        w = reader.ReadSingle();
                         break;
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        reader.Skip();
                         break;
                 }
             }
@@ -139,21 +144,21 @@ namespace MessagePack.Unity
 
     public sealed class QuaternionFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::UnityEngine.Quaternion>
     {
-        public void Serialize(ref BufferWriter writer, global::UnityEngine.Quaternion value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, global::UnityEngine.Quaternion value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 4);
-            MessagePackBinary.WriteSingle(ref writer, value.x);
-            MessagePackBinary.WriteSingle(ref writer, value.y);
-            MessagePackBinary.WriteSingle(ref writer, value.z);
-            MessagePackBinary.WriteSingle(ref writer, value.w);
+            writer.WriteFixedArrayHeaderUnsafe(4);
+            writer.WriteSingle(value.x);
+            writer.WriteSingle(value.y);
+            writer.WriteSingle(value.z);
+            writer.WriteSingle(value.w);
         }
-        public global::UnityEngine.Quaternion Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.Quaternion Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
                 throw new InvalidOperationException("typecode is null, struct not supported");
             }
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = reader.ReadArrayHeader();
             var x = default(float);
             var y = default(float);
             var z = default(float);
@@ -164,19 +169,19 @@ namespace MessagePack.Unity
                 switch (key)
                 {
                     case 0:
-                        x = MessagePackBinary.ReadSingle(ref byteSequence);
+                        x = reader.ReadSingle();
                         break;
                     case 1:
-                        y = MessagePackBinary.ReadSingle(ref byteSequence);
+                        y = reader.ReadSingle();
                         break;
                     case 2:
-                        z = MessagePackBinary.ReadSingle(ref byteSequence);
+                        z = reader.ReadSingle();
                         break;
                     case 3:
-                        w = MessagePackBinary.ReadSingle(ref byteSequence);
+                        w = reader.ReadSingle();
                         break;
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        reader.Skip();
                         break;
                 }
             }
@@ -188,21 +193,21 @@ namespace MessagePack.Unity
 
     public sealed class ColorFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::UnityEngine.Color>
     {
-        public void Serialize(ref BufferWriter writer, global::UnityEngine.Color value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, global::UnityEngine.Color value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 4);
-            MessagePackBinary.WriteSingle(ref writer, value.r);
-            MessagePackBinary.WriteSingle(ref writer, value.g);
-            MessagePackBinary.WriteSingle(ref writer, value.b);
-            MessagePackBinary.WriteSingle(ref writer, value.a);
+            writer.WriteFixedArrayHeaderUnsafe(4);
+            writer.WriteSingle(value.r);
+            writer.WriteSingle(value.g);
+            writer.WriteSingle(value.b);
+            writer.WriteSingle(value.a);
         }
-        public global::UnityEngine.Color Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.Color Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
                 throw new InvalidOperationException("typecode is null, struct not supported");
             }
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = reader.ReadArrayHeader();
             var r = default(float);
             var g = default(float);
             var b = default(float);
@@ -213,19 +218,19 @@ namespace MessagePack.Unity
                 switch (key)
                 {
                     case 0:
-                        r = MessagePackBinary.ReadSingle(ref byteSequence);
+                        r = reader.ReadSingle();
                         break;
                     case 1:
-                        g = MessagePackBinary.ReadSingle(ref byteSequence);
+                        g = reader.ReadSingle();
                         break;
                     case 2:
-                        b = MessagePackBinary.ReadSingle(ref byteSequence);
+                        b = reader.ReadSingle();
                         break;
                     case 3:
-                        a = MessagePackBinary.ReadSingle(ref byteSequence);
+                        a = reader.ReadSingle();
                         break;
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        reader.Skip();
                         break;
                 }
             }
@@ -237,19 +242,19 @@ namespace MessagePack.Unity
 
     public sealed class BoundsFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::UnityEngine.Bounds>
     {
-        public void Serialize(ref BufferWriter writer, global::UnityEngine.Bounds value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, global::UnityEngine.Bounds value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
+            writer.WriteFixedArrayHeaderUnsafe(2);
             formatterResolver.GetFormatterWithVerify<global::UnityEngine.Vector3>().Serialize(ref writer, value.center, formatterResolver);
             formatterResolver.GetFormatterWithVerify<global::UnityEngine.Vector3>().Serialize(ref writer, value.size, formatterResolver);
         }
-        public global::UnityEngine.Bounds Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.Bounds Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
                 throw new InvalidOperationException("typecode is null, struct not supported");
             }
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = reader.ReadArrayHeader();
             var center = default(global::UnityEngine.Vector3);
             var size = default(global::UnityEngine.Vector3);
             for (int i = 0; i < length; i++)
@@ -258,13 +263,13 @@ namespace MessagePack.Unity
                 switch (key)
                 {
                     case 0:
-                        center = formatterResolver.GetFormatterWithVerify<global::UnityEngine.Vector3>().Deserialize(ref byteSequence, formatterResolver);
+                        center = formatterResolver.GetFormatterWithVerify<global::UnityEngine.Vector3>().Deserialize(ref reader, formatterResolver);
                         break;
                     case 1:
-                        size = formatterResolver.GetFormatterWithVerify<global::UnityEngine.Vector3>().Deserialize(ref byteSequence, formatterResolver);
+                        size = formatterResolver.GetFormatterWithVerify<global::UnityEngine.Vector3>().Deserialize(ref reader, formatterResolver);
                         break;
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        reader.Skip();
                         break;
                 }
             }
@@ -276,21 +281,21 @@ namespace MessagePack.Unity
 
     public sealed class RectFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::UnityEngine.Rect>
     {
-        public void Serialize(ref BufferWriter writer, global::UnityEngine.Rect value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, global::UnityEngine.Rect value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 4);
-            MessagePackBinary.WriteSingle(ref writer, value.x);
-            MessagePackBinary.WriteSingle(ref writer, value.y);
-            MessagePackBinary.WriteSingle(ref writer, value.width);
-            MessagePackBinary.WriteSingle(ref writer, value.height);
+            writer.WriteFixedArrayHeaderUnsafe(4);
+            writer.WriteSingle(value.x);
+            writer.WriteSingle(value.y);
+            writer.WriteSingle(value.width);
+            writer.WriteSingle(value.height);
         }
-        public global::UnityEngine.Rect Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.Rect Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
                 throw new InvalidOperationException("typecode is null, struct not supported");
             }
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = reader.ReadArrayHeader();
             var x = default(float);
             var y = default(float);
             var width = default(float);
@@ -301,19 +306,19 @@ namespace MessagePack.Unity
                 switch (key)
                 {
                     case 0:
-                        x = MessagePackBinary.ReadSingle(ref byteSequence);
+                        x = reader.ReadSingle();
                         break;
                     case 1:
-                        y = MessagePackBinary.ReadSingle(ref byteSequence);
+                        y = reader.ReadSingle();
                         break;
                     case 2:
-                        width = MessagePackBinary.ReadSingle(ref byteSequence);
+                        width = reader.ReadSingle();
                         break;
                     case 3:
-                        height = MessagePackBinary.ReadSingle(ref byteSequence);
+                        height = reader.ReadSingle();
                         break;
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        reader.Skip();
                         break;
                 }
             }
@@ -325,43 +330,43 @@ namespace MessagePack.Unity
     // additional
     public sealed class WrapModeFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::UnityEngine.WrapMode>
     {
-        public void Serialize(ref BufferWriter writer, global::UnityEngine.WrapMode value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, global::UnityEngine.WrapMode value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            MessagePackBinary.WriteInt32(ref writer, (Int32)value);
+            writer.WriteInt32((Int32)value);
         }
-        public global::UnityEngine.WrapMode Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.WrapMode Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            return (global::UnityEngine.WrapMode)MessagePackBinary.ReadInt32(ref byteSequence);
+            return (global::UnityEngine.WrapMode)reader.ReadInt32();
         }
     }
     public sealed class GradientModeFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::UnityEngine.GradientMode>
     {
-        public void Serialize(ref BufferWriter writer, global::UnityEngine.GradientMode value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, global::UnityEngine.GradientMode value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            MessagePackBinary.WriteInt32(ref writer, (Int32)value);
+            writer.WriteInt32((Int32)value);
         }
-        public global::UnityEngine.GradientMode Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.GradientMode Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            return (global::UnityEngine.GradientMode)MessagePackBinary.ReadInt32(ref byteSequence);
+            return (global::UnityEngine.GradientMode)reader.ReadInt32();
         }
     }
     public sealed class KeyframeFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::UnityEngine.Keyframe>
     {
-        public void Serialize(ref BufferWriter writer, global::UnityEngine.Keyframe value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, global::UnityEngine.Keyframe value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 4);
-            MessagePackBinary.WriteSingle(ref writer, value.time);
-            MessagePackBinary.WriteSingle(ref writer, value.value);
-            MessagePackBinary.WriteSingle(ref writer, value.inTangent);
-            MessagePackBinary.WriteSingle(ref writer, value.outTangent);
+            writer.WriteFixedArrayHeaderUnsafe(4);
+            writer.WriteSingle(value.time);
+            writer.WriteSingle(value.value);
+            writer.WriteSingle(value.inTangent);
+            writer.WriteSingle(value.outTangent);
         }
-        public global::UnityEngine.Keyframe Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.Keyframe Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
                 throw new InvalidOperationException("typecode is null, struct not supported");
             }
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = reader.ReadArrayHeader();
             var __time__ = default(float);
             var __value__ = default(float);
             var __inTangent__ = default(float);
@@ -372,19 +377,19 @@ namespace MessagePack.Unity
                 switch (key)
                 {
                     case 0:
-                        __time__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __time__ = reader.ReadSingle();
                         break;
                     case 1:
-                        __value__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __value__ = reader.ReadSingle();
                         break;
                     case 2:
-                        __inTangent__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __inTangent__ = reader.ReadSingle();
                         break;
                     case 3:
-                        __outTangent__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __outTangent__ = reader.ReadSingle();
                         break;
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        reader.Skip();
                         break;
                 }
             }
@@ -400,26 +405,25 @@ namespace MessagePack.Unity
 
     public sealed class AnimationCurveFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::UnityEngine.AnimationCurve>
     {
-        public void Serialize(ref BufferWriter writer, global::UnityEngine.AnimationCurve value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, global::UnityEngine.AnimationCurve value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
                 return;
             }
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 3);
+            writer.WriteFixedArrayHeaderUnsafe(3);
             formatterResolver.GetFormatterWithVerify<global::UnityEngine.Keyframe[]>().Serialize(ref writer, value.keys, formatterResolver);
             formatterResolver.GetFormatterWithVerify<global::UnityEngine.WrapMode>().Serialize(ref writer, value.postWrapMode, formatterResolver);
             formatterResolver.GetFormatterWithVerify<global::UnityEngine.WrapMode>().Serialize(ref writer, value.preWrapMode, formatterResolver);
         }
-        public global::UnityEngine.AnimationCurve Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.AnimationCurve Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
-                byteSequence = byteSequence.Slice(1);
                 return null;
             }
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = reader.ReadArrayHeader();
             var __keys__ = default(global::UnityEngine.Keyframe[]);
             var __postWrapMode__ = default(global::UnityEngine.WrapMode);
             var __preWrapMode__ = default(global::UnityEngine.WrapMode);
@@ -429,16 +433,16 @@ namespace MessagePack.Unity
                 switch (key)
                 {
                     case 0:
-                        __keys__ = formatterResolver.GetFormatterWithVerify<global::UnityEngine.Keyframe[]>().Deserialize(ref byteSequence, formatterResolver);
+                        __keys__ = formatterResolver.GetFormatterWithVerify<global::UnityEngine.Keyframe[]>().Deserialize(ref reader, formatterResolver);
                         break;
                     case 1:
-                        __postWrapMode__ = formatterResolver.GetFormatterWithVerify<global::UnityEngine.WrapMode>().Deserialize(ref byteSequence, formatterResolver);
+                        __postWrapMode__ = formatterResolver.GetFormatterWithVerify<global::UnityEngine.WrapMode>().Deserialize(ref reader, formatterResolver);
                         break;
                     case 2:
-                        __preWrapMode__ = formatterResolver.GetFormatterWithVerify<global::UnityEngine.WrapMode>().Deserialize(ref byteSequence, formatterResolver);
+                        __preWrapMode__ = formatterResolver.GetFormatterWithVerify<global::UnityEngine.WrapMode>().Deserialize(ref reader, formatterResolver);
                         break;
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        reader.Skip();
                         break;
                 }
             }
@@ -452,33 +456,33 @@ namespace MessagePack.Unity
     }
     public sealed class Matrix4x4Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::UnityEngine.Matrix4x4>
     {
-        public void Serialize(ref BufferWriter writer, global::UnityEngine.Matrix4x4 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, global::UnityEngine.Matrix4x4 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            global::MessagePack.MessagePackBinary.WriteArrayHeader(ref writer, 16);
-            MessagePackBinary.WriteSingle(ref writer, value.m00);
-            MessagePackBinary.WriteSingle(ref writer, value.m10);
-            MessagePackBinary.WriteSingle(ref writer, value.m20);
-            MessagePackBinary.WriteSingle(ref writer, value.m30);
-            MessagePackBinary.WriteSingle(ref writer, value.m01);
-            MessagePackBinary.WriteSingle(ref writer, value.m11);
-            MessagePackBinary.WriteSingle(ref writer, value.m21);
-            MessagePackBinary.WriteSingle(ref writer, value.m31);
-            MessagePackBinary.WriteSingle(ref writer, value.m02);
-            MessagePackBinary.WriteSingle(ref writer, value.m12);
-            MessagePackBinary.WriteSingle(ref writer, value.m22);
-            MessagePackBinary.WriteSingle(ref writer, value.m32);
-            MessagePackBinary.WriteSingle(ref writer, value.m03);
-            MessagePackBinary.WriteSingle(ref writer, value.m13);
-            MessagePackBinary.WriteSingle(ref writer, value.m23);
-            MessagePackBinary.WriteSingle(ref writer, value.m33);
+            writer.WriteArrayHeader(16);
+            writer.WriteSingle(value.m00);
+            writer.WriteSingle(value.m10);
+            writer.WriteSingle(value.m20);
+            writer.WriteSingle(value.m30);
+            writer.WriteSingle(value.m01);
+            writer.WriteSingle(value.m11);
+            writer.WriteSingle(value.m21);
+            writer.WriteSingle(value.m31);
+            writer.WriteSingle(value.m02);
+            writer.WriteSingle(value.m12);
+            writer.WriteSingle(value.m22);
+            writer.WriteSingle(value.m32);
+            writer.WriteSingle(value.m03);
+            writer.WriteSingle(value.m13);
+            writer.WriteSingle(value.m23);
+            writer.WriteSingle(value.m33);
         }
-        public global::UnityEngine.Matrix4x4 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.Matrix4x4 Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
                 throw new InvalidOperationException("typecode is null, struct not supported");
             }
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = reader.ReadArrayHeader();
             var __m00__ = default(float);
             var __m10__ = default(float);
             var __m20__ = default(float);
@@ -501,55 +505,55 @@ namespace MessagePack.Unity
                 switch (key)
                 {
                     case 0:
-                        __m00__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __m00__ = reader.ReadSingle();
                         break;
                     case 1:
-                        __m10__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __m10__ = reader.ReadSingle();
                         break;
                     case 2:
-                        __m20__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __m20__ = reader.ReadSingle();
                         break;
                     case 3:
-                        __m30__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __m30__ = reader.ReadSingle();
                         break;
                     case 4:
-                        __m01__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __m01__ = reader.ReadSingle();
                         break;
                     case 5:
-                        __m11__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __m11__ = reader.ReadSingle();
                         break;
                     case 6:
-                        __m21__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __m21__ = reader.ReadSingle();
                         break;
                     case 7:
-                        __m31__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __m31__ = reader.ReadSingle();
                         break;
                     case 8:
-                        __m02__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __m02__ = reader.ReadSingle();
                         break;
                     case 9:
-                        __m12__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __m12__ = reader.ReadSingle();
                         break;
                     case 10:
-                        __m22__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __m22__ = reader.ReadSingle();
                         break;
                     case 11:
-                        __m32__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __m32__ = reader.ReadSingle();
                         break;
                     case 12:
-                        __m03__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __m03__ = reader.ReadSingle();
                         break;
                     case 13:
-                        __m13__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __m13__ = reader.ReadSingle();
                         break;
                     case 14:
-                        __m23__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __m23__ = reader.ReadSingle();
                         break;
                     case 15:
-                        __m33__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __m33__ = reader.ReadSingle();
                         break;
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        reader.Skip();
                         break;
                 }
             }
@@ -577,19 +581,19 @@ namespace MessagePack.Unity
 
     public sealed class GradientColorKeyFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::UnityEngine.GradientColorKey>
     {
-        public void Serialize(ref BufferWriter writer, global::UnityEngine.GradientColorKey value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, global::UnityEngine.GradientColorKey value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
+            writer.WriteFixedArrayHeaderUnsafe(2);
             formatterResolver.GetFormatterWithVerify<global::UnityEngine.Color>().Serialize(ref writer, value.color, formatterResolver);
-            MessagePackBinary.WriteSingle(ref writer, value.time);
+            writer.WriteSingle(value.time);
         }
-        public global::UnityEngine.GradientColorKey Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.GradientColorKey Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
                 throw new InvalidOperationException("typecode is null, struct not supported");
             }
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = reader.ReadArrayHeader();
             var __color__ = default(global::UnityEngine.Color);
             var __time__ = default(float);
             for (int i = 0; i < length; i++)
@@ -598,13 +602,13 @@ namespace MessagePack.Unity
                 switch (key)
                 {
                     case 0:
-                        __color__ = formatterResolver.GetFormatterWithVerify<global::UnityEngine.Color>().Deserialize(ref byteSequence, formatterResolver);
+                        __color__ = formatterResolver.GetFormatterWithVerify<global::UnityEngine.Color>().Deserialize(ref reader, formatterResolver);
                         break;
                     case 1:
-                        __time__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __time__ = reader.ReadSingle();
                         break;
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        reader.Skip();
                         break;
                 }
             }
@@ -618,19 +622,19 @@ namespace MessagePack.Unity
 
     public sealed class GradientAlphaKeyFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::UnityEngine.GradientAlphaKey>
     {
-        public void Serialize(ref BufferWriter writer, global::UnityEngine.GradientAlphaKey value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, global::UnityEngine.GradientAlphaKey value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
-            MessagePackBinary.WriteSingle(ref writer, value.alpha);
-            MessagePackBinary.WriteSingle(ref writer, value.time);
+            writer.WriteFixedArrayHeaderUnsafe(2);
+            writer.WriteSingle(value.alpha);
+            writer.WriteSingle(value.time);
         }
-        public global::UnityEngine.GradientAlphaKey Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.GradientAlphaKey Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
                 throw new InvalidOperationException("typecode is null, struct not supported");
             }
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = reader.ReadArrayHeader();
             var __alpha__ = default(float);
             var __time__ = default(float);
             for (int i = 0; i < length; i++)
@@ -639,13 +643,13 @@ namespace MessagePack.Unity
                 switch (key)
                 {
                     case 0:
-                        __alpha__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __alpha__ = reader.ReadSingle();
                         break;
                     case 1:
-                        __time__ = MessagePackBinary.ReadSingle(ref byteSequence);
+                        __time__ = reader.ReadSingle();
                         break;
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        reader.Skip();
                         break;
                 }
             }
@@ -659,26 +663,25 @@ namespace MessagePack.Unity
 
     public sealed class GradientFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::UnityEngine.Gradient>
     {
-        public void Serialize(ref BufferWriter writer, global::UnityEngine.Gradient value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, global::UnityEngine.Gradient value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
                 return;
             }
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 3);
+            writer.WriteFixedArrayHeaderUnsafe(3);
             formatterResolver.GetFormatterWithVerify<global::UnityEngine.GradientColorKey[]>().Serialize(ref writer, value.colorKeys, formatterResolver);
             formatterResolver.GetFormatterWithVerify<global::UnityEngine.GradientAlphaKey[]>().Serialize(ref writer, value.alphaKeys, formatterResolver);
             formatterResolver.GetFormatterWithVerify<global::UnityEngine.GradientMode>().Serialize(ref writer, value.mode, formatterResolver);
         }
-        public global::UnityEngine.Gradient Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.Gradient Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
-                byteSequence = byteSequence.Slice(1);
                 return null;
             }
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = reader.ReadArrayHeader();
             var __colorKeys__ = default(global::UnityEngine.GradientColorKey[]);
             var __alphaKeys__ = default(global::UnityEngine.GradientAlphaKey[]);
             var __mode__ = default(global::UnityEngine.GradientMode);
@@ -688,16 +691,16 @@ namespace MessagePack.Unity
                 switch (key)
                 {
                     case 0:
-                        __colorKeys__ = formatterResolver.GetFormatterWithVerify<global::UnityEngine.GradientColorKey[]>().Deserialize(ref byteSequence, formatterResolver);
+                        __colorKeys__ = formatterResolver.GetFormatterWithVerify<global::UnityEngine.GradientColorKey[]>().Deserialize(ref reader, formatterResolver);
                         break;
                     case 1:
-                        __alphaKeys__ = formatterResolver.GetFormatterWithVerify<global::UnityEngine.GradientAlphaKey[]>().Deserialize(ref byteSequence, formatterResolver);
+                        __alphaKeys__ = formatterResolver.GetFormatterWithVerify<global::UnityEngine.GradientAlphaKey[]>().Deserialize(ref reader, formatterResolver);
                         break;
                     case 2:
-                        __mode__ = formatterResolver.GetFormatterWithVerify<global::UnityEngine.GradientMode>().Deserialize(ref byteSequence, formatterResolver);
+                        __mode__ = formatterResolver.GetFormatterWithVerify<global::UnityEngine.GradientMode>().Deserialize(ref reader, formatterResolver);
                         break;
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        reader.Skip();
                         break;
                 }
             }
@@ -712,21 +715,21 @@ namespace MessagePack.Unity
 
     public sealed class Color32Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::UnityEngine.Color32>
     {
-        public void Serialize(ref BufferWriter writer, global::UnityEngine.Color32 value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, global::UnityEngine.Color32 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 4);
-            MessagePackBinary.WriteByte(ref writer, value.r);
-            MessagePackBinary.WriteByte(ref writer, value.g);
-            MessagePackBinary.WriteByte(ref writer, value.b);
-            MessagePackBinary.WriteByte(ref writer, value.a);
+            writer.WriteFixedArrayHeaderUnsafe(4);
+            writer.WriteByte(value.r);
+            writer.WriteByte(value.g);
+            writer.WriteByte(value.b);
+            writer.WriteByte(value.a);
         }
-        public global::UnityEngine.Color32 Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.Color32 Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
                 throw new InvalidOperationException("typecode is null, struct not supported");
             }
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = reader.ReadArrayHeader();
             var __r__ = default(byte);
             var __g__ = default(byte);
             var __b__ = default(byte);
@@ -737,19 +740,19 @@ namespace MessagePack.Unity
                 switch (key)
                 {
                     case 0:
-                        __r__ = MessagePackBinary.ReadByte(ref byteSequence);
+                        __r__ = reader.ReadByte();
                         break;
                     case 1:
-                        __g__ = MessagePackBinary.ReadByte(ref byteSequence);
+                        __g__ = reader.ReadByte();
                         break;
                     case 2:
-                        __b__ = MessagePackBinary.ReadByte(ref byteSequence);
+                        __b__ = reader.ReadByte();
                         break;
                     case 3:
-                        __a__ = MessagePackBinary.ReadByte(ref byteSequence);
+                        __a__ = reader.ReadByte();
                         break;
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        reader.Skip();
                         break;
                 }
             }
@@ -765,27 +768,26 @@ namespace MessagePack.Unity
 
     public sealed class RectOffsetFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::UnityEngine.RectOffset>
     {
-        public void Serialize(ref BufferWriter writer, global::UnityEngine.RectOffset value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, global::UnityEngine.RectOffset value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                global::MessagePack.MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
                 return;
             }
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 4);
-            MessagePackBinary.WriteInt32(ref writer, value.left);
-            MessagePackBinary.WriteInt32(ref writer, value.right);
-            MessagePackBinary.WriteInt32(ref writer, value.top);
-            MessagePackBinary.WriteInt32(ref writer, value.bottom);
+            writer.WriteFixedArrayHeaderUnsafe(4);
+            writer.WriteInt32(value.left);
+            writer.WriteInt32(value.right);
+            writer.WriteInt32(value.top);
+            writer.WriteInt32(value.bottom);
         }
-        public global::UnityEngine.RectOffset Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.RectOffset Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
-                byteSequence = byteSequence.Slice(1);
                 return null;
             }
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = reader.ReadArrayHeader();
             var __left__ = default(int);
             var __right__ = default(int);
             var __top__ = default(int);
@@ -796,19 +798,19 @@ namespace MessagePack.Unity
                 switch (key)
                 {
                     case 0:
-                        __left__ = MessagePackBinary.ReadInt32(ref byteSequence);
+                        __left__ = reader.ReadInt32();
                         break;
                     case 1:
-                        __right__ = MessagePackBinary.ReadInt32(ref byteSequence);
+                        __right__ = reader.ReadInt32();
                         break;
                     case 2:
-                        __top__ = MessagePackBinary.ReadInt32(ref byteSequence);
+                        __top__ = reader.ReadInt32();
                         break;
                     case 3:
-                        __bottom__ = MessagePackBinary.ReadInt32(ref byteSequence);
+                        __bottom__ = reader.ReadInt32();
                         break;
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        reader.Skip();
                         break;
                 }
             }
@@ -824,18 +826,18 @@ namespace MessagePack.Unity
 
     public sealed class LayerMaskFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::UnityEngine.LayerMask>
     {
-        public void Serialize(ref BufferWriter writer, global::UnityEngine.LayerMask value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, global::UnityEngine.LayerMask value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 1);
-            MessagePackBinary.WriteInt32(ref writer, value.value);
+            writer.WriteFixedArrayHeaderUnsafe(1);
+            writer.WriteInt32(value.value);
         }
-        public global::UnityEngine.LayerMask Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.LayerMask Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
                 throw new InvalidOperationException("typecode is null, struct not supported");
             }
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = reader.ReadArrayHeader();
             var __value__ = default(int);
             for (int i = 0; i < length; i++)
             {
@@ -843,10 +845,10 @@ namespace MessagePack.Unity
                 switch (key)
                 {
                     case 0:
-                        __value__ = MessagePackBinary.ReadInt32(ref byteSequence);
+                        __value__ = reader.ReadInt32();
                         break;
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        reader.Skip();
                         break;
                 }
             }
@@ -859,19 +861,19 @@ namespace MessagePack.Unity
 #if UNITY_2017_2_OR_NEWER
     public sealed class Vector2IntFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::UnityEngine.Vector2Int>
     {
-        public void Serialize(ref BufferWriter writerglobal::UnityEngine.Vector2Int value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writerglobal::UnityEngine.Vector2Int value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
-            MessagePackBinary.WriteInt32(ref writer, value.x);
-            MessagePackBinary.WriteInt32(ref writer, value.y);
+            writer.WriteFixedArrayHeaderUnsafe(2);
+            writer.WriteInt32(value.x);
+            writer.WriteInt32(value.y);
         }
-        public global::UnityEngine.Vector2Int Deserialize(ref ReadOnlySequence<byte> byteSequenceglobal::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.Vector2Int Deserialize(ref MessagePackReader readerglobal::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
                 throw new InvalidOperationException("typecode is null, struct not supported");
             }
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = reader.ReadArrayHeader();
             var __x__ = default(int);
             var __y__ = default(int);
             for (int i = 0; i < length; i++)
@@ -880,13 +882,13 @@ namespace MessagePack.Unity
                 switch (key)
                 {
                     case 0:
-                        __x__ = MessagePackBinary.ReadInt32(ref byteSequence);
+                        __x__ = reader.ReadInt32();
                         break;
                     case 1:
-                        __y__ = MessagePackBinary.ReadInt32(ref byteSequence);
+                        __y__ = reader.ReadInt32();
                         break;
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        reader.Skip();
                         break;
                 }
             }
@@ -902,18 +904,18 @@ namespace MessagePack.Unity
     {
         public void Serialize(ref BufferWriterwriterglobal::UnityEngine.Vector3Int value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 3);
-            MessagePackBinary.WriteInt32(ref writer, value.x);
-            MessagePackBinary.WriteInt32(ref writer, value.y);
-            MessagePackBinary.WriteInt32(ref writer, value.z);
+            writer.WriteFixedArrayHeaderUnsafe(3);
+            writer.WriteInt32(value.x);
+            writer.WriteInt32(value.y);
+            writer.WriteInt32(value.z);
         }
-        public global::UnityEngine.Vector3Int Deserialize(ref ReadOnlySequence<byte> byteSequenceglobal::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.Vector3Int Deserialize(ref MessagePackReader readerglobal::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
                 throw new InvalidOperationException("typecode is null, struct not supported");
             }
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = reader.ReadArrayHeader();
             var __x__ = default(int);
             var __y__ = default(int);
             var __z__ = default(int);
@@ -923,16 +925,16 @@ namespace MessagePack.Unity
                 switch (key)
                 {
                     case 0:
-                        __x__ = MessagePackBinary.ReadInt32(ref byteSequence);
+                        __x__ = reader.ReadInt32();
                         break;
                     case 1:
-                        __y__ = MessagePackBinary.ReadInt32(ref byteSequence);
+                        __y__ = reader.ReadInt32();
                         break;
                     case 2:
-                        __z__ = MessagePackBinary.ReadInt32(ref byteSequence);
+                        __z__ = reader.ReadInt32();
                         break;
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        reader.Skip();
                         break;
                 }
             }
@@ -949,17 +951,17 @@ namespace MessagePack.Unity
     {
         public void Serialize(ref BufferWriterwriterglobal::UnityEngine.RangeInt value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
-            MessagePackBinary.WriteInt32(ref writer, value.start);
-            MessagePackBinary.WriteInt32(ref writer, value.length);
+            writer.WriteFixedArrayHeaderUnsafe(2);
+            writer.WriteInt32(value.start);
+            writer.WriteInt32(value.length);
         }
-        public global::UnityEngine.RangeInt Deserialize(ref ReadOnlySequence<byte> byteSequenceglobal::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.RangeInt Deserialize(ref MessagePackReader readerglobal::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
                 throw new InvalidOperationException("typecode is null, struct not supported");
             }
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = reader.ReadArrayHeader();
             var __start__ = default(int);
             var __length__ = default(int);
             for (int i = 0; i < length; i++)
@@ -968,13 +970,13 @@ namespace MessagePack.Unity
                 switch (key)
                 {
                     case 0:
-                        __start__ = MessagePackBinary.ReadInt32(ref byteSequence);
+                        __start__ = reader.ReadInt32();
                         break;
                     case 1:
-                        __length__ = MessagePackBinary.ReadInt32(ref byteSequence);
+                        __length__ = reader.ReadInt32();
                         break;
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        reader.Skip();
                         break;
                 }
             }
@@ -990,19 +992,19 @@ namespace MessagePack.Unity
     {
         public void Serialize(ref BufferWriterwriterglobal::UnityEngine.RectInt value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 4);
-            MessagePackBinary.WriteInt32(ref writer, value.x);
-            MessagePackBinary.WriteInt32(ref writer, value.y);
-            MessagePackBinary.WriteInt32(ref writer, value.width);
-            MessagePackBinary.WriteInt32(ref writer, value.height);
+            writer.WriteFixedArrayHeaderUnsafe(4);
+            writer.WriteInt32(value.x);
+            writer.WriteInt32(value.y);
+            writer.WriteInt32(value.width);
+            writer.WriteInt32(value.height);
         }
-        public global::UnityEngine.RectInt Deserialize(ref ReadOnlySequence<byte> byteSequenceglobal::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.RectInt Deserialize(ref MessagePackReader readerglobal::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
                 throw new InvalidOperationException("typecode is null, struct not supported");
             }
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = reader.ReadArrayHeader();
             var __x__ = default(int);
             var __y__ = default(int);
             var __width__ = default(int);
@@ -1013,19 +1015,19 @@ namespace MessagePack.Unity
                 switch (key)
                 {
                     case 0:
-                        __x__ = MessagePackBinary.ReadInt32(ref byteSequence);
+                        __x__ = reader.ReadInt32();
                         break;
                     case 1:
-                        __y__ = MessagePackBinary.ReadInt32(ref byteSequence);
+                        __y__ = reader.ReadInt32();
                         break;
                     case 2:
-                        __width__ = MessagePackBinary.ReadInt32(ref byteSequence);
+                        __width__ = reader.ReadInt32();
                         break;
                     case 3:
-                        __height__ = MessagePackBinary.ReadInt32(ref byteSequence);
+                        __height__ = reader.ReadInt32();
                         break;
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        reader.Skip();
                         break;
                 }
             }
@@ -1043,17 +1045,17 @@ namespace MessagePack.Unity
     {
         public void Serialize(ref BufferWriterwriterglobal::UnityEngine.BoundsInt value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
+            writer.WriteFixedArrayHeaderUnsafe(2);
             formatterResolver.GetFormatterWithVerify<global::UnityEngine.Vector3Int>().Serialize(ref writer, value.position, formatterResolver);
             formatterResolver.GetFormatterWithVerify<global::UnityEngine.Vector3Int>().Serialize(ref writer, value.size, formatterResolver);
         }
-        public global::UnityEngine.BoundsInt Deserialize(ref ReadOnlySequence<byte> byteSequenceglobal::MessagePack.IFormatterResolver formatterResolver)
+        public global::UnityEngine.BoundsInt Deserialize(ref MessagePackReader readerglobal::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (global::MessagePack.MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
                 throw new InvalidOperationException("typecode is null, struct not supported");
             }
-            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(ref byteSequence);
+            var length = reader.ReadArrayHeader();
             var __position__ = default(global::UnityEngine.Vector3Int);
             var __size__ = default(global::UnityEngine.Vector3Int);
             for (int i = 0; i < length; i++)
@@ -1062,13 +1064,13 @@ namespace MessagePack.Unity
                 switch (key)
                 {
                     case 0:
-                        __position__ = formatterResolver.GetFormatterWithVerify<global::UnityEngine.Vector3Int>().Deserialize(ref byteSequence, formatterResolver);
+                        __position__ = formatterResolver.GetFormatterWithVerify<global::UnityEngine.Vector3Int>().Deserialize(ref reader, formatterResolver);
                         break;
                     case 1:
-                        __size__ = formatterResolver.GetFormatterWithVerify<global::UnityEngine.Vector3Int>().Deserialize(ref byteSequence, formatterResolver);
+                        __size__ = formatterResolver.GetFormatterWithVerify<global::UnityEngine.Vector3Int>().Deserialize(ref reader, formatterResolver);
                         break;
                     default:
-                        global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                        reader.Skip();
                         break;
                 }
             }

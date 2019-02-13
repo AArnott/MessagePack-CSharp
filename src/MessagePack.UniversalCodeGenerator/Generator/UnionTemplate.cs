@@ -146,8 +146,8 @@ namespace MessagePack.CodeGenerator.Generator
             
             #line default
             #line hidden
-            this.Write("            };\r\n        }\r\n\r\n        public void Serialize(IBufferWriter<byte> wr" +
-                    "iter, ");
+            this.Write("            };\r\n        }\r\n\r\n        public void Serialize(ref BufferWriter write" +
+                    "r, ");
             
             #line 40 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\UnionTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(info.FullName));
@@ -159,8 +159,8 @@ namespace MessagePack.CodeGenerator.Generator
             KeyValuePair<int, int> keyValuePair;
             if (value != null && this.typeToKeyAndJumpMap.TryGetValue(value.GetType().TypeHandle, out keyValuePair))
             {
-                MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
-                MessagePackBinary.WriteInt32(ref writer, keyValuePair.Key);
+                writer.WriteFixedArrayHeaderUnsafe(2);
+                writer.WriteInt32(keyValuePair.Key);
                 switch (keyValuePair.Value)
                 {
 ");
@@ -200,22 +200,21 @@ namespace MessagePack.CodeGenerator.Generator
             #line hidden
             this.Write("                    default:\r\n                        break;\r\n                }\r\n" +
                     "\r\n                return;\r\n            }\r\n\r\n            MessagePackBinary.WriteN" +
-                    "il(writer);\r\n        }\r\n        \r\n        public ");
+                    "il(ref writer);\r\n        }\r\n        \r\n        public ");
             
             #line 64 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\UnionTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(info.FullName));
             
             #line default
             #line hidden
-            this.Write(@" Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+            this.Write(@" Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
                 return null;
             }
 
-            if (MessagePackBinary.ReadArrayHeader(ref byteSequence) != 2)
+            if (reader.ReadArrayHeader() != 2)
             {
                 throw new InvalidOperationException(""Invalid Union data was detected. Type:");
             
@@ -261,7 +260,7 @@ namespace MessagePack.CodeGenerator.Generator
             
             #line default
             #line hidden
-            this.Write(">().Deserialize(ref byteSequence, formatterResolver);\r\n                    break;" +
+            this.Write(">().Deserialize(ref reader, formatterResolver);\r\n                    break;" +
                     "\r\n");
             
             #line 91 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\UnionTemplate.tt"

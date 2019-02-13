@@ -130,7 +130,7 @@ namespace MessagePack.CodeGenerator.Generator
             
             #line default
             #line hidden
-            this.Write("\r\n        public void Serialize(ref BufferWriter writer, ");
+            this.Write("\r\n        public void Serialize(ref MessagePackWriter writer, ");
             
             #line 45 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objInfo.FullName));
@@ -145,7 +145,8 @@ namespace MessagePack.CodeGenerator.Generator
             #line default
             #line hidden
             this.Write("            if (value == null)\r\n            {\r\n                global::MessagePac" +
-                    "k.MessagePackBinary.WriteNil(ref writer);\r\n                return;\r\n            }\r\n");
+                    "k.writer.WriteNil();\r\n                return;\r\n            " +
+                    "}\r\n");
             
             #line 53 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  } 
@@ -180,8 +181,8 @@ if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnBe
             
             #line default
             #line hidden
-            this.Write("            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(wri" +
-                    "ter, ");
+            this.Write("            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref" +
+                    " writer, ");
             
             #line 60 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objInfo.MaxKey + 1));
@@ -195,7 +196,7 @@ if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnBe
             
             #line default
             #line hidden
-            this.Write("            global::MessagePack.MessagePackBinary.WriteArrayHeader(ref writer, ");
+            this.Write("            global::MessagePack.writer.WriteArrayHeader(");
             
             #line 62 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objInfo.MaxKey + 1));
@@ -209,8 +210,8 @@ if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnBe
             
             #line default
             #line hidden
-            this.Write("            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(write" +
-                    "r, ");
+            this.Write("            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(ref w" +
+                    "riter, ");
             
             #line 64 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objInfo.WriteCount));
@@ -224,7 +225,7 @@ if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnBe
             
             #line default
             #line hidden
-            this.Write("            global::MessagePack.MessagePackBinary.WriteMapHeader(ref writer, ");
+            this.Write("            global::MessagePack.writer.WriteMapHeader(");
             
             #line 66 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objInfo.WriteCount));
@@ -256,7 +257,7 @@ if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnBe
             
             #line default
             #line hidden
-            this.Write("            global::MessagePack.MessagePackBinary.WriteNil(ref writer);\r\n");
+            this.Write("            global::MessagePack.writer.WriteNil();\r\n");
             
             #line 72 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  } else { 
@@ -283,8 +284,8 @@ if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnBe
             
             #line default
             #line hidden
-            this.Write("            global::MessagePack.MessagePackBinary.WriteRaw(ref writer, this.____strin" +
-                    "gByteKeys[");
+            this.Write("            global::MessagePack.writer.WriteRaw(this.____s" +
+                    "tringByteKeys[");
             
             #line 76 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index++));
@@ -312,7 +313,7 @@ if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnBe
             
             #line default
             #line hidden
-            this.Write(" Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormat" +
+            this.Write(" Deserialize(ref MessagePackReader reader, global::MessagePack.IFormat" +
                     "terResolver formatterResolver)\r\n        {\r\n            if (global::MessagePack.M" +
                     "essagePackBinary.IsNil(byteSequence))\r\n            {\r\n");
             
@@ -395,11 +396,11 @@ if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnBe
             
             #line default
             #line hidden
-            this.Write(@"                var stringKey = global::MessagePack.MessagePackBinary.ReadStringSegment(ref byteSequence);
+            this.Write(@"                var stringKey = global::MessagePack.reader.ReadStringSegment();
                 int key;
                 if (!____keyMapping.TryGetValue(stringKey, out key))
                 {
-                    global::MessagePack.MessagePackBinary.ReadNextBlock(ref byteSequence);
+                    global::MessagePack.reader.ReadNextBlock();
                     continue;
                 }
 ");

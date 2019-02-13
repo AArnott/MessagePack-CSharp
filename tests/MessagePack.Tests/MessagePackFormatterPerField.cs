@@ -46,28 +46,28 @@ namespace MessagePack.Tests
 
         public class Int_x10Formatter : IMessagePackFormatter<int>
         {
-            public int Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+            public int Deserialize(ref MessagePackReader reader, IFormatterResolver formatterResolver)
             {
-                return MessagePackBinary.ReadInt32(ref byteSequence) * 10;
+                return reader.ReadInt32() * 10;
             }
 
-            public void Serialize(ref BufferWriter writer, int value, IFormatterResolver formatterResolver)
+            public void Serialize(ref MessagePackWriter writer, int value, IFormatterResolver formatterResolver)
             {
-                MessagePackBinary.WriteInt32(ref writer, value * 10);
+                writer.WriteInt32(value * 10);
             }
         }
 
         public class String_x2Formatter : IMessagePackFormatter<string>
         {
-            public string Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+            public string Deserialize(ref MessagePackReader reader, IFormatterResolver formatterResolver)
             {
-                var s = MessagePackBinary.ReadString(ref byteSequence);
+                var s = reader.ReadString();
                 return s + s;
             }
 
-            public void Serialize(ref BufferWriter writer, string value, IFormatterResolver formatterResolver)
+            public void Serialize(ref MessagePackWriter writer, string value, IFormatterResolver formatterResolver)
             {
-                MessagePackBinary.WriteString(ref writer, value + value);
+                writer.WriteString(value + value);
             }
         }
 
@@ -77,7 +77,7 @@ namespace MessagePack.Tests
         {
             {
                 var bin = serializer.Serialize(new MyClass { MyProperty1 = 100, MyProperty2 = 9, MyProperty3 = "foo", MyProperty4 = "bar" });
-                var json = serializer.ToJson(bin);
+                var json = serializer.ConvertToJson(bin);
                 json.Is("[1000,9,\"foofoo\",\"bar\"]");
 
                 var r2 = serializer.Deserialize<MyClass>(bin);
@@ -88,7 +88,7 @@ namespace MessagePack.Tests
             }
             {
                 var bin = serializer.Serialize(new MyStruct { MyProperty1 = 100, MyProperty2 = 9, MyProperty3 = "foo", MyProperty4 = "bar" });
-                var json = serializer.ToJson(bin);
+                var json = serializer.ConvertToJson(bin);
                 json.Is("[1000,9,\"foofoo\",\"bar\"]");
 
                 var r2 = serializer.Deserialize<MyStruct>(bin);

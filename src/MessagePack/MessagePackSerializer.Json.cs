@@ -14,59 +14,67 @@ namespace MessagePack
         /// <summary>
         /// Serialize an object to JSON string.
         /// </summary>
-        public string ToJson<T>(T obj, IFormatterResolver resolver = null)
+        public void SerializeToJson<T>(TextWriter textWriter, T obj, IFormatterResolver resolver = null)
         {
-            resolver = resolver ?? this.DefaultResolver;
-
             using (var sequence = new Sequence<byte>())
             {
-                var writer = new MessagePackWriter(sequence);
-                Serialize(ref writer, obj, resolver);
-                writer.Flush();
-                return ToJson(sequence.AsReadOnlySequence);
+                var msgpackWriter = new MessagePackWriter(sequence);
+                Serialize(ref msgpackWriter, obj, resolver);
+                msgpackWriter.Flush();
+                var msgpackReader = new MessagePackReader(sequence.AsReadOnlySequence);
+                ConvertToJson(ref msgpackReader, textWriter);
             }
         }
 
         /// <summary>
-        /// Dump message-pack binary to JSON string.
+        /// Serialize an object to JSON string.
         /// </summary>
-        public string ToJson(byte[] bytes) => this.ToJson(new ReadOnlySequence<byte>(bytes));
+        public string SerializeToJson<T>(T obj, IFormatterResolver resolver = null)
+        {
+            var writer = new StringWriter();
+            SerializeToJson(writer, obj, resolver);
+            return writer.ToString();
+        }
 
         /// <summary>
-        /// Dump message-pack binary to JSON string.
+        /// Convert a message-pack binary to a JSON string.
         /// </summary>
-        public string ToJson(ReadOnlyMemory<byte> bytes) => this.ToJson(new ReadOnlySequence<byte>(bytes));
+        public string ConvertToJson(ReadOnlyMemory<byte> bytes) => this.ConvertToJson(new ReadOnlySequence<byte>(bytes));
 
         /// <summary>
-        /// Dump message-pack binary to JSON string.
+        /// Convert a message-pack binary to a JSON string.
         /// </summary>
-        public virtual void ToJson(ref MessagePackReader reader, TextWriter jsonWriter)
+        public string ConvertToJson(ReadOnlySequence<byte> bytes)
+        {
+            var jsonWriter = new StringWriter();
+            var reader = new MessagePackReader(bytes);
+            this.ConvertToJson(ref reader, jsonWriter);
+            return jsonWriter.ToString();
+        }
+
+        /// <summary>
+        /// Convert a message-pack binary to a JSON string.
+        /// </summary>
+        public virtual void ConvertToJson(ref MessagePackReader reader, TextWriter jsonWriter)
         {
             ToJsonCore(ref reader, jsonWriter);
         }
 
-        public void FromJson(string str, ref MessagePackWriter writer)
+        /// <summary>
+        /// From Json String to MessagePack binary
+        /// </summary>
+        public void ConvertFromJson(string str, ref MessagePackWriter writer)
         {
             using (var sr = new StringReader(str))
             {
-                FromJson(sr, ref writer);
+                ConvertFromJson(sr, ref writer);
             }
         }
 
         /// <summary>
         /// From Json String to MessagePack binary
         /// </summary>
-        public void FromJson(TextReader reader, IBufferWriter<byte> writer)
-        {
-            var fastWriter = new MessagePackWriter(writer);
-            this.FromJson(reader, ref fastWriter);
-            fastWriter.Flush();
-        }
-
-        /// <summary>
-        /// From Json String to MessagePack binary
-        /// </summary>
-        protected virtual void FromJson(TextReader reader, ref MessagePackWriter writer)
+        public virtual void ConvertFromJson(TextReader reader, ref MessagePackWriter writer)
         {
             using (var jr = new TinyJsonReader(reader, false))
             {

@@ -10,5 +10,11 @@
             TypeCode = typeCode;
             Length = length;
         }
+
+        public ExtensionHeader(sbyte typeCode, int length)
+        {
+            TypeCode = typeCode;
+            Length = (uint)length;
+        }
     }
 }

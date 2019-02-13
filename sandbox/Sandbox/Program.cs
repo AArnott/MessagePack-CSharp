@@ -244,14 +244,14 @@ namespace Sandbox
         // serialize/deserialize internal field.
         class CustomObjectFormatter : IMessagePackFormatter<CustomObject>
         {
-            public void Serialize(ref BufferWriter writer, CustomObject value, IFormatterResolver formatterResolver)
+            public void Serialize(ref MessagePackWriter writer, CustomObject value, IFormatterResolver formatterResolver)
             {
                 formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.internalId, formatterResolver);
             }
 
-            public CustomObject Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+            public CustomObject Deserialize(ref MessagePackReader reader, IFormatterResolver formatterResolver)
             {
-                var id = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref byteSequence, formatterResolver);
+                var id = formatterResolver.GetFormatterWithVerify<string>().Deserialize(ref reader, formatterResolver);
                 return new CustomObject { internalId = id };
             }
         }
@@ -765,13 +765,13 @@ namespace Sandbox
             {1, 1 },
         };
 
-        public void Serialize(ref BufferWriter writer, IHogeMoge value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, IHogeMoge value, IFormatterResolver formatterResolver)
         {
             KeyValuePair<int, int> key;
             if (map.TryGetValue(value.GetType(), out key))
             {
-                MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref writer, 2);
-                MessagePackBinary.WriteInt32(ref writer, key.Key);
+                writer.WriteArrayHeader(2);
+                writer.WriteInt32(key.Key);
 
                 switch (key.Value)
                 {
@@ -788,25 +788,25 @@ namespace Sandbox
                 return;
             }
 
-            MessagePackBinary.WriteNil(ref writer);
+            writer.WriteNil();
         }
 
-        public IHogeMoge Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public IHogeMoge Deserialize(ref MessagePackReader reader, IFormatterResolver formatterResolver)
         {
             // TODO:array header...
 
-            var key = MessagePackBinary.ReadInt32(ref byteSequence);
+            var key = reader.ReadInt32();
 
             switch (key)
             {
                 case 0:
                     {
-                        var result = formatterResolver.GetFormatterWithVerify<HogeMoge1>().Deserialize(ref byteSequence, formatterResolver);
+                        var result = formatterResolver.GetFormatterWithVerify<HogeMoge1>().Deserialize(ref reader, formatterResolver);
                         return (IHogeMoge)result;
                     }
                 case 1:
                     {
-                        var result = formatterResolver.GetFormatterWithVerify<HogeMoge2>().Deserialize(ref byteSequence, formatterResolver);
+                        var result = formatterResolver.GetFormatterWithVerify<HogeMoge2>().Deserialize(ref reader, formatterResolver);
                         return (IHogeMoge)result;
                     }
                 default:

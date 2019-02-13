@@ -28,12 +28,12 @@ namespace MessagePack.Tests
         public void GetEncodedStringBytes(char c, int count)
         {
             var s = new string(c, count);
-            var bin1 = MessagePackBinary.GetEncodedStringBytes(s);
+            var bin1 = CodeGenHelpers.GetEncodedStringBytes(s);
             var bin2 = serializer.Serialize(s);
             var bin3 = new Sequence<byte>();
-            var bin3Writer = new BufferWriter(bin3);
-            MessagePackBinary.WriteRaw(ref bin3Writer, bin1);
-            bin3Writer.Commit();
+            var bin3Writer = new MessagePackWriter(bin3);
+            bin3Writer.WriteRaw(bin1);
+            bin3Writer.Flush();
 
             MessagePack.Internal.ByteArrayComparer.Equals(bin1, 0, bin1.Length, bin2).IsTrue();
             MessagePack.Internal.ByteArrayComparer.Equals(bin1, 0, bin1.Length, bin3.AsReadOnlySequence.ToArray()).IsTrue();

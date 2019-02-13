@@ -17,12 +17,12 @@ namespace <#= Namespace #>
 <# foreach(var info in enumSerializationInfos) { #>
     public sealed class <#= info.Name #>Formatter : global::MessagePack.Formatters.IMessagePackFormatter<<#= info.FullName #>>
     {
-        public void Serialize(ref BufferWriter writer, <#= info.FullName #> value, global::MessagePack.IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, <#= info.FullName #> value, global::MessagePack.IFormatterResolver formatterResolver)
         {
             MessagePackBinary.Write<#= info.UnderlyingType #>(ref writer, (<#= info.UnderlyingType #>)value);
         }
         
-        public <#= info.FullName #> Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormatterResolver formatterResolver)
+        public <#= info.FullName #> Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
             return (<#= info.FullName #>)MessagePackBinary.Read<#= info.UnderlyingType #>(ref byteSequence);
         }

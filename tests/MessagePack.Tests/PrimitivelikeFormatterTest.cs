@@ -1,5 +1,6 @@
 ﻿using MessagePack.Formatters;
 using MessagePack.Resolvers;
+using Nerdbank.Streams;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
@@ -23,12 +24,12 @@ namespace MessagePack.Tests
 
     public class DummyStringFormatter : IMessagePackFormatter<string>
     {
-        public string Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public string Deserialize(ref MessagePackReader reader, IFormatterResolver formatterResolver)
         {
             throw new NotImplementedException();
         }
 
-        public void Serialize(ref BufferWriter writer, string value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, string value, IFormatterResolver formatterResolver)
         {
             throw new NotImplementedException();
         }
@@ -36,12 +37,12 @@ namespace MessagePack.Tests
 
     public class DummyDateTimeFormatter : IMessagePackFormatter<DateTime>
     {
-        public DateTime Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public DateTime Deserialize(ref MessagePackReader reader, IFormatterResolver formatterResolver)
         {
             throw new NotImplementedException();
         }
 
-        public void Serialize(ref BufferWriter writer, DateTime value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, DateTime value, IFormatterResolver formatterResolver)
         {
             throw new NotImplementedException();
         }
@@ -49,12 +50,12 @@ namespace MessagePack.Tests
 
     public class DummyBinaryFormatter : IMessagePackFormatter<byte[]>
     {
-        public byte[] Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public byte[] Deserialize(ref MessagePackReader reader, IFormatterResolver formatterResolver)
         {
             throw new NotImplementedException();
         }
 
-        public void Serialize(ref BufferWriter writer, byte[] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, byte[] value, IFormatterResolver formatterResolver)
         {
             throw new NotImplementedException();
         }
@@ -141,15 +142,22 @@ namespace MessagePack.Tests
 
             var serializer = referenceContext.GetSerializer<string>();
 
-            var a = defaultSerializer.Serialize(data, OldSpecResolver.Instance);
-            var b = serializer.PackSingleObject(data);
+            using (var sequence = new Sequence<byte>())
+            {
+                var oldSpecWriter = new MessagePackWriter(sequence) { OldSpec = true };
+                defaultSerializer.Serialize(ref oldSpecWriter, data);
+                oldSpecWriter.Flush();
+                var a = sequence.AsReadOnlySequence.ToArray();
+                var b = serializer.PackSingleObject(data);
 
-            a.Is(b);
+                a.Is(b);
 
-            var r1 = defaultSerializer.Deserialize<string>(a, OldSpecResolver.Instance);
-            var r2 = serializer.UnpackSingleObject(b);
+                var oldSpecReader = new MessagePackReader(sequence.AsReadOnlySequence) { OldSpec = true };
+                var r1 = defaultSerializer.Deserialize<string>(ref oldSpecReader);
+                var r2 = serializer.UnpackSingleObject(b);
 
-            r1.Is(r2);
+                r1.Is(r2);
+            }
         }
 
 
@@ -165,15 +173,22 @@ namespace MessagePack.Tests
 
             var serializer = referenceContext.GetSerializer<byte[]>();
 
-            var a = defaultSerializer.Serialize(data, OldSpecResolver.Instance);
-            var b = serializer.PackSingleObject(data);
+            using (var sequence = new Sequence<byte>())
+            {
+                var oldSpecWriter = new MessagePackWriter(sequence) { OldSpec = true };
+                defaultSerializer.Serialize(ref oldSpecWriter, data);
+                oldSpecWriter.Flush();
+                var a = sequence.AsReadOnlySequence.ToArray();
+                var b = serializer.PackSingleObject(data);
 
-            a.Is(b);
+                a.Is(b);
 
-            var r1 = defaultSerializer.Deserialize<byte[]>(a, OldSpecResolver.Instance);
-            var r2 = serializer.UnpackSingleObject(b);
+                var oldSpecReader = new MessagePackReader(sequence.AsReadOnlySequence) { OldSpec = true };
+                var r1 = defaultSerializer.Deserialize<byte[]>(ref oldSpecReader);
+                var r2 = serializer.UnpackSingleObject(b);
 
-            r1.Is(r2);
+                r1.Is(r2);
+            }
         }
     }
 }

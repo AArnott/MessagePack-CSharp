@@ -57,7 +57,7 @@ namespace MessagePack.CodeGenerator.Generator
             
             #line default
             #line hidden
-            this.Write(">\r\n    {\r\n        public void Serialize(ref BufferWriter writer, ");
+            this.Write(">\r\n    {\r\n        public void Serialize(ref MessagePackWriter writer, ");
             
             #line 20 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\EnumTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(info.FullName));
@@ -86,7 +86,7 @@ namespace MessagePack.CodeGenerator.Generator
             
             #line default
             #line hidden
-            this.Write(" Deserialize(ref ReadOnlySequence<byte> byteSequence, global::MessagePack.IFormat" +
+            this.Write(" Deserialize(ref MessagePackReader reader, global::MessagePack.IFormat" +
                     "terResolver formatterResolver)\r\n        {\r\n            return (");
             
             #line 27 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\EnumTemplate.tt"

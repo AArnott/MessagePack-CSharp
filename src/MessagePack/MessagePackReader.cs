@@ -25,6 +25,15 @@ namespace MessagePack
         /// <summary>
         /// Initializes a new instance of the <see cref="MessagePackReader"/> struct.
         /// </summary>
+        /// <param name="memory">The buffer to read from.</param>
+        public MessagePackReader(ReadOnlyMemory<byte> memory)
+            : this(new ReadOnlySequence<byte>(memory))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MessagePackReader"/> struct.
+        /// </summary>
         /// <param name="readOnlySequence">The sequence to read from.</param>
         public MessagePackReader(ReadOnlySequence<byte> readOnlySequence)
         {
@@ -221,6 +230,18 @@ namespace MessagePack
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Reads a sequence of bytes without any decoding.
+        /// </summary>
+        /// <param name="length">The number of bytes to read.</param>
+        /// <returns>The sequence of bytes read.</returns>
+        public ReadOnlySequence<byte> ReadRaw(long length)
+        {
+            var result = this.reader.Sequence.Slice(this.reader.Position, length);
+            this.reader.Advance(length);
+            return result;
         }
 
         /// <summary>
