@@ -8,7 +8,7 @@ namespace MessagePack.Formatters
     public sealed class BinaryGuidFormatter : IMessagePackFormatter<Guid>
     {
         /// <summary>
-        /// Unsafe binary Guid formatter. this is only allows on LittleEndian environment.
+        /// Unsafe binary Guid formatter. this is only allowed on LittleEndian environment.
         /// </summary>
         public static readonly IMessagePackFormatter<Guid> Instance = new BinaryGuidFormatter();
 
@@ -19,49 +19,28 @@ namespace MessagePack.Formatters
         // Guid's underlying _a,...,_k field is sequential and same layout as .NET Framework and Mono(Unity).
         // But target machines must be same endian so restrict only for little endian.
 
-        public unsafe void Serialize(ref BufferWriter writer, Guid value, IFormatterResolver formatterResolver)
+        public unsafe void Serialize(ref MessagePackWriter writer, Guid value, IFormatterResolver resolver)
         {
             if (!BitConverter.IsLittleEndian) throw new Exception("BinaryGuidFormatter only allows on little endian env.");
 
-            fixed (byte* dst = &writer.GetSpan(18)[0])
-            {
-                var src = &value;
-
-                dst[0] = MessagePackCode.Bin8;
-                dst[1] = 16;
-
-                *(Guid*)(dst + 2) = *src;
-            }
-
-            writer.Advance(18);
+            var valueSpan = new ReadOnlySpan<byte>(&value, sizeof(Guid));
+            writer.WriteBytes(valueSpan);
         }
 
-        public unsafe Guid Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public unsafe Guid Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
             if (!BitConverter.IsLittleEndian) throw new Exception("BinaryGuidFormatter only allows on little endian env.");
 
-            if (byteSequence.Length < 18)
+            var valueSequence = reader.ReadBytes();
+            if (valueSequence.Length != sizeof(Guid))
             {
-                throw new ArgumentOutOfRangeException();
+                throw new InvalidOperationException("Invalid Guid Size.");
             }
 
-            return MessagePackBinary.Parse(ref byteSequence, 18, span =>
-                {
-                    fixed (byte* src = &span[0])
-                    {
-                        if (src[0] != MessagePackCode.Bin8)
-                        {
-                            throw new InvalidOperationException(string.Format("code is invalid. code:{0} format:{1}", span[0], MessagePackCode.ToFormatName(span[0])));
-                        }
-                        if (src[1] != 16)
-                        {
-                            throw new InvalidOperationException("Invalid Guid Size.");
-                        }
-
-                        var target = *(Guid*)(src + 2);
-                        return target;
-                    }
-                });
+            Guid result;
+            var resultSpan = new Span<byte>(&result, sizeof(Guid));
+            valueSequence.CopyTo(resultSpan);
+            return result;
         }
     }
 
@@ -79,49 +58,28 @@ namespace MessagePack.Formatters
         // decimal underlying "flags, hi, lo, mid" fields are sequential and same layuout with .NET Framework and Mono(Unity)
         // But target machines must be same endian so restrict only for little endian.
 
-        public unsafe void Serialize(ref BufferWriter writer, Decimal value, IFormatterResolver formatterResolver)
+        public unsafe void Serialize(ref MessagePackWriter writer, Decimal value, IFormatterResolver resolver)
         {
             if (!BitConverter.IsLittleEndian) throw new Exception("BinaryGuidFormatter only allows on little endian env.");
 
-            fixed (byte* dst = &writer.GetSpan(18)[0])
-            {
-                var src = &value;
-
-                dst[0] = MessagePackCode.Bin8;
-                dst[1] = 16;
-
-                *(Decimal*)(dst + 2) = *src;
-            }
-
-            writer.Advance(18);
+            var valueSpan = new ReadOnlySpan<byte>(&value, sizeof(Decimal));
+            writer.WriteBytes(valueSpan);
         }
 
-        public unsafe Decimal Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public unsafe Decimal Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
             if (!BitConverter.IsLittleEndian) throw new Exception("BinaryDecimalFormatter only allows on little endian env.");
 
-            if (byteSequence.Length < 18)
+            var valueSequence = reader.ReadBytes();
+            if (valueSequence.Length != sizeof(decimal))
             {
-                throw new ArgumentOutOfRangeException();
+                throw new InvalidOperationException("Invalid decimal Size.");
             }
 
-            return MessagePackBinary.Parse(ref byteSequence, 18, span =>
-            {
-                fixed (byte* src = &span[0])
-                {
-                    if (src[0] != MessagePackCode.Bin8)
-                    {
-                        throw new InvalidOperationException(string.Format("code is invalid. code:{0} format:{1}", span[0], MessagePackCode.ToFormatName(span[0])));
-                    }
-                    if (src[1] != 16)
-                    {
-                        throw new InvalidOperationException("Invalid Guid Size.");
-                    }
-
-                    var target = *(Decimal*)(src + 2);
-                    return target;
-                }
-            });
+            decimal result;
+            var resultSpan = new Span<byte>(&result, sizeof(decimal));
+            valueSequence.CopyTo(resultSpan);
+            return result;
         }
     }
 }

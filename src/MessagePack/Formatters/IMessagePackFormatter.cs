@@ -14,14 +14,14 @@ namespace MessagePack.Formatters
         /// <param name="writer">The writer to use when serializing the value.</param>
         /// <param name="value">The value to be serialized.</param>
         /// <param name="resolver">The resolver to use to obtain formatters for types that make up the composite type <typeparamref name="T"/>.</param>
-        void Serialize(ref BufferWriter writer, T value, IFormatterResolver resolver);
+        void Serialize(ref MessagePackWriter writer, T value, IFormatterResolver resolver);
 
         /// <summary>
-        /// Deserializes some value from a byte sequence.
+        /// Deserializes a value.
         /// </summary>
-        /// <param name="byteSequence">The buffer to deserialize from.</param>
+        /// <param name="reader">The reader to deserialize from.</param>
         /// <param name="resolver">The resolver to use to obtain formatters for types that make up the composite type <typeparamref name="T"/>.</param>
         /// <returns>The deserialized value.</returns>
-        T Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver resolver);
+        T Deserialize(ref MessagePackReader reader, IFormatterResolver resolver);
     }
 }

@@ -25,7 +25,7 @@ namespace MessagePack.Formatters
             }
         }
 
-        public void Serialize(ref BufferWriter writer, T value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, T value, IFormatterResolver resolver)
         {
             string name;
             if (!valueNameMapping.TryGetValue(value, out name))
@@ -33,12 +33,12 @@ namespace MessagePack.Formatters
                 name = value.ToString(); // fallback for flags etc, But Enum.ToString is too slow.
             }
 
-            MessagePackBinary.WriteString(ref writer, name);
+            writer.WriteString(name);
         }
 
-        public T Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public T Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            var name = MessagePackBinary.ReadString(ref byteSequence);
+            var name = reader.ReadString();
 
             T value;
             if (!nameValueMapping.TryGetValue(name, out value))

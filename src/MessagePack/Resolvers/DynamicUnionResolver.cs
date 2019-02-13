@@ -120,7 +120,7 @@ namespace MessagePack.Resolvers
             {
                 var method = typeBuilder.DefineMethod("Serialize", MethodAttributes.Public | MethodAttributes.Final | MethodAttributes.Virtual | MethodAttributes.HideBySig | MethodAttributes.NewSlot,
                     null,
-                    new Type[] { typeof(BufferWriter).MakeByRefType(), type, typeof(IFormatterResolver) });
+                    new Type[] { typeof(MessagePackWriter).MakeByRefType(), type, typeof(IFormatterResolver) });
 
                 var il = method.GetILGenerator();
                 BuildSerialize(type, unionAttrs, method, typeToKeyAndJumpMap, il);
@@ -380,8 +380,8 @@ namespace MessagePack.Resolvers
         static readonly Type refKvp = typeof(KeyValuePair<int, int>).MakeByRefType();
         static readonly MethodInfo getFormatterWithVerify = typeof(FormatterResolverExtensions).GetRuntimeMethods().First(x => x.Name == "GetFormatterWithVerify");
 
-        static readonly Func<Type, MethodInfo> getSerialize = t => typeof(IMessagePackFormatter<>).MakeGenericType(t).GetRuntimeMethod("Serialize", new[] { typeof(BufferWriter).MakeByRefType(), t, typeof(IFormatterResolver) });
-        static readonly Func<Type, MethodInfo> getDeserialize = t => typeof(IMessagePackFormatter<>).MakeGenericType(t).GetRuntimeMethod("Deserialize", new[] { typeof(ReadOnlySequence<byte>).MakeByRefType(), typeof(IFormatterResolver) });
+        static readonly Func<Type, MethodInfo> getSerialize = t => typeof(IMessagePackFormatter<>).MakeGenericType(t).GetRuntimeMethod("Serialize", new[] { typeof(MessagePackWriter).MakeByRefType(), t, typeof(IFormatterResolver) });
+        static readonly Func<Type, MethodInfo> getDeserialize = t => typeof(IMessagePackFormatter<>).MakeGenericType(t).GetRuntimeMethod("Deserialize", new[] { typeof(MessagePackReader).MakeByRefType(), typeof(IFormatterResolver) });
 
         static readonly FieldInfo runtimeTypeHandleEqualityComparer = typeof(RuntimeTypeHandleEqualityComparer).GetRuntimeField("Default");
         static readonly ConstructorInfo intIntKeyValuePairConstructor = typeof(KeyValuePair<int, int>).GetTypeInfo().DeclaredConstructors.First(x => x.GetParameters().Length == 2);
@@ -406,25 +406,26 @@ namespace MessagePack.Resolvers
 
         static class MessagePackBinaryTypeInfo
         {
-            public static TypeInfo TypeInfo = typeof(MessagePackBinary).GetTypeInfo();
+            public static TypeInfo WriterTypeInfo = typeof(MessagePackWriter).GetTypeInfo();
+            public static TypeInfo ReaderTypeInfo = typeof(MessagePackReader).GetTypeInfo();
 
-            public static MethodInfo WriteFixedMapHeaderUnsafe = typeof(MessagePackBinary).GetRuntimeMethod("WriteFixedMapHeaderUnsafe", new[] { typeof(BufferWriter).MakeByRefType(), typeof(int) });
-            public static MethodInfo WriteFixedArrayHeaderUnsafe = typeof(MessagePackBinary).GetRuntimeMethod("WriteFixedArrayHeaderUnsafe", new[] { typeof(BufferWriter).MakeByRefType(), typeof(int) });
-            public static MethodInfo WriteMapHeader = typeof(MessagePackBinary).GetRuntimeMethod("WriteMapHeader", new[] { typeof(BufferWriter).MakeByRefType(), typeof(int) });
-            public static MethodInfo WriteArrayHeader = typeof(MessagePackBinary).GetRuntimeMethod("WriteArrayHeader", new[] { typeof(BufferWriter).MakeByRefType(), typeof(int) });
-            public static MethodInfo WritePositiveFixedIntUnsafe = typeof(MessagePackBinary).GetRuntimeMethod("WritePositiveFixedIntUnsafe", new[] { typeof(BufferWriter).MakeByRefType(), typeof(int) });
-            public static MethodInfo WriteInt32 = typeof(MessagePackBinary).GetRuntimeMethod("WriteInt32", new[] { typeof(BufferWriter).MakeByRefType(), typeof(int) });
-            public static MethodInfo WriteBytes = typeof(MessagePackBinary).GetRuntimeMethod("WriteBytes", new[] { typeof(BufferWriter).MakeByRefType(), typeof(byte[]) });
-            public static MethodInfo WriteNil = typeof(MessagePackBinary).GetRuntimeMethod("WriteNil", new[] { typeof(BufferWriter).MakeByRefType() });
-            public static MethodInfo ReadBytes = typeof(MessagePackBinary).GetRuntimeMethod("ReadBytes", new[] { refReadOnlySequence });
-            public static MethodInfo ReadInt32 = typeof(MessagePackBinary).GetRuntimeMethod("ReadInt32", new[] { refReadOnlySequence });
-            public static MethodInfo ReadString = typeof(MessagePackBinary).GetRuntimeMethod("ReadString", new[] { refReadOnlySequence });
-            public static MethodInfo IsNil = typeof(MessagePackBinary).GetRuntimeMethod("IsNil", new[] { typeof(ReadOnlySequence<byte>) });
-            public static MethodInfo ReadNextBlock = typeof(MessagePackBinary).GetRuntimeMethod("ReadNextBlock", new[] { refReadOnlySequence });
-            public static MethodInfo WriteStringUnsafe = typeof(MessagePackBinary).GetRuntimeMethod("WriteStringUnsafe", new[] { typeof(BufferWriter).MakeByRefType(), typeof(string), typeof(int) });
+            public static MethodInfo WriteFixedMapHeaderUnsafe = typeof(MessagePackWriter).GetRuntimeMethod("WriteFixedMapHeaderUnsafe", new[] { typeof(int) });
+            public static MethodInfo WriteFixedArrayHeaderUnsafe = typeof(MessagePackWriter).GetRuntimeMethod("WriteFixedArrayHeaderUnsafe", new[] { typeof(int) });
+            public static MethodInfo WriteMapHeader = typeof(MessagePackWriter).GetRuntimeMethod("WriteMapHeader", new[] { typeof(int) });
+            public static MethodInfo WriteArrayHeader = typeof(MessagePackWriter).GetRuntimeMethod("WriteArrayHeader", new[] { typeof(int) });
+            public static MethodInfo WritePositiveFixedIntUnsafe = typeof(MessagePackWriter).GetRuntimeMethod("WritePositiveFixedIntUnsafe", new[] { typeof(int) });
+            public static MethodInfo WriteInt32 = typeof(MessagePackWriter).GetRuntimeMethod("WriteInt32", new[] { typeof(int) });
+            public static MethodInfo WriteBytes = typeof(MessagePackWriter).GetRuntimeMethod("WriteBytes", new[] { typeof(byte[]) });
+            public static MethodInfo WriteNil = typeof(MessagePackWriter).GetRuntimeMethod("WriteNil", Type.EmptyTypes);
+            public static MethodInfo ReadBytes = typeof(MessagePackReader).GetRuntimeMethod("ReadBytes", Type.EmptyTypes);
+            public static MethodInfo ReadInt32 = typeof(MessagePackReader).GetRuntimeMethod("ReadInt32", Type.EmptyTypes);
+            public static MethodInfo ReadString = typeof(MessagePackReader).GetRuntimeMethod("ReadString", Type.EmptyTypes);
+            public static MethodInfo IsNil = typeof(MessagePackReader).GetRuntimeMethod("IsNil", Type.EmptyTypes);
+            public static MethodInfo ReadNextBlock = typeof(MessagePackReader).GetRuntimeMethod("ReadNextBlock", Type.EmptyTypes);
+            public static MethodInfo WriteStringUnsafe = typeof(MessagePackWriter).GetRuntimeMethod("WriteStringUnsafe", new[] { typeof(string), typeof(int) });
 
-            public static MethodInfo ReadArrayHeader = typeof(MessagePackBinary).GetRuntimeMethod("ReadArrayHeader", new[] { refReadOnlySequence });
-            public static MethodInfo ReadMapHeader = typeof(MessagePackBinary).GetRuntimeMethod("ReadMapHeader", new[] { refReadOnlySequence });
+            public static MethodInfo ReadArrayHeader = typeof(MessagePackReader).GetRuntimeMethod("ReadArrayHeader", Type.EmptyTypes);
+            public static MethodInfo ReadMapHeader = typeof(MessagePackReader).GetRuntimeMethod("ReadMapHeader", Type.EmptyTypes);
 
             static MessagePackBinaryTypeInfo()
             {

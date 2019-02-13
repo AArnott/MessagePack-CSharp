@@ -55,104 +55,101 @@ namespace MessagePack.Internal
         }
 
         // 4-pattern, lower/upper and '-' or no
-        public GuidBits(ArraySegment<byte> utf8string)
+        public GuidBits(ReadOnlySpan<byte> utf8string)
         {
             this = default(GuidBits);
 
-            var array = utf8string.Array;
-            var offset = utf8string.Offset;
-
             // 32
-            if (utf8string.Count == 32)
+            if (utf8string.Length == 32)
             {
                 if (BitConverter.IsLittleEndian)
                 {
-                    this.Byte0 = Parse(array, offset + 6);
-                    this.Byte1 = Parse(array, offset + 4);
-                    this.Byte2 = Parse(array, offset + 2);
-                    this.Byte3 = Parse(array, offset + 0);
+                    this.Byte0 = Parse(utf8string, 6);
+                    this.Byte1 = Parse(utf8string, 4);
+                    this.Byte2 = Parse(utf8string, 2);
+                    this.Byte3 = Parse(utf8string, 0);
 
-                    this.Byte4 = Parse(array, offset + 10);
-                    this.Byte5 = Parse(array, offset + 8);
+                    this.Byte4 = Parse(utf8string, 10);
+                    this.Byte5 = Parse(utf8string, 8);
 
-                    this.Byte6 = Parse(array, offset + 14);
-                    this.Byte7 = Parse(array, offset + 12);
+                    this.Byte6 = Parse(utf8string, 14);
+                    this.Byte7 = Parse(utf8string, 12);
                 }
                 else
                 {
-                    this.Byte0 = Parse(array, offset + 0);
-                    this.Byte1 = Parse(array, offset + 2);
-                    this.Byte2 = Parse(array, offset + 4);
-                    this.Byte3 = Parse(array, offset + 6);
+                    this.Byte0 = Parse(utf8string, 0);
+                    this.Byte1 = Parse(utf8string, 2);
+                    this.Byte2 = Parse(utf8string, 4);
+                    this.Byte3 = Parse(utf8string, 6);
 
-                    this.Byte4 = Parse(array, offset + 8);
-                    this.Byte5 = Parse(array, offset + 10);
+                    this.Byte4 = Parse(utf8string, 8);
+                    this.Byte5 = Parse(utf8string, 10);
 
-                    this.Byte6 = Parse(array, offset + 12);
-                    this.Byte7 = Parse(array, offset + 14);
+                    this.Byte6 = Parse(utf8string, 12);
+                    this.Byte7 = Parse(utf8string, 14);
                 }
-                this.Byte8 = Parse(array, offset + 16);
-                this.Byte9 = Parse(array, offset + 18);
+                this.Byte8 = Parse(utf8string, 16);
+                this.Byte9 = Parse(utf8string, 18);
 
-                this.Byte10 = Parse(array, offset + 20);
-                this.Byte11 = Parse(array, offset + 22);
-                this.Byte12 = Parse(array, offset + 24);
-                this.Byte13 = Parse(array, offset + 26);
-                this.Byte14 = Parse(array, offset + 28);
-                this.Byte15 = Parse(array, offset + 30);
+                this.Byte10 = Parse(utf8string, 20);
+                this.Byte11 = Parse(utf8string, 22);
+                this.Byte12 = Parse(utf8string, 24);
+                this.Byte13 = Parse(utf8string, 26);
+                this.Byte14 = Parse(utf8string, 28);
+                this.Byte15 = Parse(utf8string, 30);
                 return;
             }
-            else if (utf8string.Count == 36)
+            else if (utf8string.Length == 36)
             {
                 // '-' => 45
                 if (BitConverter.IsLittleEndian)
                 {
-                    this.Byte0 = Parse(array, offset + 6);
-                    this.Byte1 = Parse(array, offset + 4);
-                    this.Byte2 = Parse(array, offset + 2);
-                    this.Byte3 = Parse(array, offset + 0);
+                    this.Byte0 = Parse(utf8string, 6);
+                    this.Byte1 = Parse(utf8string, 4);
+                    this.Byte2 = Parse(utf8string, 2);
+                    this.Byte3 = Parse(utf8string, 0);
 
-                    if (array[offset + 8] != '-') goto ERROR;
+                    if (utf8string[8] != '-') goto ERROR;
 
-                    this.Byte4 = Parse(array, offset + 11);
-                    this.Byte5 = Parse(array, offset + 9);
+                    this.Byte4 = Parse(utf8string, 11);
+                    this.Byte5 = Parse(utf8string, 9);
 
-                    if (array[offset + 13] != '-') goto ERROR;
+                    if (utf8string[13] != '-') goto ERROR;
 
-                    this.Byte6 = Parse(array, offset + 16);
-                    this.Byte7 = Parse(array, offset + 14);
+                    this.Byte6 = Parse(utf8string, 16);
+                    this.Byte7 = Parse(utf8string, 14);
                 }
                 else
                 {
-                    this.Byte0 = Parse(array, offset + 0);
-                    this.Byte1 = Parse(array, offset + 2);
-                    this.Byte2 = Parse(array, offset + 4);
-                    this.Byte3 = Parse(array, offset + 6);
+                    this.Byte0 = Parse(utf8string, 0);
+                    this.Byte1 = Parse(utf8string, 2);
+                    this.Byte2 = Parse(utf8string, 4);
+                    this.Byte3 = Parse(utf8string, 6);
 
-                    if (array[offset + 8] != '-') goto ERROR;
+                    if (utf8string[8] != '-') goto ERROR;
 
-                    this.Byte4 = Parse(array, offset + 9);
-                    this.Byte5 = Parse(array, offset + 11);
+                    this.Byte4 = Parse(utf8string, 9);
+                    this.Byte5 = Parse(utf8string, 11);
 
-                    if (array[offset + 13] != '-') goto ERROR;
+                    if (utf8string[13] != '-') goto ERROR;
 
-                    this.Byte6 = Parse(array, offset + 14);
-                    this.Byte7 = Parse(array, offset + 16);
+                    this.Byte6 = Parse(utf8string, 14);
+                    this.Byte7 = Parse(utf8string, 16);
                 }
 
-                if (array[offset + 18] != '-') goto ERROR;
+                if (utf8string[18] != '-') goto ERROR;
 
-                this.Byte8 = Parse(array, offset + 19);
-                this.Byte9 = Parse(array, offset + 21);
+                this.Byte8 = Parse(utf8string, 19);
+                this.Byte9 = Parse(utf8string, 21);
 
-                if (array[offset + 23] != '-') goto ERROR;
+                if (utf8string[23] != '-') goto ERROR;
 
-                this.Byte10 = Parse(array, offset + 24);
-                this.Byte11 = Parse(array, offset + 26);
-                this.Byte12 = Parse(array, offset + 28);
-                this.Byte13 = Parse(array, offset + 30);
-                this.Byte14 = Parse(array, offset + 32);
-                this.Byte15 = Parse(array, offset + 34);
+                this.Byte10 = Parse(utf8string, 24);
+                this.Byte11 = Parse(utf8string, 26);
+                this.Byte12 = Parse(utf8string, 28);
+                this.Byte13 = Parse(utf8string, 30);
+                this.Byte14 = Parse(utf8string, 32);
+                this.Byte15 = Parse(utf8string, 34);
                 return;
             }
 
@@ -163,7 +160,7 @@ namespace MessagePack.Internal
 #if !UNITY
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        static byte Parse(byte[] bytes, int highOffset)
+        static byte Parse(ReadOnlySpan<byte> bytes, int highOffset)
         {
             return unchecked((byte)(SwitchParse(bytes[highOffset]) * 16 + SwitchParse(bytes[highOffset + 1])));
         }

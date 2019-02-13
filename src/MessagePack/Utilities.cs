@@ -1,6 +1,8 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
 using MessagePack.Formatters;
 using Microsoft;
+using Nerdbank.Streams;
 
 namespace MessagePack
 {
@@ -20,6 +22,26 @@ namespace MessagePack
             {
                 writer.Write(segment.Span);
             }
+        }
+
+        internal delegate void GetWriterBytesAction<TArg>(ref MessagePackWriter writer, TArg argument);
+
+        internal static byte[] GetWriterBytes<TArg>(TArg arg, GetWriterBytesAction<TArg> action)
+        {
+            using (var sequence = new Sequence<byte>())
+            {
+                var writer = new MessagePackWriter(sequence);
+                action(ref writer, arg);
+                writer.Flush();
+                return sequence.AsReadOnlySequence.ToArray();
+            }
+        }
+
+        internal static PrefixingBufferWriter<byte> StartDeferredPrefixWrite(this ref MessagePackWriter writer, int prefixSize, int payloadSizeHint)
+        {
+            writer.Flush();
+            var prefixingBufferWriter = new PrefixingBufferWriter<byte>(writer.UnderlyingWriter.UnderlyingWriter, prefixSize, payloadSizeHint);
+            return prefixingBufferWriter;
         }
     }
 }

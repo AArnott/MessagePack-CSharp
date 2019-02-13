@@ -11,14 +11,14 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, Int16 value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Int16 value, IFormatterResolver resolver)
         {
-            MessagePackBinary.WriteInt16(ref writer, value);
+            writer.WriteInt16(value);
         }
 
-        public Int16 Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Int16 Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            return MessagePackBinary.ReadInt16(ref byteSequence);
+            return reader.ReadInt16();
         }
     }
 
@@ -30,28 +30,27 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, Int16? value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Int16? value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteInt16(ref writer, value.Value);
+                writer.WriteInt16(value.Value);
             }
         }
 
-        public Int16? Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Int16? Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                return MessagePackBinary.ReadInt16(ref byteSequence);
+                return reader.ReadInt16();
             }
         }
     }
@@ -65,36 +64,35 @@ namespace MessagePack.Formatters
 
         }
 
-        public void Serialize(ref BufferWriter writer, Int16[] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Int16[] value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteArrayHeader(ref writer, value.Length);
+                writer.WriteArrayHeader(value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    MessagePackBinary.WriteInt16(ref writer, value[i]);
+                    writer.WriteInt16(value[i]);
                 }
             }
         }
 
-        public Int16[] Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Int16[] Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
+                var len = reader.ReadArrayHeader();
                 var array = new Int16[len];
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] = MessagePackBinary.ReadInt16(ref byteSequence);
+                    array[i] = reader.ReadInt16();
                 }
                 return array;
             }
@@ -109,14 +107,14 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, Int32 value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Int32 value, IFormatterResolver resolver)
         {
-            MessagePackBinary.WriteInt32(ref writer, value);
+            writer.WriteInt32(value);
         }
 
-        public Int32 Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Int32 Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            return MessagePackBinary.ReadInt32(ref byteSequence);
+            return reader.ReadInt32();
         }
     }
 
@@ -128,28 +126,27 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, Int32? value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Int32? value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteInt32(ref writer, value.Value);
+                writer.WriteInt32(value.Value);
             }
         }
 
-        public Int32? Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Int32? Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                return MessagePackBinary.ReadInt32(ref byteSequence);
+                return reader.ReadInt32();
             }
         }
     }
@@ -163,36 +160,35 @@ namespace MessagePack.Formatters
 
         }
 
-        public void Serialize(ref BufferWriter writer, Int32[] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Int32[] value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteArrayHeader(ref writer, value.Length);
+                writer.WriteArrayHeader(value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    MessagePackBinary.WriteInt32(ref writer, value[i]);
+                    writer.WriteInt32(value[i]);
                 }
             }
         }
 
-        public Int32[] Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Int32[] Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
+                var len = reader.ReadArrayHeader();
                 var array = new Int32[len];
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] = MessagePackBinary.ReadInt32(ref byteSequence);
+                    array[i] = reader.ReadInt32();
                 }
                 return array;
             }
@@ -207,14 +203,14 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, Int64 value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Int64 value, IFormatterResolver resolver)
         {
-            MessagePackBinary.WriteInt64(ref writer, value);
+            writer.WriteInt64(value);
         }
 
-        public Int64 Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Int64 Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            return MessagePackBinary.ReadInt64(ref byteSequence);
+            return reader.ReadInt64();
         }
     }
 
@@ -226,28 +222,27 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, Int64? value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Int64? value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteInt64(ref writer, value.Value);
+                writer.WriteInt64(value.Value);
             }
         }
 
-        public Int64? Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Int64? Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                return MessagePackBinary.ReadInt64(ref byteSequence);
+                return reader.ReadInt64();
             }
         }
     }
@@ -261,36 +256,35 @@ namespace MessagePack.Formatters
 
         }
 
-        public void Serialize(ref BufferWriter writer, Int64[] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Int64[] value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteArrayHeader(ref writer, value.Length);
+                writer.WriteArrayHeader(value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    MessagePackBinary.WriteInt64(ref writer, value[i]);
+                    writer.WriteInt64(value[i]);
                 }
             }
         }
 
-        public Int64[] Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Int64[] Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
+                var len = reader.ReadArrayHeader();
                 var array = new Int64[len];
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] = MessagePackBinary.ReadInt64(ref byteSequence);
+                    array[i] = reader.ReadInt64();
                 }
                 return array;
             }
@@ -305,14 +299,14 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, UInt16 value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, UInt16 value, IFormatterResolver resolver)
         {
-            MessagePackBinary.WriteUInt16(ref writer, value);
+            writer.WriteUInt16(value);
         }
 
-        public UInt16 Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public UInt16 Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            return MessagePackBinary.ReadUInt16(ref byteSequence);
+            return reader.ReadUInt16();
         }
     }
 
@@ -324,28 +318,27 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, UInt16? value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, UInt16? value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteUInt16(ref writer, value.Value);
+                writer.WriteUInt16(value.Value);
             }
         }
 
-        public UInt16? Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public UInt16? Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                return MessagePackBinary.ReadUInt16(ref byteSequence);
+                return reader.ReadUInt16();
             }
         }
     }
@@ -359,36 +352,35 @@ namespace MessagePack.Formatters
 
         }
 
-        public void Serialize(ref BufferWriter writer, UInt16[] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, UInt16[] value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteArrayHeader(ref writer, value.Length);
+                writer.WriteArrayHeader(value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    MessagePackBinary.WriteUInt16(ref writer, value[i]);
+                    writer.WriteUInt16(value[i]);
                 }
             }
         }
 
-        public UInt16[] Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public UInt16[] Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
+                var len = reader.ReadArrayHeader();
                 var array = new UInt16[len];
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] = MessagePackBinary.ReadUInt16(ref byteSequence);
+                    array[i] = reader.ReadUInt16();
                 }
                 return array;
             }
@@ -403,14 +395,14 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, UInt32 value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, UInt32 value, IFormatterResolver resolver)
         {
-            MessagePackBinary.WriteUInt32(ref writer, value);
+            writer.WriteUInt32(value);
         }
 
-        public UInt32 Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public UInt32 Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            return MessagePackBinary.ReadUInt32(ref byteSequence);
+            return reader.ReadUInt32();
         }
     }
 
@@ -422,28 +414,27 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, UInt32? value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, UInt32? value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteUInt32(ref writer, value.Value);
+                writer.WriteUInt32(value.Value);
             }
         }
 
-        public UInt32? Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public UInt32? Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                return MessagePackBinary.ReadUInt32(ref byteSequence);
+                return reader.ReadUInt32();
             }
         }
     }
@@ -457,36 +448,35 @@ namespace MessagePack.Formatters
 
         }
 
-        public void Serialize(ref BufferWriter writer, UInt32[] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, UInt32[] value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteArrayHeader(ref writer, value.Length);
+                writer.WriteArrayHeader(value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    MessagePackBinary.WriteUInt32(ref writer, value[i]);
+                    writer.WriteUInt32(value[i]);
                 }
             }
         }
 
-        public UInt32[] Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public UInt32[] Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
+                var len = reader.ReadArrayHeader();
                 var array = new UInt32[len];
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] = MessagePackBinary.ReadUInt32(ref byteSequence);
+                    array[i] = reader.ReadUInt32();
                 }
                 return array;
             }
@@ -501,14 +491,14 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, UInt64 value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, UInt64 value, IFormatterResolver resolver)
         {
-            MessagePackBinary.WriteUInt64(ref writer, value);
+            writer.WriteUInt64(value);
         }
 
-        public UInt64 Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public UInt64 Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            return MessagePackBinary.ReadUInt64(ref byteSequence);
+            return reader.ReadUInt64();
         }
     }
 
@@ -520,28 +510,27 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, UInt64? value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, UInt64? value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteUInt64(ref writer, value.Value);
+                writer.WriteUInt64(value.Value);
             }
         }
 
-        public UInt64? Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public UInt64? Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                return MessagePackBinary.ReadUInt64(ref byteSequence);
+                return reader.ReadUInt64();
             }
         }
     }
@@ -555,36 +544,35 @@ namespace MessagePack.Formatters
 
         }
 
-        public void Serialize(ref BufferWriter writer, UInt64[] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, UInt64[] value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteArrayHeader(ref writer, value.Length);
+                writer.WriteArrayHeader(value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    MessagePackBinary.WriteUInt64(ref writer, value[i]);
+                    writer.WriteUInt64(value[i]);
                 }
             }
         }
 
-        public UInt64[] Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public UInt64[] Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
+                var len = reader.ReadArrayHeader();
                 var array = new UInt64[len];
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] = MessagePackBinary.ReadUInt64(ref byteSequence);
+                    array[i] = reader.ReadUInt64();
                 }
                 return array;
             }
@@ -599,14 +587,14 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, Single value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Single value, IFormatterResolver resolver)
         {
-            MessagePackBinary.WriteSingle(ref writer, value);
+            writer.WriteSingle(value);
         }
 
-        public Single Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Single Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            return MessagePackBinary.ReadSingle(ref byteSequence);
+            return reader.ReadSingle();
         }
     }
 
@@ -618,28 +606,27 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, Single? value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Single? value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteSingle(ref writer, value.Value);
+                writer.WriteSingle(value.Value);
             }
         }
 
-        public Single? Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Single? Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                return MessagePackBinary.ReadSingle(ref byteSequence);
+                return reader.ReadSingle();
             }
         }
     }
@@ -653,36 +640,35 @@ namespace MessagePack.Formatters
 
         }
 
-        public void Serialize(ref BufferWriter writer, Single[] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Single[] value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteArrayHeader(ref writer, value.Length);
+                writer.WriteArrayHeader(value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    MessagePackBinary.WriteSingle(ref writer, value[i]);
+                    writer.WriteSingle(value[i]);
                 }
             }
         }
 
-        public Single[] Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Single[] Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
+                var len = reader.ReadArrayHeader();
                 var array = new Single[len];
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] = MessagePackBinary.ReadSingle(ref byteSequence);
+                    array[i] = reader.ReadSingle();
                 }
                 return array;
             }
@@ -697,14 +683,14 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, Double value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Double value, IFormatterResolver resolver)
         {
-            MessagePackBinary.WriteDouble(ref writer, value);
+            writer.WriteDouble(value);
         }
 
-        public Double Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Double Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            return MessagePackBinary.ReadDouble(ref byteSequence);
+            return reader.ReadDouble();
         }
     }
 
@@ -716,28 +702,27 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, Double? value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Double? value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteDouble(ref writer, value.Value);
+                writer.WriteDouble(value.Value);
             }
         }
 
-        public Double? Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Double? Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                return MessagePackBinary.ReadDouble(ref byteSequence);
+                return reader.ReadDouble();
             }
         }
     }
@@ -751,36 +736,35 @@ namespace MessagePack.Formatters
 
         }
 
-        public void Serialize(ref BufferWriter writer, Double[] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Double[] value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteArrayHeader(ref writer, value.Length);
+                writer.WriteArrayHeader(value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    MessagePackBinary.WriteDouble(ref writer, value[i]);
+                    writer.WriteDouble(value[i]);
                 }
             }
         }
 
-        public Double[] Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Double[] Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
+                var len = reader.ReadArrayHeader();
                 var array = new Double[len];
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] = MessagePackBinary.ReadDouble(ref byteSequence);
+                    array[i] = reader.ReadDouble();
                 }
                 return array;
             }
@@ -795,14 +779,14 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, Boolean value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Boolean value, IFormatterResolver resolver)
         {
-            MessagePackBinary.WriteBoolean(ref writer, value);
+            writer.WriteBoolean(value);
         }
 
-        public Boolean Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Boolean Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            return MessagePackBinary.ReadBoolean(ref byteSequence);
+            return reader.ReadBoolean();
         }
     }
 
@@ -814,28 +798,27 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, Boolean? value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Boolean? value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteBoolean(ref writer, value.Value);
+                writer.WriteBoolean(value.Value);
             }
         }
 
-        public Boolean? Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Boolean? Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                return MessagePackBinary.ReadBoolean(ref byteSequence);
+                return reader.ReadBoolean();
             }
         }
     }
@@ -849,36 +832,35 @@ namespace MessagePack.Formatters
 
         }
 
-        public void Serialize(ref BufferWriter writer, Boolean[] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Boolean[] value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteArrayHeader(ref writer, value.Length);
+                writer.WriteArrayHeader(value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    MessagePackBinary.WriteBoolean(ref writer, value[i]);
+                    writer.WriteBoolean(value[i]);
                 }
             }
         }
 
-        public Boolean[] Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Boolean[] Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
+                var len = reader.ReadArrayHeader();
                 var array = new Boolean[len];
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] = MessagePackBinary.ReadBoolean(ref byteSequence);
+                    array[i] = reader.ReadBoolean();
                 }
                 return array;
             }
@@ -893,14 +875,14 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, Byte value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Byte value, IFormatterResolver resolver)
         {
-            MessagePackBinary.WriteByte(ref writer, value);
+            writer.WriteByte(value);
         }
 
-        public Byte Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Byte Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            return MessagePackBinary.ReadByte(ref byteSequence);
+            return reader.ReadByte();
         }
     }
 
@@ -912,28 +894,27 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, Byte? value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Byte? value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteByte(ref writer, value.Value);
+                writer.WriteByte(value.Value);
             }
         }
 
-        public Byte? Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Byte? Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                return MessagePackBinary.ReadByte(ref byteSequence);
+                return reader.ReadByte();
             }
         }
     }
@@ -947,14 +928,14 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, SByte value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, SByte value, IFormatterResolver resolver)
         {
-            MessagePackBinary.WriteSByte(ref writer, value);
+            writer.WriteSByte(value);
         }
 
-        public SByte Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public SByte Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            return MessagePackBinary.ReadSByte(ref byteSequence);
+            return reader.ReadSByte();
         }
     }
 
@@ -966,28 +947,27 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, SByte? value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, SByte? value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteSByte(ref writer, value.Value);
+                writer.WriteSByte(value.Value);
             }
         }
 
-        public SByte? Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public SByte? Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                return MessagePackBinary.ReadSByte(ref byteSequence);
+                return reader.ReadSByte();
             }
         }
     }
@@ -1001,36 +981,35 @@ namespace MessagePack.Formatters
 
         }
 
-        public void Serialize(ref BufferWriter writer, SByte[] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, SByte[] value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteArrayHeader(ref writer, value.Length);
+                writer.WriteArrayHeader(value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    MessagePackBinary.WriteSByte(ref writer, value[i]);
+                    writer.WriteSByte(value[i]);
                 }
             }
         }
 
-        public SByte[] Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public SByte[] Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
+                var len = reader.ReadArrayHeader();
                 var array = new SByte[len];
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] = MessagePackBinary.ReadSByte(ref byteSequence);
+                    array[i] = reader.ReadSByte();
                 }
                 return array;
             }
@@ -1045,14 +1024,14 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, Char value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Char value, IFormatterResolver resolver)
         {
-            MessagePackBinary.WriteChar(ref writer, value);
+            writer.WriteChar(value);
         }
 
-        public Char Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Char Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            return MessagePackBinary.ReadChar(ref byteSequence);
+            return reader.ReadChar();
         }
     }
 
@@ -1064,28 +1043,27 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, Char? value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Char? value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteChar(ref writer, value.Value);
+                writer.WriteChar(value.Value);
             }
         }
 
-        public Char? Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Char? Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                return MessagePackBinary.ReadChar(ref byteSequence);
+                return reader.ReadChar();
             }
         }
     }
@@ -1099,36 +1077,35 @@ namespace MessagePack.Formatters
 
         }
 
-        public void Serialize(ref BufferWriter writer, Char[] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, Char[] value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteArrayHeader(ref writer, value.Length);
+                writer.WriteArrayHeader(value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    MessagePackBinary.WriteChar(ref writer, value[i]);
+                    writer.WriteChar(value[i]);
                 }
             }
         }
 
-        public Char[] Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public Char[] Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
+                var len = reader.ReadArrayHeader();
                 var array = new Char[len];
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] = MessagePackBinary.ReadChar(ref byteSequence);
+                    array[i] = reader.ReadChar();
                 }
                 return array;
             }
@@ -1143,14 +1120,14 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, DateTime value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, DateTime value, IFormatterResolver resolver)
         {
-            MessagePackBinary.WriteDateTime(ref writer, value);
+            writer.WriteDateTime(value);
         }
 
-        public DateTime Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public DateTime Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            return MessagePackBinary.ReadDateTime(ref byteSequence);
+            return reader.ReadDateTime();
         }
     }
 
@@ -1162,28 +1139,27 @@ namespace MessagePack.Formatters
         {
         }
 
-        public void Serialize(ref BufferWriter writer, DateTime? value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, DateTime? value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteDateTime(ref writer, value.Value);
+                writer.WriteDateTime(value.Value);
             }
         }
 
-        public DateTime? Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public DateTime? Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                return MessagePackBinary.ReadDateTime(ref byteSequence);
+                return reader.ReadDateTime();
             }
         }
     }
@@ -1197,36 +1173,35 @@ namespace MessagePack.Formatters
 
         }
 
-        public void Serialize(ref BufferWriter writer, DateTime[] value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, DateTime[] value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteArrayHeader(ref writer, value.Length);
+                writer.WriteArrayHeader(value.Length);
                 for (int i = 0; i < value.Length; i++)
                 {
-                    MessagePackBinary.WriteDateTime(ref writer, value[i]);
+                    writer.WriteDateTime(value[i]);
                 }
             }
         }
 
-        public DateTime[] Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public DateTime[] Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                var len = MessagePackBinary.ReadArrayHeader(ref byteSequence);
+                var len = reader.ReadArrayHeader();
                 var array = new DateTime[len];
                 for (int i = 0; i < array.Length; i++)
                 {
-                    array[i] = MessagePackBinary.ReadDateTime(ref byteSequence);
+                    array[i] = reader.ReadDateTime();
                 }
                 return array;
             }

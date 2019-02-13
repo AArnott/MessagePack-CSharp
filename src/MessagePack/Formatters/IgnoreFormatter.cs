@@ -4,14 +4,14 @@ namespace MessagePack.Formatters
 {
     public sealed class IgnoreFormatter<T> : IMessagePackFormatter<T>
     {
-        public void Serialize(ref BufferWriter writer, T value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, T value, IFormatterResolver resolver)
         {
-            MessagePackBinary.WriteNil(ref writer);
+            writer.WriteNil();
         }
 
-        public T Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public T Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            MessagePackBinary.ReadNextBlock(ref byteSequence);
+            reader.Skip();
             return default(T);
         }
     }

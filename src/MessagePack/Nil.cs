@@ -40,14 +40,15 @@ namespace MessagePack.Formatters
 
         }
 
-        public void Serialize(ref BufferWriter writer, Nil value, IFormatterResolver typeResolver)
+        public void Serialize(ref MessagePackWriter writer, Nil value, IFormatterResolver typeResolver)
+           
         {
-            MessagePackBinary.WriteNil(ref writer);
+            writer.WriteNil();
         }
 
-        public Nil Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver typeResolver)
+        public Nil Deserialize(ref MessagePackReader reader, IFormatterResolver typeResolver)
         {
-            return MessagePackBinary.ReadNil(ref byteSequence);
+            return reader.ReadNil();
         }
     }
 
@@ -61,14 +62,15 @@ namespace MessagePack.Formatters
 
         }
 
-        public void Serialize(ref BufferWriter writer, Nil? value, IFormatterResolver typeResolver)
+        public void Serialize(ref MessagePackWriter writer, Nil? value, IFormatterResolver typeResolver)
+           
         {
-            MessagePackBinary.WriteNil(ref writer);
+            writer.WriteNil();
         }
 
-        public Nil? Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver typeResolver)
+        public Nil? Deserialize(ref MessagePackReader reader, IFormatterResolver typeResolver)
         {
-            return MessagePackBinary.ReadNil(ref byteSequence);
+            return reader.ReadNil();
         }
     }
 }

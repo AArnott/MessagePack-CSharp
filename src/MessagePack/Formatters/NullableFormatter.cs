@@ -5,11 +5,11 @@ namespace MessagePack.Formatters
     public sealed class NullableFormatter<T> : IMessagePackFormatter<T?>
         where T : struct
     {
-        public void Serialize(ref BufferWriter writer, T? value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, T? value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
@@ -17,16 +17,16 @@ namespace MessagePack.Formatters
             }
         }
 
-        public T? Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public T? Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
-                byteSequence = byteSequence.Slice(1);
+                reader.ReadNil();
                 return null;
             }
             else
             {
-                return formatterResolver.GetFormatterWithVerify<T>().Deserialize(ref byteSequence, formatterResolver);
+                return resolver.GetFormatterWithVerify<T>().Deserialize(ref reader, resolver);
             }
         }
     }
@@ -41,11 +41,11 @@ namespace MessagePack.Formatters
             this.underlyingFormatter = underlyingFormatter;
         }
 
-        public void Serialize(ref BufferWriter writer, T? value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, T? value, IFormatterResolver formatterResolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
@@ -53,16 +53,15 @@ namespace MessagePack.Formatters
             }
         }
 
-        public T? Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public T? Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
                 return null;
             }
             else
             {
-                return underlyingFormatter.Deserialize(ref byteSequence, formatterResolver);
+                return underlyingFormatter.Deserialize(ref reader, resolver);
             }
         }
     }

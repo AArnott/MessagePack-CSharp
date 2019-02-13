@@ -64,9 +64,9 @@ namespace MessagePack
                 resolver = this.DefaultResolver;
             }
 
-            var fastWriter = new BufferWriter(writer);
-            this.Serialize<T>(ref fastWriter, value, resolver);
-            fastWriter.Commit();
+            var fastWriter = new MessagePackWriter(writer);
+            this.Serialize(ref fastWriter, value, resolver);
+            fastWriter.Flush();
         }
 
         /// <summary>
@@ -76,26 +76,35 @@ namespace MessagePack
         /// <param name="byteSequence">The sequence to deserialize from.</param>
         /// <param name="resolver">The resolver to use during deserialization. Use <c>null</c> to use the <see cref="DefaultResolver"/>.</param>
         /// <returns>The deserialized value.</returns>
-        public T Deserialize<T>(ReadOnlySequence<byte> byteSequence, IFormatterResolver resolver = null) => this.Deserialize<T>(byteSequence, resolver, out _);
+        public T Deserialize<T>(ReadOnlySequence<byte> byteSequence, IFormatterResolver resolver = null)
+        {
+            var reader = new MessagePackReader(byteSequence);
+            return this.Deserialize<T>(ref reader, resolver);
+        }
 
         /// <summary>
         /// Deserializes a value of a given type from a sequence of bytes.
         /// </summary>
         /// <typeparam name="T">The type of value to deserialize.</typeparam>
-        /// <param name="byteSequence">The sequence to deserialize from.</param>
+        /// <param name="reader">The reader to deserialize from.</param>
         /// <param name="resolver">The resolver to use during deserialization. Use <c>null</c> to use the <see cref="DefaultResolver"/>.</param>
-        /// <param name="endPosition">The position in the <paramref name="byteSequence"/> just after the last read byte.</param>
         /// <returns>The deserialized value.</returns>
-        public virtual T Deserialize<T>(ReadOnlySequence<byte> byteSequence, IFormatterResolver resolver, out SequencePosition endPosition)
+        public virtual T Deserialize<T>(ref MessagePackReader reader, IFormatterResolver resolver = null)
         {
-            if (resolver == null)
-            {
-                resolver = this.DefaultResolver;
-            }
+            resolver = resolver ?? this.DefaultResolver;
+            return resolver.GetFormatterWithVerify<T>().Deserialize(ref reader, resolver);
+        }
 
-            T result = resolver.GetFormatterWithVerify<T>().Deserialize(ref byteSequence, resolver);
-            endPosition = byteSequence.Start;
-            return result;
+        /// <summary>
+        /// Serializes a given value with the specified buffer writer.
+        /// </summary>
+        /// <param name="writer">The buffer writer to serialize with.</param>
+        /// <param name="value">The value to serialize.</param>
+        /// <param name="resolver">The resolver to use during deserialization. Use <c>null</c> to use the <see cref="DefaultResolver"/>.</param>
+        public virtual void Serialize<T>(ref MessagePackWriter writer, T value, IFormatterResolver resolver = null)
+        {
+            resolver = resolver ?? this.DefaultResolver;
+            resolver.GetFormatterWithVerify<T>().Serialize(ref writer, value, resolver);
         }
 
         /// <summary>
@@ -153,7 +162,11 @@ namespace MessagePack
         /// <param name="buffer">The buffer to deserialize from.</param>
         /// <param name="resolver">The resolver to use during deserialization. Use <c>null</c> to use the <see cref="DefaultResolver"/>.</param>
         /// <returns>The deserialized value.</returns>
-        public T Deserialize<T>(Memory<byte> buffer, IFormatterResolver resolver = null) => this.Deserialize<T>(new ReadOnlySequence<byte>(buffer), resolver, out SequencePosition endPosition);
+        public T Deserialize<T>(Memory<byte> buffer, IFormatterResolver resolver = null)
+        {
+            var reader = new MessagePackReader(new ReadOnlySequence<byte>(buffer));
+            return this.Deserialize<T>(ref reader, resolver);
+        }
 
         /// <summary>
         /// Deserializes a value of a given type from a sequence of bytes.
@@ -170,8 +183,8 @@ namespace MessagePack
                 throw new ArgumentNullException(nameof(buffer));
             }
 
-            var sequence = new ReadOnlySequence<byte>(buffer.AsMemory(offset));
-            return Deserialize<T>(sequence, resolver, out SequencePosition endPosition);
+            var reader = new MessagePackReader(new ReadOnlySequence<byte>(buffer.AsMemory(offset)));
+            return Deserialize<T>(ref reader, resolver);
         }
 
         /// <summary>
@@ -191,8 +204,9 @@ namespace MessagePack
             }
 
             var sequence = new ReadOnlySequence<byte>(buffer.AsMemory(offset));
-            T result = Deserialize<T>(sequence, resolver, out SequencePosition endPosition);
-            bytesRead = endPosition.GetInteger(); // we know the sequence has just one segment, so this is safe.
+            var reader = new MessagePackReader(sequence);
+            T result = Deserialize<T>(ref reader, resolver);
+            bytesRead = (int)sequence.Slice(0, reader.Position).Length;
             return result;
         }
 
@@ -215,7 +229,7 @@ namespace MessagePack
                     sequence.Advance(bytesRead);
                 } while (bytesRead > 0);
 
-                return this.Deserialize<T>(sequence.AsReadOnlySequence, resolver, out _);
+                return this.Deserialize<T>(sequence.AsReadOnlySequence, resolver);
             }
         }
 
@@ -239,20 +253,8 @@ namespace MessagePack
                     sequence.Advance(bytesRead);
                 } while (bytesRead > 0);
 
-                return this.Deserialize<T>(sequence.AsReadOnlySequence, resolver, out _);
+                return this.Deserialize<T>(sequence.AsReadOnlySequence, resolver);
             }
-        }
-
-        /// <summary>
-        /// Serializes a given value with the specified buffer writer.
-        /// </summary>
-        /// <param name="writer">The buffer writer to serialize with.</param>
-        /// <param name="value">The value to serialize.</param>
-        /// <param name="resolver">The resolver to use during deserialization. Use <c>null</c> to use the <see cref="DefaultResolver"/>.</param>
-        protected virtual void Serialize<T>(ref BufferWriter writer, T value, IFormatterResolver resolver)
-        {
-            var formatter = resolver.GetFormatterWithVerify<T>();
-            formatter.Serialize(ref writer, value, resolver);
         }
     }
 }

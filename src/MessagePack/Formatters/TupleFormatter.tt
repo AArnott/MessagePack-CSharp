@@ -20,36 +20,35 @@ namespace MessagePack.Formatters
 
     public sealed class TupleFormatter<<#= ts #>> : IMessagePackFormatter<<#= t #>>
     {
-        public void Serialize(ref BufferWriter writer, <#= t #> value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, <#= t #> value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                MessagePackBinary.WriteArrayHeader(ref writer, <#= i #>);
+                writer.WriteArrayHeader(<#= i #>);
 
 <# for(var j = 1; j <= i; j++) { #>
-                formatterResolver.GetFormatterWithVerify<<#= toT(j) #>>().Serialize(ref writer, value.<#= toItem(j) #>, formatterResolver);
+                resolver.GetFormatterWithVerify<<#= toT(j) #>>().Serialize(ref writer, value.<#= toItem(j) #>, resolver);
 <# } #>
             }
         }
 
-        public <#= t #> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public <#= t #> Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
-                return null;
+                return default;
             }
             else
             {
-                var count = MessagePackBinary.ReadArrayHeader(ref byteSequence);
+                var count = reader.ReadArrayHeader();
                 if (count != <#= i #>) throw new InvalidOperationException("Invalid Tuple count");
 
 <# for(var j = 1; j <= i; j++) { #>
-                var item<#= j #> = formatterResolver.GetFormatterWithVerify<<#= toT(j) #>>().Deserialize(ref byteSequence, formatterResolver);
+                var item<#= j #> = resolver.GetFormatterWithVerify<<#= toT(j) #>>().Deserialize(ref reader, resolver);
 <# } #>
 
                 return new Tuple<<#= ts #>>(<#= string.Join(", ", Enumerable.Range(1, i).Select(x => "item" + x)) #>);

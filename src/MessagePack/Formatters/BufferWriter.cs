@@ -58,6 +58,11 @@ namespace MessagePack.Formatters
         /// </summary>
         public long BytesCommitted => _bytesCommitted;
 
+        /// <summary>
+        /// Gets the <see cref="IBufferWriter{T}"/> underlying this instance.
+        /// </summary>
+        internal IBufferWriter<byte> UnderlyingWriter => _output;
+
         public Span<byte> GetSpan(int sizeHint)
         {
             Ensure(sizeHint);

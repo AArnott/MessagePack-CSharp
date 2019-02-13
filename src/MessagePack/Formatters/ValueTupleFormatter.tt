@@ -19,28 +19,28 @@ namespace MessagePack.Formatters
 
     public sealed class ValueTupleFormatter<<#= ts #>> : IMessagePackFormatter<<#= t #>><#= (t.Contains("TRest") ? " where TRest : struct" : "") #>
     {
-        public void Serialize(ref BufferWriter writer, <#= t #> value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, <#= t #> value, IFormatterResolver resolver)
         {
-            MessagePackBinary.WriteArrayHeader(ref writer, <#= i #>);
+            writer.WriteArrayHeader(<#= i #>);
 
 <# for(var j = 1; j <= i; j++) { #>
-            formatterResolver.GetFormatterWithVerify<<#= toT(j) #>>().Serialize(ref writer, value.<#= toItem(j) #>, formatterResolver);
+            resolver.GetFormatterWithVerify<<#= toT(j) #>>().Serialize(ref writer, value.<#= toItem(j) #>, resolver);
 <# } #>
         }
 
-        public <#= t #> Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public <#= t #> Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.IsNil)
             {
                 throw new InvalidOperationException("Data is Nil, ValueTuple can not be null.");
             }
             else
             {
-                var count = MessagePackBinary.ReadArrayHeader(ref byteSequence);
+                var count = reader.ReadArrayHeader();
                 if (count != <#= i #>) throw new InvalidOperationException("Invalid ValueTuple count");
 
 <# for(var j = 1; j <= i; j++) { #>
-                var item<#= j #> = formatterResolver.GetFormatterWithVerify<<#= toT(j) #>>().Deserialize(ref byteSequence, formatterResolver);
+                var item<#= j #> = resolver.GetFormatterWithVerify<<#= toT(j) #>>().Deserialize(ref reader, resolver);
 <# } #>
             
                 return new ValueTuple<<#= ts #>>(<#= string.Join(", ", Enumerable.Range(1, i).Select(x => "item" + x)) #>);

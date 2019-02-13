@@ -17,16 +17,16 @@ namespace MessagePack.Formatters
         where TDictionary : IEnumerable<KeyValuePair<TKey, TValue>>
         where TEnumerator : IEnumerator<KeyValuePair<TKey, TValue>>
     {
-        public void Serialize(ref BufferWriter writer, TDictionary value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, TDictionary value, IFormatterResolver resolver)
         {
             if (value == null)
             {
-                MessagePackBinary.WriteNil(ref writer);
+                writer.WriteNil();
             }
             else
             {
-                var keyFormatter = formatterResolver.GetFormatterWithVerify<TKey>();
-                var valueFormatter = formatterResolver.GetFormatterWithVerify<TValue>();
+                var keyFormatter = resolver.GetFormatterWithVerify<TKey>();
+                var valueFormatter = resolver.GetFormatterWithVerify<TValue>();
 
                 int count;
                 {
@@ -49,7 +49,7 @@ namespace MessagePack.Formatters
                     }
                 }
 
-                MessagePackBinary.WriteMapHeader(ref writer, count);
+                writer.WriteMapHeader(count);
 
                 var e = GetSourceEnumerator(value);
                 try
@@ -57,8 +57,8 @@ namespace MessagePack.Formatters
                     while (e.MoveNext())
                     {
                         var item = e.Current;
-                        keyFormatter.Serialize(ref writer, item.Key, formatterResolver);
-                        valueFormatter.Serialize(ref writer, item.Value, formatterResolver);
+                        keyFormatter.Serialize(ref writer, item.Key, resolver);
+                        valueFormatter.Serialize(ref writer, item.Value, resolver);
                     }
                 }
                 finally
@@ -68,26 +68,25 @@ namespace MessagePack.Formatters
             }
         }
 
-        public TDictionary Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public TDictionary Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(byteSequence))
+            if (reader.TryReadNil())
             {
-                byteSequence = byteSequence.Slice(1);
                 return default(TDictionary);
             }
             else
             {
-                var keyFormatter = formatterResolver.GetFormatterWithVerify<TKey>();
-                var valueFormatter = formatterResolver.GetFormatterWithVerify<TValue>();
+                var keyFormatter = resolver.GetFormatterWithVerify<TKey>();
+                var valueFormatter = resolver.GetFormatterWithVerify<TValue>();
 
-                var len = MessagePackBinary.ReadMapHeader(ref byteSequence);
+                var len = reader.ReadMapHeader();
 
                 var dict = Create(len);
                 for (int i = 0; i < len; i++)
                 {
-                    var key = keyFormatter.Deserialize(ref byteSequence, formatterResolver);
+                    var key = keyFormatter.Deserialize(ref reader, resolver);
 
-                    var value = valueFormatter.Deserialize(ref byteSequence, formatterResolver);
+                    var value = valueFormatter.Deserialize(ref reader, resolver);
 
                     Add(dict, i, key, value);
                 }
@@ -272,7 +271,7 @@ namespace MessagePack.Formatters
     public abstract class DictionaryFormatterBase<TKey, TValue, TIntermediate, TDictionary> : IMessagePackFormatter<TDictionary>
         where TDictionary : IDictionary<TKey, TValue>
     {
-        public void Serialize(ref BufferWriter writer, TDictionary value, IFormatterResolver formatterResolver)
+        public void Serialize(ref MessagePackWriter writer, TDictionary value, IFormatterResolver resolver)
         {
             if (value == null)
             {
@@ -281,8 +280,8 @@ namespace MessagePack.Formatters
             else
             {
                 var startOffset = offset;
-                var keyFormatter = formatterResolver.GetFormatterWithVerify<TKey>();
-                var valueFormatter = formatterResolver.GetFormatterWithVerify<TValue>();
+                var keyFormatter = resolver.GetFormatterWithVerify<TKey>();
+                var valueFormatter = resolver.GetFormatterWithVerify<TValue>();
 
                 var count = value.Count;
 
@@ -294,8 +293,8 @@ namespace MessagePack.Formatters
                     while (e.MoveNext())
                     {
                         var item = e.Current;
-                        offset += keyFormatter.Serialize(ref bytes, offset, item.Key, formatterResolver);
-                        offset += valueFormatter.Serialize(ref bytes, offset, item.Value, formatterResolver);
+                        offset += keyFormatter.Serialize(ref bytes, offset, item.Key, resolver);
+                        offset += valueFormatter.Serialize(ref bytes, offset, item.Value, resolver);
                     }
                 }
                 finally
@@ -307,18 +306,17 @@ namespace MessagePack.Formatters
             }
         }
 
-        public TDictionary Deserialize(ref ReadOnlySequence<byte> byteSequence, IFormatterResolver formatterResolver)
+        public TDictionary Deserialize(ref MessagePackReader reader, IFormatterResolver resolver)
         {
-            if (MessagePackBinary.IsNil(bytes, offset))
+            if (reader.TryReadNil())
             {
-                readSize = 1;
                 return default(TDictionary);
             }
             else
             {
                 var startOffset = offset;
-                var keyFormatter = formatterResolver.GetFormatterWithVerify<TKey>();
-                var valueFormatter = formatterResolver.GetFormatterWithVerify<TValue>();
+                var keyFormatter = resolver.GetFormatterWithVerify<TKey>();
+                var valueFormatter = resolver.GetFormatterWithVerify<TValue>();
 
                 var len = MessagePackBinary.ReadMapHeader(bytes, offset, out readSize);
                 offset += readSize;
@@ -326,10 +324,10 @@ namespace MessagePack.Formatters
                 var dict = Create(len);
                 for (int i = 0; i < len; i++)
                 {
-                    var key = keyFormatter.Deserialize(bytes, offset, formatterResolver, out readSize);
+                    var key = keyFormatter.Deserialize(bytes, offset, resolver, out readSize);
                     offset += readSize;
 
-                    var value = valueFormatter.Deserialize(bytes, offset, formatterResolver, out readSize);
+                    var value = valueFormatter.Deserialize(bytes, offset, resolver, out readSize);
                     offset += readSize;
 
                     Add(dict, i, key, value);
