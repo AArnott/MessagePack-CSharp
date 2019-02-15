@@ -916,7 +916,6 @@ namespace MessagePack
 
         /// <summary>
         /// Writes out a <see cref="string"/>, prefixed with the length using one of these message codes:
-        /// <see cref="MessagePackCode.Nil"/>,
         /// <see cref="MessagePackCode.MinFixStr"/>,
         /// <see cref="MessagePackCode.Str8"/>,
         /// <see cref="MessagePackCode.Str16"/>,
@@ -926,7 +925,11 @@ namespace MessagePack
         /// <param name="forceFullHeaderLength"><c>true</c> to force the maximum length header to be written; <c>false</c> to allow the most compact form possible to be used.</param>
         public void Write(string value, bool forceFullHeaderLength = false)
         {
-            Requires.NotNull(value, nameof(value));
+            if (value == null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+
             Write(value.AsSpan(), forceFullHeaderLength);
         }
 
