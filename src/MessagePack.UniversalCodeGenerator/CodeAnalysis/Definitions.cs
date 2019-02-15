@@ -98,7 +98,7 @@ namespace MessagePack.CodeGenerator
         {
             if (primitiveTypes.Contains(Type))
             {
-                return $"MessagePackBinary.Write{ShortTypeName.Replace("[]", "s")}(ref writer, value.{Name})";
+                return $"writer.Write(value.{Name})";
             }
             else
             {
@@ -110,7 +110,7 @@ namespace MessagePack.CodeGenerator
         {
             if (primitiveTypes.Contains(Type))
             {
-                return $"MessagePackBinary.Read{ShortTypeName.Replace("[]", "s")}(ref byteSequence)";
+                return $"reader.Read{ShortTypeName.Replace("[]", "s")}()";
             }
             else
             {

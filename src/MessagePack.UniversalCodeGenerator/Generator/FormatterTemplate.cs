@@ -109,7 +109,8 @@ namespace MessagePack.CodeGenerator.Generator
             
             #line default
             #line hidden
-            this.Write("                global::MessagePack.MessagePackBinary.GetEncodedStringBytes(\"");
+            this.Write("                global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes" +
+                    "(\"");
             
             #line 38 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(x.StringKey));
@@ -144,9 +145,8 @@ namespace MessagePack.CodeGenerator.Generator
             
             #line default
             #line hidden
-            this.Write("            if (value == null)\r\n            {\r\n                global::MessagePac" +
-                    "k.writer.WriteNil();\r\n                return;\r\n            " +
-                    "}\r\n");
+            this.Write("            if (value == null)\r\n            {\r\n                writer.WriteNil();" +
+                    "\r\n                return;\r\n            }\r\n");
             
             #line 53 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  } 
@@ -177,12 +177,11 @@ if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnBe
             #line hidden
             
             #line 59 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
- if( objInfo.IsIntKey) { if( (objInfo.MaxKey + 1) <= 15) { 
+ if( objInfo.IsIntKey) { 
             
             #line default
             #line hidden
-            this.Write("            global::MessagePack.MessagePackBinary.WriteFixedArrayHeaderUnsafe(ref" +
-                    " writer, ");
+            this.Write("            writer.WriteArrayHeader(");
             
             #line 60 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objInfo.MaxKey + 1));
@@ -196,136 +195,105 @@ if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnBe
             
             #line default
             #line hidden
-            this.Write("            global::MessagePack.writer.WriteArrayHeader(");
+            this.Write("            writer.WriteMapHeader(");
             
             #line 62 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objInfo.MaxKey + 1));
+            this.Write(this.ToStringHelper.ToStringWithCulture(objInfo.WriteCount));
             
             #line default
             #line hidden
             this.Write(");\r\n");
             
             #line 63 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
- } } else if( objInfo.WriteCount <= 15) { 
-            
-            #line default
-            #line hidden
-            this.Write("            global::MessagePack.MessagePackBinary.WriteFixedMapHeaderUnsafe(ref w" +
-                    "riter, ");
-            
-            #line 64 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objInfo.WriteCount));
-            
-            #line default
-            #line hidden
-            this.Write(");\r\n");
-            
-            #line 65 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
- } else { 
-            
-            #line default
-            #line hidden
-            this.Write("            global::MessagePack.writer.WriteMapHeader(");
-            
-            #line 66 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(objInfo.WriteCount));
-            
-            #line default
-            #line hidden
-            this.Write(");\r\n");
-            
-            #line 67 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  } 
             
             #line default
             #line hidden
             
-            #line 68 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 64 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  if(objInfo.IsIntKey) { 
             
             #line default
             #line hidden
             
-            #line 69 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 65 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  for(var i =0; i<= objInfo.MaxKey; i++) { var member = objInfo.GetMember(i); 
             
             #line default
             #line hidden
             
-            #line 70 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 66 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  if( member == null) { 
             
             #line default
             #line hidden
-            this.Write("            global::MessagePack.writer.WriteNil();\r\n");
+            this.Write("            writer.WriteNil();\r\n");
             
-            #line 72 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 68 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  } else { 
             
             #line default
             #line hidden
             this.Write("            ");
             
-            #line 73 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 69 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(member.GetSerializeMethodString()));
             
             #line default
             #line hidden
             this.Write(";\r\n");
             
-            #line 74 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 70 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  } } } else { 
             
             #line default
             #line hidden
             
-            #line 75 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 71 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  var index = 0; foreach(var x in objInfo.Members) { 
             
             #line default
             #line hidden
-            this.Write("            global::MessagePack.writer.WriteRaw(this.____s" +
-                    "tringByteKeys[");
+            this.Write("            writer.WriteRaw(this.____stringByteKeys[");
             
-            #line 76 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 72 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(index++));
             
             #line default
             #line hidden
             this.Write("]);\r\n            ");
             
-            #line 77 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 73 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(x.GetSerializeMethodString()));
             
             #line default
             #line hidden
             this.Write(";\r\n");
             
-            #line 78 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 74 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  } } 
             
             #line default
             #line hidden
             this.Write("        }\r\n\r\n        public ");
             
-            #line 81 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 77 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objInfo.FullName));
             
             #line default
             #line hidden
-            this.Write(" Deserialize(ref MessagePackReader reader, global::MessagePack.IFormat" +
-                    "terResolver formatterResolver)\r\n        {\r\n            if (global::MessagePack.M" +
-                    "essagePackBinary.IsNil(byteSequence))\r\n            {\r\n");
+            this.Write(" Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver" +
+                    " formatterResolver)\r\n        {\r\n            if (reader.TryReadNil())\r\n          " +
+                    "  {\r\n");
             
-            #line 85 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 81 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  if( objInfo.IsClass) { 
             
             #line default
             #line hidden
-            this.Write("                byteSequence = byteSequence.Slice(1);\r\n                return nul" +
-                    "l;\r\n");
+            this.Write("                return null;\r\n");
             
-            #line 88 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 83 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  } else { 
             
             #line default
@@ -333,164 +301,162 @@ if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnBe
             this.Write("                throw new InvalidOperationException(\"typecode is null, struct not" +
                     " supported\");\r\n");
             
-            #line 90 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 85 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  } 
             
             #line default
             #line hidden
             this.Write("            }\r\n\r\n");
             
-            #line 93 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 88 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  if(objInfo.IsStringKey) { 
             
             #line default
             #line hidden
-            this.Write("            var length = global::MessagePack.MessagePackBinary.ReadMapHeader(ref " +
-                    "byteSequence);\r\n");
+            this.Write("            var length = reader.ReadMapHeader();\r\n");
             
-            #line 95 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 90 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  } else { 
             
             #line default
             #line hidden
-            this.Write("            var length = global::MessagePack.MessagePackBinary.ReadArrayHeader(re" +
-                    "f byteSequence);\r\n");
+            this.Write("            var length = reader.ReadArrayHeader();\r\n");
             
-            #line 97 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 92 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  } 
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 99 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 94 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  foreach(var x in objInfo.Members) { 
             
             #line default
             #line hidden
             this.Write("            var __");
             
-            #line 100 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 95 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(x.Name));
             
             #line default
             #line hidden
             this.Write("__ = default(");
             
-            #line 100 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 95 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(x.Type));
             
             #line default
             #line hidden
             this.Write(");\r\n");
             
-            #line 101 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 96 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  } 
             
             #line default
             #line hidden
             this.Write("\r\n            for (int i = 0; i < length; i++)\r\n            {\r\n");
             
-            #line 105 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 100 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  if(objInfo.IsStringKey) { 
             
             #line default
             #line hidden
-            this.Write(@"                var stringKey = global::MessagePack.reader.ReadStringSegment();
+            this.Write(@"                var stringKey = reader.ReadStringSegment();
                 int key;
                 if (!____keyMapping.TryGetValue(stringKey, out key))
                 {
-                    global::MessagePack.reader.ReadNextBlock();
+                    reader.Skip();
                     continue;
                 }
 ");
             
-            #line 113 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 108 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  } else { 
             
             #line default
             #line hidden
             this.Write("                var key = i;\r\n");
             
-            #line 115 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 110 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  } 
             
             #line default
             #line hidden
             this.Write("\r\n                switch (key)\r\n                {\r\n");
             
-            #line 119 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 114 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  foreach(var x in objInfo.Members) { 
             
             #line default
             #line hidden
             this.Write("                    case ");
             
-            #line 120 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 115 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(x.IntKey));
             
             #line default
             #line hidden
             this.Write(":\r\n                        __");
             
-            #line 121 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 116 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(x.Name));
             
             #line default
             #line hidden
             this.Write("__ = ");
             
-            #line 121 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 116 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(x.GetDeserializeMethodString()));
             
             #line default
             #line hidden
             this.Write(";\r\n                        break;\r\n");
             
-            #line 123 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 118 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  } 
             
             #line default
             #line hidden
-            this.Write("                    default:\r\n                        global::MessagePack.Message" +
-                    "PackBinary.ReadNextBlock(ref byteSequence);\r\n                        break;\r\n   " +
-                    "             }\r\n            }\r\n\r\n            var ____result = new ");
+            this.Write("                    default:\r\n                        reader.Skip();\r\n           " +
+                    "             break;\r\n                }\r\n            }\r\n\r\n            var ____res" +
+                    "ult = new ");
             
-            #line 130 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 125 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(objInfo.GetConstructorString()));
             
             #line default
             #line hidden
             this.Write(";\r\n");
             
-            #line 131 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 126 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  foreach(var x in objInfo.Members.Where(x => x.IsWritable)) { 
             
             #line default
             #line hidden
             this.Write("            ____result.");
             
-            #line 132 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 127 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(x.Name));
             
             #line default
             #line hidden
             this.Write(" = __");
             
-            #line 132 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 127 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(x.Name));
             
             #line default
             #line hidden
             this.Write("__;\r\n");
             
-            #line 133 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 128 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  } 
             
             #line default
             #line hidden
             
-            #line 134 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 129 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
 if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnAfter) { 
             
             #line default
@@ -498,21 +464,21 @@ if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnAf
             this.Write("            ((IMessagePackSerializationCallbackReceiver)____result).OnAfterDeseri" +
                     "alize();\r\n");
             
-            #line 136 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 131 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  } else if(objInfo.HasIMessagePackSerializationCallbackReceiver) { 
             
             #line default
             #line hidden
             this.Write("            ____result.OnAfterDeserialize();\r\n");
             
-            #line 138 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 133 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  } 
             
             #line default
             #line hidden
             this.Write("            return ____result;\r\n        }\r\n    }\r\n\r\n");
             
-            #line 143 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
+            #line 138 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\FormatterTemplate.tt"
  } 
             
             #line default

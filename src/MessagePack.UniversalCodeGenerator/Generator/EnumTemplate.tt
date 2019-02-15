@@ -19,12 +19,12 @@ namespace <#= Namespace #>
     {
         public void Serialize(ref MessagePackWriter writer, <#= info.FullName #> value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            MessagePackBinary.Write<#= info.UnderlyingType #>(ref writer, (<#= info.UnderlyingType #>)value);
+            writer.Write((<#= info.UnderlyingType #>)value);
         }
         
         public <#= info.FullName #> Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            return (<#= info.FullName #>)MessagePackBinary.Read<#= info.UnderlyingType #>(ref byteSequence);
+            return (<#= info.FullName #>)reader.Read<#= info.UnderlyingType #>();
         }
     }
 
