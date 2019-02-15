@@ -810,23 +810,23 @@ namespace GeneratedFormatter
                 }
 
                 writer.WriteMapHeader(9);
-                writer.WriteStringBytes(this.stringByteKeys[0]);
+                writer.WriteString(this.stringByteKeys[0]);
                 writer.WriteInt32(stringKeySerializerTarget.MyProperty1);
-                writer.WriteStringBytes(this.stringByteKeys[1]);
+                writer.WriteString(this.stringByteKeys[1]);
                 writer.WriteInt32(stringKeySerializerTarget.MyProperty2);
-                writer.WriteStringBytes(this.stringByteKeys[2]);
+                writer.WriteString(this.stringByteKeys[2]);
                 writer.WriteInt32(stringKeySerializerTarget.MyProperty3);
-                writer.WriteStringBytes(this.stringByteKeys[3]);
+                writer.WriteString(this.stringByteKeys[3]);
                 writer.WriteInt32(stringKeySerializerTarget.MyProperty4);
-                writer.WriteStringBytes(this.stringByteKeys[4]);
+                writer.WriteString(this.stringByteKeys[4]);
                 writer.WriteInt32(stringKeySerializerTarget.MyProperty5);
-                writer.WriteStringBytes(this.stringByteKeys[5]);
+                writer.WriteString(this.stringByteKeys[5]);
                 writer.WriteInt32(stringKeySerializerTarget.MyProperty6);
-                writer.WriteStringBytes(this.stringByteKeys[6]);
+                writer.WriteString(this.stringByteKeys[6]);
                 writer.WriteInt32(stringKeySerializerTarget.MyProperty7);
-                writer.WriteStringBytes(this.stringByteKeys[7]);
+                writer.WriteString(this.stringByteKeys[7]);
                 writer.WriteInt32(stringKeySerializerTarget.MyProperty8);
-                writer.WriteStringBytes(this.stringByteKeys[8]);
+                writer.WriteString(this.stringByteKeys[8]);
                 writer.WriteInt32(stringKeySerializerTarget.MyProperty9);
             }
 
@@ -979,23 +979,23 @@ namespace GeneratedFormatter
                 }
 
                 writer.WriteMapHeader(9);
-                writer.WriteStringBytes(this.stringByteKeys[0]);
+                writer.WriteString(this.stringByteKeys[0]);
                 writer.WriteInt32(stringKeySerializerTarget.MyProperty1);
-                writer.WriteStringBytes(this.stringByteKeys[1]);
+                writer.WriteString(this.stringByteKeys[1]);
                 writer.WriteInt32(stringKeySerializerTarget.MyProperty2);
-                writer.WriteStringBytes(this.stringByteKeys[2]);
+                writer.WriteString(this.stringByteKeys[2]);
                 writer.WriteInt32(stringKeySerializerTarget.MyProperty3);
-                writer.WriteStringBytes(this.stringByteKeys[3]);
+                writer.WriteString(this.stringByteKeys[3]);
                 writer.WriteInt32(stringKeySerializerTarget.MyProperty4);
-                writer.WriteStringBytes(this.stringByteKeys[4]);
+                writer.WriteString(this.stringByteKeys[4]);
                 writer.WriteInt32(stringKeySerializerTarget.MyProperty5);
-                writer.WriteStringBytes(this.stringByteKeys[5]);
+                writer.WriteString(this.stringByteKeys[5]);
                 writer.WriteInt32(stringKeySerializerTarget.MyProperty6);
-                writer.WriteStringBytes(this.stringByteKeys[6]);
+                writer.WriteString(this.stringByteKeys[6]);
                 writer.WriteInt32(stringKeySerializerTarget.MyProperty7);
-                writer.WriteStringBytes(this.stringByteKeys[7]);
+                writer.WriteString(this.stringByteKeys[7]);
                 writer.WriteInt32(stringKeySerializerTarget.MyProperty8);
-                writer.WriteStringBytes(this.stringByteKeys[8]);
+                writer.WriteString(this.stringByteKeys[8]);
                 writer.WriteInt32(stringKeySerializerTarget.MyProperty9);
             }
 

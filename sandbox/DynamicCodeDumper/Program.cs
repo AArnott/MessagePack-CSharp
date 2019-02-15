@@ -151,7 +151,7 @@ namespace DynamicCodeDumper
 
         public void Serialize(ref MessagePackWriter writer, string value, IFormatterResolver formatterResolver)
         {
-            writer.WriteString(value + value);
+            writer.Write(value + value);
         }
     }
 

@@ -35,8 +35,8 @@ namespace MessagePack.Tests
             bin3Writer.WriteRaw(bin1);
             bin3Writer.Flush();
 
-            MessagePack.Internal.ByteArrayComparer.Equals(bin1, 0, bin1.Length, bin2).IsTrue();
-            MessagePack.Internal.ByteArrayComparer.Equals(bin1, 0, bin1.Length, bin3.AsReadOnlySequence.ToArray()).IsTrue();
+            MessagePack.Internal.ByteArrayComparer.Equals(bin1, bin2).IsTrue();
+            MessagePack.Internal.ByteArrayComparer.Equals(bin1, CodeGenHelpers.GetSpanFromSequence(bin3)).IsTrue();
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace MessagePack.Tests
                 ((typeof(UnsafeMemory32).GetMethod("WriteRaw" + i)).CreateDelegate(typeof(WriteDelegate)) as WriteDelegate).Invoke(ref dstWriter, src);
                 dstWriter.Flush();
                 dst.Length.Is(i);
-                MessagePack.Internal.ByteArrayComparer.Equals(src, 0, src.Length, dst.AsReadOnlySequence.ToArray()).IsTrue();
+                MessagePack.Internal.ByteArrayComparer.Equals(src, CodeGenHelpers.GetSpanFromSequence(dst.AsReadOnlySequence)).IsTrue();
             }
             // x64
             for (int i = 1; i <= MessagePackRange.MaxFixStringLength; i++)
@@ -62,7 +62,7 @@ namespace MessagePack.Tests
                 ((typeof(UnsafeMemory64).GetMethod("WriteRaw" + i)).CreateDelegate(typeof(WriteDelegate)) as WriteDelegate).Invoke(ref dstWriter, src);
                 dstWriter.Flush();
                 dst.Length.Is(i);
-                MessagePack.Internal.ByteArrayComparer.Equals(src, 0, src.Length, dst.AsReadOnlySequence.ToArray()).IsTrue();
+                MessagePack.Internal.ByteArrayComparer.Equals(src, CodeGenHelpers.GetSpanFromSequence(dst.AsReadOnlySequence)).IsTrue();
             }
         }
     }
