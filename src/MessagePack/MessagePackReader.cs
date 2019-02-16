@@ -1018,10 +1018,21 @@ namespace MessagePack
         /// Gets the length of the next string.
         /// </summary>
         /// <returns>The length of the next string.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int GetStringLengthInBytes()
         {
             ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
 
+            if (code >= MessagePackCode.MinFixStr && code <= MessagePackCode.MaxFixStr)
+            {
+                return code & 0x1F;
+            }
+
+            return GetStringLengthInBytesSlow(code);
+        }
+
+        private int GetStringLengthInBytesSlow(byte code)
+        {
             switch (code)
             {
                 case MessagePackCode.Str8:
