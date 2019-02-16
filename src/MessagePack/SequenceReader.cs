@@ -88,6 +88,7 @@ namespace System.Buffers
         /// </summary>
         public long Length
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
                 if (_length < 0)

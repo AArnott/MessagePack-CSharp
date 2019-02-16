@@ -5,6 +5,7 @@ using System;
 using System.Buffers;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.CompilerServices;
 using MessagePack.Internal;
 
 namespace MessagePack
@@ -1046,11 +1047,12 @@ namespace MessagePack
 
             return length;
         }
-        
+
         /// <summary>
         /// Gets the length of the next string.
         /// </summary>
         /// <returns>The length of the next string.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int GetStringLengthInBytes()
         {
             ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
