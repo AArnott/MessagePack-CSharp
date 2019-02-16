@@ -10,6 +10,7 @@
   </ItemGroup>
   <ItemGroup Condition=" '$(RunningMPC)' == 'true' ">
     <Reference Include="..\..\bin\MessagePack\Debug\netstandard1.6\MessagePack.dll" />
+    <Reference Include="..\..\bin\MessagePack.Annotations\Debug\netstandard1.0\MessagePack.Annotations.dll" />
 
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="System.Memory" Version="4.5.1" />
