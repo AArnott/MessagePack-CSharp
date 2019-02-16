@@ -222,6 +222,7 @@ namespace MessagePack
         /// Reads nil if it is the next token.
         /// </summary>
         /// <returns><c>true</c> if the next token was nil; <c>false</c> otherwise.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryReadNil()
         {
             if (NextCode == MessagePackCode.Nil)
@@ -251,6 +252,7 @@ namespace MessagePack
         /// <see cref="MessagePackCode.Array32"/>, or
         /// some built-in code between <see cref="MessagePackCode.MinFixArray"/> and <see cref="MessagePackCode.MaxFixArray"/>.
         /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int ReadArrayHeader()
         {
             ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
@@ -332,6 +334,7 @@ namespace MessagePack
         /// or some value between <see cref="MessagePackCode.MinFixInt"/> and <see cref="MessagePackCode.MaxFixInt"/>.
         /// </summary>
         /// <returns>The value.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public sbyte ReadSByte()
         {
             ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
@@ -472,6 +475,7 @@ namespace MessagePack
         /// or anything between <see cref="MessagePackCode.MinFixInt"/> and <see cref="MessagePackCode.MaxFixInt"/>.
         /// </summary>
         /// <returns>A 32-bit integer.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int ReadInt32()
         {
             ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
@@ -862,60 +866,22 @@ namespace MessagePack
         /// or a code between <see cref="MessagePackCode.MinFixStr"/> and <see cref="MessagePackCode.MaxFixStr"/>.
         /// </summary>
         /// <returns>A string.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string ReadString()
         {
             int byteLength = GetStringLengthInBytes();
 
-            ThrowInsufficientBufferUnless(this.reader.Remaining >= byteLength);
-            if (this.reader.UnreadSpan.Length >= byteLength)
+            ReadOnlySpan<byte> unreadSpan = this.reader.UnreadSpan;
+            if (unreadSpan.Length >= byteLength)
             {
                 // Fast path: all bytes to decode appear in the same span.
-                string value = StringEncoding.UTF8.GetString(this.reader.UnreadSpan.Slice(0, byteLength));
+                string value = StringEncoding.UTF8.GetString(unreadSpan.Slice(0, byteLength));
                 this.reader.Advance(byteLength);
                 return value;
             }
             else
             {
-                // Slow path
-#if NETSTANDARD1_6
-                // We need to concatenate all the bytes together into one array.
-                byte[] byteArray = ArrayPool<byte>.Shared.Rent(byteLength);
-                ThrowInsufficientBufferUnless(this.reader.TryCopyTo(byteArray));
-                this.reader.Advance(byteArray.Length);
-                string value = StringEncoding.UTF8.GetString(byteArray);
-                ArrayPool<byte>.Shared.Return(byteArray);
-                return value;
-#else
-                // We need to decode bytes incrementally across multiple spans.
-                int maxCharLength = StringEncoding.UTF8.GetMaxCharCount(byteLength);
-                char[] charArray = ArrayPool<char>.Shared.Rent(maxCharLength);
-                var decoder = StringEncoding.UTF8.GetDecoder();
-
-                int remainingByteLength = byteLength;
-                int initializedChars = 0;
-                while (remainingByteLength > 0)
-                {
-                    int bytesRead = Math.Min(remainingByteLength, this.reader.UnreadSpan.Length);
-                    remainingByteLength -= bytesRead;
-                    bool flush = remainingByteLength == 0;
-#if NETCOREAPP2_1
-                    initializedChars += decoder.GetChars(this.reader.UnreadSpan.Slice(0, bytesRead), charArray.AsSpan(initializedChars), flush);
-#else
-                    unsafe
-                    {
-                        fixed (byte* pUnreadSpan = this.reader.UnreadSpan)
-                        fixed (char* pCharArray = &charArray[initializedChars])
-                        {
-                            initializedChars += decoder.GetChars(pUnreadSpan, bytesRead, pCharArray, charArray.Length - initializedChars, flush);
-                        }
-                    }
-#endif
-                }
-
-                string value = new string(charArray, 0, initializedChars);
-                ArrayPool<char>.Shared.Return(charArray);
-                return value;
-#endif
+                return ReadStringSlow(byteLength);
             }
         }
 
@@ -1052,7 +1018,6 @@ namespace MessagePack
         /// Gets the length of the next string.
         /// </summary>
         /// <returns>The length of the next string.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int GetStringLengthInBytes()
         {
             ThrowInsufficientBufferUnless(this.reader.TryRead(out byte code));
@@ -1076,6 +1041,55 @@ namespace MessagePack
 
                     throw ThrowInvalidCode(code);
             }
+        }
+
+        /// <summary>
+        /// Reads a string assuming that it is spread across multiple spans in the <see cref="ReadOnlySequence{T}"/>.
+        /// </summary>
+        /// <param name="byteLength">The length of the string to be decoded, in bytes.</param>
+        /// <returns>The decoded string.</returns>
+        private string ReadStringSlow(int byteLength)
+        {
+            ThrowInsufficientBufferUnless(this.reader.Remaining >= byteLength);
+#if NETSTANDARD1_6
+            // We need to concatenate all the bytes together into one array.
+            byte[] byteArray = ArrayPool<byte>.Shared.Rent(byteLength);
+            ThrowInsufficientBufferUnless(this.reader.TryCopyTo(byteArray));
+            this.reader.Advance(byteArray.Length);
+            string value = StringEncoding.UTF8.GetString(byteArray);
+            ArrayPool<byte>.Shared.Return(byteArray);
+            return value;
+#else
+                // We need to decode bytes incrementally across multiple spans.
+                int maxCharLength = StringEncoding.UTF8.GetMaxCharCount(byteLength);
+                char[] charArray = ArrayPool<char>.Shared.Rent(maxCharLength);
+                var decoder = StringEncoding.UTF8.GetDecoder();
+
+                int remainingByteLength = byteLength;
+                int initializedChars = 0;
+                while (remainingByteLength > 0)
+                {
+                    int bytesRead = Math.Min(remainingByteLength, this.reader.UnreadSpan.Length);
+                    remainingByteLength -= bytesRead;
+                    bool flush = remainingByteLength == 0;
+#if NETCOREAPP2_1
+                    initializedChars += decoder.GetChars(this.reader.UnreadSpan.Slice(0, bytesRead), charArray.AsSpan(initializedChars), flush);
+#else
+                    unsafe
+                    {
+                        fixed (byte* pUnreadSpan = this.reader.UnreadSpan)
+                        fixed (char* pCharArray = &charArray[initializedChars])
+                        {
+                            initializedChars += decoder.GetChars(pUnreadSpan, bytesRead, pCharArray, charArray.Length - initializedChars, flush);
+                        }
+                    }
+#endif
+                }
+
+                string value = new string(charArray, 0, initializedChars);
+                ArrayPool<char>.Shared.Return(charArray);
+                return value;
+#endif
         }
 
         private void ReadNextArray()
