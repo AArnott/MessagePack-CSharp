@@ -7,6 +7,7 @@ using Microsoft;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace MessagePack
@@ -103,6 +104,7 @@ namespace MessagePack
         /// </summary>
         /// <param name="count">The number of elements that will be written in the array.</param>
         /// <param name="forceFullHeaderLength"><c>true</c> to force the maximum length header to be written; <c>false</c> to allow the most compact form possible to be used.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void WriteArrayHeader(uint count, bool forceFullHeaderLength = false)
         {
             if (count <= MessagePackRange.MaxFixArrayCount && !forceFullHeaderLength)
@@ -324,6 +326,7 @@ namespace MessagePack
         /// <see cref="MessagePackCode.UInt32"/>
         /// </summary>
         /// <param name="value">The value to write.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(uint value)
         {
             if (value <= MessagePackRange.MaxFixPositiveInt)
@@ -375,6 +378,7 @@ namespace MessagePack
         /// <see cref="MessagePackCode.Int32"/>
         /// </summary>
         /// <param name="value">The value to write.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(int value)
         {
             if (value >= 0)
@@ -923,11 +927,12 @@ namespace MessagePack
         /// </summary>
         /// <param name="value">The value to write. Must not be null.</param>
         /// <param name="forceFullHeaderLength"><c>true</c> to force the maximum length header to be written; <c>false</c> to allow the most compact form possible to be used.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Write(string value, bool forceFullHeaderLength = false)
         {
             if (value == null)
             {
-                throw new ArgumentNullException(nameof(value));
+                ThrowArgumentNullException(nameof(value));
             }
 
             Write(value.AsSpan(), forceFullHeaderLength);
@@ -1197,5 +1202,7 @@ namespace MessagePack
                 span[0] = (byte)(value >> 56);
             }
         }
+
+        private static void ThrowArgumentNullException(string parameterName) => throw new ArgumentNullException(parameterName);
     }
 }
