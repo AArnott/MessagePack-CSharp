@@ -300,7 +300,7 @@ namespace MessagePack.Formatters.SharedData
             KeyValuePair<int, int> keyValuePair;
             if (value != null && this.typeToKeyAndJumpMap.TryGetValue(value.GetType().TypeHandle, out keyValuePair))
             {
-                writer.WriteArrayHeader(2);
+                writer.WriteFixedArrayHeaderUnsafe(2);
                 writer.WriteInt32(keyValuePair.Key);
                 switch (keyValuePair.Value)
                 {
@@ -325,7 +325,7 @@ namespace MessagePack.Formatters.SharedData
 
             writer.WriteNil();
         }
-        
+
         public global::SharedData.IUnionChecker Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (reader.TryReadNil())
@@ -364,7 +364,7 @@ namespace MessagePack.Formatters.SharedData
                     reader.Skip();
                     break;
             }
-            
+
             return result;
         }
     }
@@ -397,7 +397,7 @@ namespace MessagePack.Formatters.SharedData
             KeyValuePair<int, int> keyValuePair;
             if (value != null && this.typeToKeyAndJumpMap.TryGetValue(value.GetType().TypeHandle, out keyValuePair))
             {
-                writer.WriteArrayHeader(2);
+                writer.WriteFixedArrayHeaderUnsafe(2);
                 writer.WriteInt32(keyValuePair.Key);
                 switch (keyValuePair.Value)
                 {
@@ -422,7 +422,7 @@ namespace MessagePack.Formatters.SharedData
 
             writer.WriteNil();
         }
-        
+
         public global::SharedData.IUnionChecker2 Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (reader.TryReadNil())
@@ -461,7 +461,7 @@ namespace MessagePack.Formatters.SharedData
                     reader.Skip();
                     break;
             }
-            
+
             return result;
         }
     }
@@ -488,7 +488,7 @@ namespace MessagePack.Formatters.SharedData
             KeyValuePair<int, int> keyValuePair;
             if (value != null && this.typeToKeyAndJumpMap.TryGetValue(value.GetType().TypeHandle, out keyValuePair))
             {
-                writer.WriteArrayHeader(2);
+                writer.WriteFixedArrayHeaderUnsafe(2);
                 writer.WriteInt32(keyValuePair.Key);
                 switch (keyValuePair.Value)
                 {
@@ -504,7 +504,7 @@ namespace MessagePack.Formatters.SharedData
 
             writer.WriteNil();
         }
-        
+
         public global::SharedData.IIVersioningUnion Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (reader.TryReadNil())
@@ -534,7 +534,7 @@ namespace MessagePack.Formatters.SharedData
                     reader.Skip();
                     break;
             }
-            
+
             return result;
         }
     }
@@ -563,7 +563,7 @@ namespace MessagePack.Formatters.SharedData
             KeyValuePair<int, int> keyValuePair;
             if (value != null && this.typeToKeyAndJumpMap.TryGetValue(value.GetType().TypeHandle, out keyValuePair))
             {
-                writer.WriteArrayHeader(2);
+                writer.WriteFixedArrayHeaderUnsafe(2);
                 writer.WriteInt32(keyValuePair.Key);
                 switch (keyValuePair.Value)
                 {
@@ -582,7 +582,7 @@ namespace MessagePack.Formatters.SharedData
 
             writer.WriteNil();
         }
-        
+
         public global::SharedData.RootUnionType Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (reader.TryReadNil())
@@ -615,7 +615,7 @@ namespace MessagePack.Formatters.SharedData
                     reader.Skip();
                     break;
             }
-            
+
             return result;
         }
     }
@@ -644,7 +644,7 @@ namespace MessagePack.Formatters.SharedData
             KeyValuePair<int, int> keyValuePair;
             if (value != null && this.typeToKeyAndJumpMap.TryGetValue(value.GetType().TypeHandle, out keyValuePair))
             {
-                writer.WriteArrayHeader(2);
+                writer.WriteFixedArrayHeaderUnsafe(2);
                 writer.WriteInt32(keyValuePair.Key);
                 switch (keyValuePair.Value)
                 {
@@ -663,7 +663,7 @@ namespace MessagePack.Formatters.SharedData
 
             writer.WriteNil();
         }
-        
+
         public global::SharedData.IUnionSample Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (reader.TryReadNil())
@@ -696,7 +696,7 @@ namespace MessagePack.Formatters.SharedData
                     reader.Skip();
                     break;
             }
-            
+
             return result;
         }
     }
@@ -708,6 +708,7 @@ namespace MessagePack.Formatters.SharedData
 #pragma warning restore 414
 #pragma warning restore 618
 #pragma warning restore 612
+
 #pragma warning disable 618
 #pragma warning disable 612
 #pragma warning disable 414
@@ -746,7 +747,7 @@ namespace MessagePack.Formatters
             KeyValuePair<int, int> keyValuePair;
             if (value != null && this.typeToKeyAndJumpMap.TryGetValue(value.GetType().TypeHandle, out keyValuePair))
             {
-                writer.WriteArrayHeader(2);
+                writer.WriteFixedArrayHeaderUnsafe(2);
                 writer.WriteInt32(keyValuePair.Key);
                 switch (keyValuePair.Value)
                 {
@@ -768,7 +769,7 @@ namespace MessagePack.Formatters
 
             writer.WriteNil();
         }
-        
+
         public global::IMessageBody Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (reader.TryReadNil())
@@ -804,7 +805,7 @@ namespace MessagePack.Formatters
                     reader.Skip();
                     break;
             }
-            
+
             return result;
         }
     }
@@ -816,6 +817,7 @@ namespace MessagePack.Formatters
 #pragma warning restore 414
 #pragma warning restore 618
 #pragma warning restore 612
+
 
 #pragma warning disable 618
 #pragma warning disable 612
@@ -839,8 +841,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(3);
+            writer.WriteFixedArrayHeaderUnsafe(3);
             writer.Write(value.Prop1);
             formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Prop2, formatterResolver);
             writer.Write(value.Prop3);
@@ -909,7 +910,6 @@ namespace MessagePack.Formatters.SharedData
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Prop1"),
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Prop2"),
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Prop3"),
-                
             };
         }
 
@@ -921,7 +921,6 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
             writer.WriteMapHeader(3);
             writer.WriteRaw(this.____stringByteKeys[0]);
             writer.Write(value.Prop1);
@@ -985,8 +984,7 @@ namespace MessagePack.Formatters.SharedData
 
         public void Serialize(ref MessagePackWriter writer, global::SharedData.SimpleStructIntKeyData value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            
-            writer.WriteArrayHeader(3);
+            writer.WriteFixedArrayHeaderUnsafe(3);
             writer.Write(value.X);
             writer.Write(value.Y);
             formatterResolver.GetFormatterWithVerify<byte[]>().Serialize(ref writer, value.BytesSpecial, formatterResolver);
@@ -1053,14 +1051,12 @@ namespace MessagePack.Formatters.SharedData
             {
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("key-X"),
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("key-Y"),
-                
             };
         }
 
 
         public void Serialize(ref MessagePackWriter writer, global::SharedData.SimpleStructStringKeyData value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            
             writer.WriteMapHeader(2);
             writer.WriteRaw(this.____stringByteKeys[0]);
             writer.Write(value.X);
@@ -1122,8 +1118,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(7);
+            writer.WriteFixedArrayHeaderUnsafe(7);
             writer.Write(value.Prop1);
             formatterResolver.GetFormatterWithVerify<global::SharedData.ByteEnum>().Serialize(ref writer, value.Prop2, formatterResolver);
             formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Prop3, formatterResolver);
@@ -1201,8 +1196,7 @@ namespace MessagePack.Formatters.SharedData
 
         public void Serialize(ref MessagePackWriter writer, global::SharedData.Vector2 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            
-            writer.WriteArrayHeader(2);
+            writer.WriteFixedArrayHeaderUnsafe(2);
             writer.Write(value.X);
             writer.Write(value.Y);
         }
@@ -1253,8 +1247,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(0);
+            writer.WriteFixedArrayHeaderUnsafe(0);
         }
 
         public global::SharedData.EmptyClass Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
@@ -1290,8 +1283,7 @@ namespace MessagePack.Formatters.SharedData
 
         public void Serialize(ref MessagePackWriter writer, global::SharedData.EmptyStruct value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            
-            writer.WriteArrayHeader(0);
+            writer.WriteFixedArrayHeaderUnsafe(0);
         }
 
         public global::SharedData.EmptyStruct Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
@@ -1332,8 +1324,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(6);
+            writer.WriteFixedArrayHeaderUnsafe(6);
             writer.WriteNil();
             writer.WriteNil();
             writer.WriteNil();
@@ -1395,8 +1386,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(8);
+            writer.WriteFixedArrayHeaderUnsafe(8);
             writer.WriteNil();
             writer.WriteNil();
             writer.WriteNil();
@@ -1465,8 +1455,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(4);
+            writer.WriteFixedArrayHeaderUnsafe(4);
             writer.WriteNil();
             writer.WriteNil();
             writer.WriteNil();
@@ -1516,8 +1505,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(2);
+            writer.WriteFixedArrayHeaderUnsafe(2);
             formatterResolver.GetFormatterWithVerify<global::SharedData.Version1>().Serialize(ref writer, value.MyProperty1, formatterResolver);
             writer.Write(value.After);
         }
@@ -1570,8 +1558,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(2);
+            writer.WriteFixedArrayHeaderUnsafe(2);
             formatterResolver.GetFormatterWithVerify<global::SharedData.Version2>().Serialize(ref writer, value.MyProperty1, formatterResolver);
             writer.Write(value.After);
         }
@@ -1624,8 +1611,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(2);
+            writer.WriteFixedArrayHeaderUnsafe(2);
             formatterResolver.GetFormatterWithVerify<global::SharedData.Version0>().Serialize(ref writer, value.MyProperty1, formatterResolver);
             writer.Write(value.After);
         }
@@ -1678,9 +1664,8 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
             value.OnBeforeSerialize();
-            writer.WriteArrayHeader(1);
+            writer.WriteFixedArrayHeaderUnsafe(1);
             writer.Write(value.X);
         }
 
@@ -1728,9 +1713,8 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
             ((IMessagePackSerializationCallbackReceiver)value).OnBeforeSerialize();
-            writer.WriteArrayHeader(1);
+            writer.WriteFixedArrayHeaderUnsafe(1);
             writer.Write(value.X);
         }
 
@@ -1784,14 +1768,12 @@ namespace MessagePack.Formatters.SharedData
             this.____stringByteKeys = new byte[][]
             {
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("X"),
-                
             };
         }
 
 
         public void Serialize(ref MessagePackWriter writer, global::SharedData.Callback2 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            
             value.OnBeforeSerialize();
             writer.WriteMapHeader(1);
             writer.WriteRaw(this.____stringByteKeys[0]);
@@ -1854,14 +1836,12 @@ namespace MessagePack.Formatters.SharedData
             this.____stringByteKeys = new byte[][]
             {
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("X"),
-                
             };
         }
 
 
         public void Serialize(ref MessagePackWriter writer, global::SharedData.Callback2_2 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            
             ((IMessagePackSerializationCallbackReceiver)value).OnBeforeSerialize();
             writer.WriteMapHeader(1);
             writer.WriteRaw(this.____stringByteKeys[0]);
@@ -1918,8 +1898,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(2);
+            writer.WriteFixedArrayHeaderUnsafe(2);
             writer.Write(value.MyProperty);
             writer.Write(value.MyProperty1);
         }
@@ -1972,8 +1951,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(2);
+            writer.WriteFixedArrayHeaderUnsafe(2);
             writer.Write(value.MyProperty);
             writer.Write(value.MyProperty2);
         }
@@ -2026,8 +2004,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(4);
+            writer.WriteFixedArrayHeaderUnsafe(4);
             writer.WriteNil();
             writer.WriteNil();
             writer.WriteNil();
@@ -2072,8 +2049,7 @@ namespace MessagePack.Formatters.SharedData
 
         public void Serialize(ref MessagePackWriter writer, global::SharedData.MySubUnion2 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            
-            writer.WriteArrayHeader(6);
+            writer.WriteFixedArrayHeaderUnsafe(6);
             writer.WriteNil();
             writer.WriteNil();
             writer.WriteNil();
@@ -2125,8 +2101,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(3);
+            writer.WriteFixedArrayHeaderUnsafe(3);
             writer.WriteNil();
             writer.WriteNil();
             writer.Write(value.Three);
@@ -2170,8 +2145,7 @@ namespace MessagePack.Formatters.SharedData
 
         public void Serialize(ref MessagePackWriter writer, global::SharedData.MySubUnion4 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            
-            writer.WriteArrayHeader(8);
+            writer.WriteFixedArrayHeaderUnsafe(8);
             writer.WriteNil();
             writer.WriteNil();
             writer.WriteNil();
@@ -2225,8 +2199,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(8);
+            writer.WriteFixedArrayHeaderUnsafe(8);
             writer.WriteNil();
             writer.WriteNil();
             writer.WriteNil();
@@ -2280,8 +2253,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(3);
+            writer.WriteFixedArrayHeaderUnsafe(3);
             writer.Write(value.MyProperty1);
             writer.Write(value.MyProperty2);
             writer.Write(value.MyProperty3);
@@ -2340,8 +2312,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(3);
+            writer.WriteFixedArrayHeaderUnsafe(3);
             writer.Write(value.MyProperty);
             formatterResolver.GetFormatterWithVerify<global::SharedData.MyClass>().Serialize(ref writer, value.UnknownBlock, formatterResolver);
             writer.Write(value.MyProperty2);
@@ -2400,8 +2371,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(3);
+            writer.WriteFixedArrayHeaderUnsafe(3);
             writer.Write(value.MyProperty);
             writer.WriteNil();
             writer.Write(value.MyProperty2);
@@ -2455,8 +2425,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(0);
+            writer.WriteFixedArrayHeaderUnsafe(0);
         }
 
         public global::SharedData.Empty1 Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
@@ -2501,7 +2470,6 @@ namespace MessagePack.Formatters.SharedData
 
             this.____stringByteKeys = new byte[][]
             {
-                
             };
         }
 
@@ -2513,7 +2481,6 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
             writer.WriteMapHeader(0);
         }
 
@@ -2561,8 +2528,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(1);
+            writer.WriteFixedArrayHeaderUnsafe(1);
             writer.Write(value.MyProperty);
         }
 
@@ -2615,7 +2581,6 @@ namespace MessagePack.Formatters.SharedData
             this.____stringByteKeys = new byte[][]
             {
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("MyProperty"),
-                
             };
         }
 
@@ -2627,7 +2592,6 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
             writer.WriteMapHeader(1);
             writer.WriteRaw(this.____stringByteKeys[0]);
             writer.Write(value.MyProperty);
@@ -2677,8 +2641,7 @@ namespace MessagePack.Formatters.SharedData
 
         public void Serialize(ref MessagePackWriter writer, global::SharedData.VectorLike2 value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            
-            writer.WriteArrayHeader(2);
+            writer.WriteFixedArrayHeaderUnsafe(2);
             writer.Write(value.x);
             writer.Write(value.y);
         }
@@ -2726,8 +2689,7 @@ namespace MessagePack.Formatters.SharedData
 
         public void Serialize(ref MessagePackWriter writer, global::SharedData.Vector3Like value, global::MessagePack.IFormatterResolver formatterResolver)
         {
-            
-            writer.WriteArrayHeader(3);
+            writer.WriteFixedArrayHeaderUnsafe(3);
             writer.Write(value.x);
             writer.Write(value.y);
             writer.Write(value.z);
@@ -2786,7 +2748,6 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
             writer.WriteArrayHeader(16);
             writer.Write(value.MyProperty0);
             writer.Write(value.MyProperty1);
@@ -2924,8 +2885,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(1);
+            writer.WriteFixedArrayHeaderUnsafe(1);
             writer.Write(value.MyProperty);
         }
 
@@ -2972,8 +2932,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(1);
+            writer.WriteFixedArrayHeaderUnsafe(1);
             writer.Write(value.XYZ);
         }
 
@@ -3020,8 +2979,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(1);
+            writer.WriteFixedArrayHeaderUnsafe(1);
             formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.OPQ, formatterResolver);
         }
 
@@ -3068,8 +3026,7 @@ namespace MessagePack.Formatters.SharedData
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(2);
+            writer.WriteFixedArrayHeaderUnsafe(2);
             writer.Write(value.Data1);
             formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Data2, formatterResolver);
         }
@@ -3117,6 +3074,7 @@ namespace MessagePack.Formatters.SharedData
 #pragma warning restore 414
 #pragma warning restore 618
 #pragma warning restore 612
+
 #pragma warning disable 618
 #pragma warning disable 612
 #pragma warning disable 414
@@ -3139,8 +3097,7 @@ namespace MessagePack.Formatters.Abcdefg.Efcdigjl.Ateatatea.Hgfagfafgad
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(1);
+            writer.WriteFixedArrayHeaderUnsafe(1);
             writer.Write(value.MyProperty);
         }
 
@@ -3182,6 +3139,7 @@ namespace MessagePack.Formatters.Abcdefg.Efcdigjl.Ateatatea.Hgfagfafgad
 #pragma warning restore 414
 #pragma warning restore 618
 #pragma warning restore 612
+
 #pragma warning disable 618
 #pragma warning disable 612
 #pragma warning disable 414
@@ -3204,8 +3162,7 @@ namespace MessagePack.Formatters
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(1);
+            writer.WriteFixedArrayHeaderUnsafe(1);
             writer.Write(value.MyProperty);
         }
 
@@ -3252,8 +3209,7 @@ namespace MessagePack.Formatters
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(4);
+            writer.WriteFixedArrayHeaderUnsafe(4);
             writer.Write(value.UserId);
             writer.Write(value.RoomId);
             formatterResolver.GetFormatterWithVerify<global::System.DateTime>().Serialize(ref writer, value.PostTime, formatterResolver);
@@ -3318,8 +3274,7 @@ namespace MessagePack.Formatters
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(1);
+            writer.WriteFixedArrayHeaderUnsafe(1);
             formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Text, formatterResolver);
         }
 
@@ -3366,8 +3321,7 @@ namespace MessagePack.Formatters
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(1);
+            writer.WriteFixedArrayHeaderUnsafe(1);
             writer.Write(value.StampId);
         }
 
@@ -3414,8 +3368,7 @@ namespace MessagePack.Formatters
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(2);
+            writer.WriteFixedArrayHeaderUnsafe(2);
             writer.Write(value.QuestId);
             formatterResolver.GetFormatterWithVerify<string>().Serialize(ref writer, value.Text, formatterResolver);
         }
@@ -3468,8 +3421,7 @@ namespace MessagePack.Formatters
                 writer.WriteNil();
                 return;
             }
-            
-            writer.WriteArrayHeader(7);
+            writer.WriteFixedArrayHeaderUnsafe(7);
             formatterResolver.GetFormatterWithVerify<int[]>().Serialize(ref writer, value.MyProperty0, formatterResolver);
             formatterResolver.GetFormatterWithVerify<int[,]>().Serialize(ref writer, value.MyProperty1, formatterResolver);
             formatterResolver.GetFormatterWithVerify<global::GlobalMyEnum[,]>().Serialize(ref writer, value.MyProperty2, formatterResolver);
@@ -3568,7 +3520,6 @@ namespace MessagePack.Formatters
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Precision"),
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Money"),
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Amount"),
-                
             };
         }
 
@@ -3580,7 +3531,6 @@ namespace MessagePack.Formatters
                 writer.WriteNil();
                 return;
             }
-            
             writer.WriteMapHeader(6);
             writer.WriteRaw(this.____stringByteKeys[0]);
             writer.Write(value.Id);
@@ -3685,7 +3635,6 @@ namespace MessagePack.Formatters
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("Name"),
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("UpdatedOn"),
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("SimpleModels"),
-                
             };
         }
 
@@ -3697,7 +3646,6 @@ namespace MessagePack.Formatters
                 writer.WriteNil();
                 return;
             }
-            
             writer.WriteMapHeader(6);
             writer.WriteRaw(this.____stringByteKeys[0]);
             formatterResolver.GetFormatterWithVerify<global::System.Collections.Generic.IDictionary<string, string>>().Serialize(ref writer, value.AdditionalProperty, formatterResolver);
@@ -3780,6 +3728,7 @@ namespace MessagePack.Formatters
 #pragma warning restore 414
 #pragma warning restore 618
 #pragma warning restore 612
+
 #pragma warning disable 618
 #pragma warning disable 612
 #pragma warning disable 414
@@ -3824,7 +3773,6 @@ namespace MessagePack.Formatters.PerfBenchmarkDotNet
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("MyProperty7"),
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("MyProperty8"),
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("MyProperty9"),
-                
             };
         }
 
@@ -3836,7 +3784,6 @@ namespace MessagePack.Formatters.PerfBenchmarkDotNet
                 writer.WriteNil();
                 return;
             }
-            
             writer.WriteMapHeader(9);
             writer.WriteRaw(this.____stringByteKeys[0]);
             writer.Write(value.MyProperty1);
@@ -3942,3 +3889,4 @@ namespace MessagePack.Formatters.PerfBenchmarkDotNet
 #pragma warning restore 414
 #pragma warning restore 618
 #pragma warning restore 612
+

@@ -7,6 +7,7 @@ using Microsoft;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -109,9 +110,7 @@ namespace MessagePack
         {
             if (count <= MessagePackRange.MaxFixArrayCount && !forceFullHeaderLength)
             {
-                var span = writer.GetSpan(1);
-                span[0] = (byte)(MessagePackCode.MinFixArray | count);
-                writer.Advance(1);
+                WriteFixedArrayHeaderUnsafe(count);
             }
             else if (count <= ushort.MaxValue && !forceFullHeaderLength)
             {
@@ -127,6 +126,22 @@ namespace MessagePack
                 WriteBigEndian(count, span.Slice(1));
                 writer.Advance(5);
             }
+        }
+
+        /// <summary>
+        /// Write the length of the next array to be written as <see cref="MessagePackCode.MinFixArray"/>.
+        /// </summary>
+        /// <param name="count">
+        /// The number of elements that will be written in the array. This MUST be less than <see cref="MessagePackRange.MaxFixArrayCount"/>.
+        /// This condition is NOT checked within this method, and violating this rule will result in data corruption.
+        /// </param>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void WriteFixedArrayHeaderUnsafe(uint count)
+        {
+            var span = writer.GetSpan(1);
+            span[0] = (byte)(MessagePackCode.MinFixArray | count);
+            writer.Advance(1);
         }
 
         /// <summary>

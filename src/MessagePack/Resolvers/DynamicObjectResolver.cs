@@ -619,13 +619,13 @@ namespace MessagePack.Internal
                 var len = maxKey + 1;
                 argWriter.EmitLoad();
                 il.EmitLdc_I4(len);
-                il.EmitLdc_I4(0);
-                //if (len <= MessagePackRange.MaxFixMapCount)
-                //{
-                //    il.EmitCall(MessagePackWriterTypeInfo.WriteFixedArrayHeaderUnsafe);
-                //}
-                //else
+                if (len <= MessagePackRange.MaxFixMapCount)
                 {
+                    il.EmitCall(MessagePackWriterTypeInfo.WriteFixedArrayHeaderUnsafe);
+                }
+                else
+                {
+                    il.EmitLdc_I4(0);
                     il.EmitCall(MessagePackWriterTypeInfo.WriteArrayHeader);
                 }
 
@@ -1104,6 +1104,7 @@ namespace MessagePack.Internal
 
             public static MethodInfo WriteMapHeader = typeof(MessagePackWriter).GetRuntimeMethod(nameof(MessagePackWriter.WriteMapHeader), new[] { typeof(int), typeof(bool) });
             public static MethodInfo WriteArrayHeader = typeof(MessagePackWriter).GetRuntimeMethod(nameof(MessagePackWriter.WriteArrayHeader), new[] { typeof(int), typeof(bool) });
+            public static MethodInfo WriteFixedArrayHeaderUnsafe = typeof(MessagePackWriter).GetRuntimeMethod(nameof(MessagePackWriter.WriteFixedArrayHeaderUnsafe), new[] { typeof(uint) });
             public static MethodInfo WriteBytes = typeof(MessagePackWriter).GetRuntimeMethod(nameof(MessagePackWriter.Write), new[] { typeof(ReadOnlySpan<byte>), typeof(bool) });
             public static MethodInfo WriteNil = typeof(MessagePackWriter).GetRuntimeMethod(nameof(MessagePackWriter.WriteNil), Type.EmptyTypes);
             public static MethodInfo WriteRaw = typeof(MessagePackWriter).GetRuntimeMethod(nameof(MessagePackWriter.WriteRaw), new[] { typeof(ReadOnlySpan<byte>) });

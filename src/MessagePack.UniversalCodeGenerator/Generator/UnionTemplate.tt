@@ -42,7 +42,7 @@ namespace <#= Namespace #>
             KeyValuePair<int, int> keyValuePair;
             if (value != null && this.typeToKeyAndJumpMap.TryGetValue(value.GetType().TypeHandle, out keyValuePair))
             {
-                writer.WriteArrayHeader(2);
+                writer.WriteFixedArrayHeaderUnsafe(2);
                 writer.WriteInt32(keyValuePair.Key);
                 switch (keyValuePair.Value)
                 {
@@ -60,7 +60,7 @@ namespace <#= Namespace #>
 
             writer.WriteNil();
         }
-        
+
         public <#= info.FullName #> Deserialize(ref MessagePackReader reader, global::MessagePack.IFormatterResolver formatterResolver)
         {
             if (reader.TryReadNil())
@@ -92,7 +92,7 @@ namespace <#= Namespace #>
                     reader.Skip();
                     break;
             }
-            
+
             return result;
         }
     }

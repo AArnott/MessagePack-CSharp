@@ -36,7 +36,7 @@ namespace <#= Namespace #>
             {
 <# foreach(var x in objInfo.Members.Where(x => x.IsReadable)) { #>
                 global::MessagePack.Internal.CodeGenHelpers.GetEncodedStringBytes("<#= x.StringKey #>"),
-<# } #>                
+<# } #>
             };
         }
 
@@ -50,15 +50,17 @@ namespace <#= Namespace #>
                 writer.WriteNil();
                 return;
             }
-<# } #>            
+<# } #>
 <#if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnBefore) { #>
             ((IMessagePackSerializationCallbackReceiver)value).OnBeforeSerialize();
 <# } else if(objInfo.HasIMessagePackSerializationCallbackReceiver) { #>
             value.OnBeforeSerialize();
 <# } #>
-<# if( objInfo.IsIntKey) { #>
-            writer.WriteArrayHeader(<#= objInfo.MaxKey + 1 #>);
+<# if( objInfo.IsIntKey) { if( (objInfo.MaxKey + 1) <= 15) { #>
+            writer.WriteFixedArrayHeaderUnsafe(<#= objInfo.MaxKey + 1 #>);
 <# } else { #>
+            writer.WriteArrayHeader(<#= objInfo.MaxKey + 1 #>);
+<# } } else { #>
             writer.WriteMapHeader(<#= objInfo.WriteCount #>);
 <# } #>
 <# if(objInfo.IsIntKey) { #>

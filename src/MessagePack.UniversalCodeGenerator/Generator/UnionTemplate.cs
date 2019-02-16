@@ -159,7 +159,7 @@ namespace MessagePack.CodeGenerator.Generator
             KeyValuePair<int, int> keyValuePair;
             if (value != null && this.typeToKeyAndJumpMap.TryGetValue(value.GetType().TypeHandle, out keyValuePair))
             {
-                writer.WriteArrayHeader(2);
+                writer.WriteFixedArrayHeaderUnsafe(2);
                 writer.WriteInt32(keyValuePair.Key);
                 switch (keyValuePair.Value)
                 {
@@ -200,7 +200,7 @@ namespace MessagePack.CodeGenerator.Generator
             #line hidden
             this.Write("                    default:\r\n                        break;\r\n                }\r\n" +
                     "\r\n                return;\r\n            }\r\n\r\n            writer.WriteNil();\r\n    " +
-                    "    }\r\n        \r\n        public ");
+                    "    }\r\n\r\n        public ");
             
             #line 64 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\UnionTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(info.FullName));
@@ -268,8 +268,7 @@ namespace MessagePack.CodeGenerator.Generator
             #line default
             #line hidden
             this.Write("                default:\r\n                    reader.Skip();\r\n                   " +
-                    " break;\r\n            }\r\n            \r\n            return result;\r\n        }\r\n   " +
-                    " }\r\n\r\n");
+                    " break;\r\n            }\r\n\r\n            return result;\r\n        }\r\n    }\r\n\r\n");
             
             #line 100 "D:\git\MessagePack-CSharp\src\MessagePack.UniversalCodeGenerator\Generator\UnionTemplate.tt"
  } 
@@ -277,7 +276,7 @@ namespace MessagePack.CodeGenerator.Generator
             #line default
             #line hidden
             this.Write("\r\n}\r\n\r\n#pragma warning restore 168\r\n#pragma warning restore 414\r\n#pragma warning " +
-                    "restore 618\r\n#pragma warning restore 612");
+                    "restore 618\r\n#pragma warning restore 612\r\n");
             return this.GenerationEnvironment.ToString();
         }
     }

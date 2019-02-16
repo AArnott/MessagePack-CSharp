@@ -5,11 +5,6 @@ using MessagePack.Formatters;
 
 namespace MessagePack.Unity
 {
-    internal static class CompatibilityMethods
-    {
-        internal static void WriteFixedArrayHeaderUnsafe(this ref MessagePackWriter writer, int count) => writer.WriteArrayHeader(count);
-    }
-
     public sealed class Vector2Formatter : global::MessagePack.Formatters.IMessagePackFormatter<global::UnityEngine.Vector2>
     {
         public void Serialize(ref MessagePackWriter writer, global::UnityEngine.Vector2 value, global::MessagePack.IFormatterResolver formatterResolver)
