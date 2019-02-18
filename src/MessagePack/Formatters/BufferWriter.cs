@@ -40,6 +40,7 @@ namespace MessagePack.Formatters
         /// Initializes a new instance of the <see cref="BufferWriter"/> struct.
         /// </summary>
         /// <param name="output">The <see cref="IBufferWriter{T}"/> to be wrapped.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BufferWriter(IBufferWriter<byte> output)
         {
             _buffered = 0;
