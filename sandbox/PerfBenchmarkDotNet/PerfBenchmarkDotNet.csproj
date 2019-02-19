@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworkS>net461;netcoreapp2.0</TargetFrameworkS>
+    <TargetFrameworkS>net47;netcoreapp2.0</TargetFrameworkS>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
@@ -21,10 +21,6 @@
     <PackageReference Include="protobuf-net" version="2.3.2" />
     <PackageReference Include="Sigil" version="4.7.0" />
     <PackageReference Include="ZeroFormatter" version="1.6.4" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="MessagePack_1_4_4.dll" />
-    <Content Include="MessagePack_1_6_0_3.dll" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\MessagePack.Annotations\MessagePack.Annotations.csproj">

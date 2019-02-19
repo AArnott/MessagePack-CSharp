@@ -10,6 +10,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using GeneratedFormatter.MessagePack.Formatters;
 using MsgPack.Serialization;
+using Nerdbank.Streams;
 using Newtonsoft.Json;
 using ProtoBuf;
 using System;
@@ -44,13 +45,14 @@ namespace PerfBenchmarkDotNet
             {
                 //typeof(TypelessSerializeBenchmark),
                 //typeof(TypelessDeserializeBenchmark),
-                typeof(DeserializeBenchmark),
-                typeof(SerializeBenchmark),
-                typeof(DictionaryLookupCompare),
-                typeof(StringKeyDeserializeCompare),
-                typeof(NewVsOld),
-                typeof(GuidImprov),
-                typeof(ImproveStringKeySerializeBenchmark)
+                //typeof(DeserializeBenchmark),
+                //typeof(SerializeBenchmark),
+                //typeof(DictionaryLookupCompare),
+                //typeof(StringKeyDeserializeCompare),
+                //typeof(NewVsOld),
+                //typeof(GuidImprov),
+                //typeof(ImproveStringKeySerializeBenchmark),
+                typeof(MessagePackWriterBenchmark),
             });
 
             // args = new[] { "0" };
@@ -428,8 +430,6 @@ namespace PerfBenchmarkDotNet
             }
         }
     }
-
-
 
     [Config(typeof(BenchmarkConfig))]
     public class SerializeBenchmark
