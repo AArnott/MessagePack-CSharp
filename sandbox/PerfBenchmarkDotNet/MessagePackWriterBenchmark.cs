@@ -3,15 +3,12 @@ extern alias oldmsgpack;
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Diagnostics.Windows.Configs;
 using Nerdbank.Streams;
 
 namespace PerfBenchmarkDotNet
 {
-    [ClrJob(baseline: true), CoreJob]
     [GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
     [CategoriesColumn]
-    [EtwProfiler]
     public class MessagePackWriterBenchmark
     {
         private const int RepsOverArray = 100 * 1024;
