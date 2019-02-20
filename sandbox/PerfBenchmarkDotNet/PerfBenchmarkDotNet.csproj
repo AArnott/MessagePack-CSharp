@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworkS>net47;netcoreapp2.0</TargetFrameworkS>
+    <TargetFrameworkS>net47;netcoreapp2.2</TargetFrameworkS>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
@@ -13,6 +13,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" version="0.11.4" />
+    <PackageReference Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.11.4" />
     <PackageReference Include="Hyperion" version="0.9.6" />
     <PackageReference Include="Jil" version="2.15.4" />
     <PackageReference Include="MessagePack" version="1.4.3" />

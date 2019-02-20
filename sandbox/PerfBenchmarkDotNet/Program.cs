@@ -4,10 +4,12 @@ extern alias oldmsgpack;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
+using BenchmarkDotNet.Diagnostics.Windows;
 using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Validators;
 using GeneratedFormatter.MessagePack.Formatters;
 using MsgPack.Serialization;
 using Nerdbank.Streams;
@@ -57,7 +59,7 @@ namespace PerfBenchmarkDotNet
 
             // args = new[] { "0" };
 #if !DEBUG
-            switcher.Run(args);
+            switcher.Run(args, DefaultConfig.Instance.With(new EtwProfiler()));
 #else
             // new TypelessBenchmark().MessagePackSerializer_Deserialize_TypelessContractlessStandardResolverComplexBytes();
 #endif
