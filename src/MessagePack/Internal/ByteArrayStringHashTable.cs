@@ -11,7 +11,7 @@ namespace MessagePack.Internal
     // and specialized for internal use(nongenerics, TValue is int)
 
     // internal, but code generator requires this class
-    public class ByteArrayStringHashTable : IEnumerable<KeyValuePair<string, int>>
+    internal class ByteArrayStringHashTable : IEnumerable<KeyValuePair<string, int>>
     {
         readonly Entry[][] buckets; // immutable array(faster than linkedlist)
         readonly ulong indexFor;

@@ -9,6 +9,14 @@
     <CodeAnalysisRuleSet>MessagePack.Tests.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\src\MessagePack\Internal\AutomataDictionary.cs" Link="AutomataDictionary.cs" />
+    <Compile Include="..\..\src\MessagePack\Internal\ByteArrayComparer.cs" Link="ByteArrayComparer.cs" />
+    <Compile Include="..\..\src\MessagePack\Internal\ByteArrayStringHashTable.cs" Link="ByteArrayStringHashTable.cs" />
+    <Compile Include="..\..\src\MessagePack\Internal\FarmHash.cs" Link="FarmHash.cs" />
+    <Compile Include="..\..\src\MessagePack\Internal\ILGeneratorExtensions.cs" Link="ILGeneratorExtensions.cs" />
+    <Compile Include="..\..\src\MessagePack\StringEncoding.cs" Link="StringEncoding.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\sandbox\SharedData\SharedData.csproj" />
     <ProjectReference Include="..\..\src\MessagePack.ImmutableCollection\MessagePack.ImmutableCollection.csproj" />
     <ProjectReference Include="..\..\src\MessagePack.ReactiveProperty\MessagePack.ReactiveProperty.csproj" />
