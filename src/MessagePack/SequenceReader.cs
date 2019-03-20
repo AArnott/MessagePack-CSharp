@@ -72,25 +72,6 @@ namespace System.Buffers
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SequenceReader{T}"/> struct
-        /// over the given <see cref="ReadOnlyMemory{T}"/>.
-        /// </summary>
-        public SequenceReader(ReadOnlyMemory<T> memory)
-        {
-            _usingSequence = false;
-            CurrentSpanIndex = 0;
-            Consumed = 0;
-            _memory = memory;
-            CurrentSpan = memory.Span;
-            _length = memory.Length;
-            _moreData = memory.Length > 0;
-
-            _currentPosition = default;
-            _nextPosition = default;
-            _sequence = default;
-        }
-
-        /// <summary>
         /// True when there is no more data in the <see cref="Sequence"/>.
         /// </summary>
         public bool End => !_moreData;

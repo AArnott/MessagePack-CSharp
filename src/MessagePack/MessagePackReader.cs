@@ -29,7 +29,7 @@ namespace MessagePack
         /// <param name="memory">The buffer to read from.</param>
         public MessagePackReader(ReadOnlyMemory<byte> memory)
         {
-            this.reader = new SequenceReader<byte>(memory);
+            this.reader = new SequenceReader<byte>(new ReadOnlySequence<byte>(memory));
         }
 
         /// <summary>
