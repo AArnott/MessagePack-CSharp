@@ -82,6 +82,9 @@
     <Compile Include="..\..\src\MessagePack\SequenceReaderExtensions.cs">
       <Link>Code\SequenceReaderExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\..\src\MessagePack\SequenceReaderExtensions2.cs">
+      <Link>Code\SequenceReaderExtensions2.cs</Link>
+    </Compile>
     <Compile Include="..\..\src\MessagePack\MessagePackCode.cs">
       <Link>Code\MessagePackCode.cs</Link>
     </Compile>
