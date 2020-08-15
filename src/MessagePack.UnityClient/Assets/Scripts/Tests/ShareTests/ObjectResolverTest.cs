@@ -217,16 +217,32 @@ namespace MessagePack.Tests
             {
                 var c1 = new Callback1(0);
                 var d = MessagePackSerializer.Serialize(c1);
-                c1.CalledBefore.IsTrue();
-                MessagePackSerializer.Deserialize<Callback1>(d).CalledAfter.IsTrue();
+                c1.CalledBeforeSerialize.IsTrue();
+                MessagePackSerializer.Deserialize<Callback1>(d).CalledAfterDeserialize.IsTrue();
             }
 
             {
-                var before = false;
-
-                var c1 = new Callback2(0, () => before = true, () => { });
+                var c1 = new Callback1_CB2(1);
                 var d = MessagePackSerializer.Serialize(c1);
-                before.IsTrue();
+                c1.CalledBeforeSerialize.IsTrue();
+                c1.CalledAfterSerialize.IsTrue();
+                c1.CalledBeforeDeserialize.IsFalse();
+                c1.CalledAfterDeserialize.IsFalse();
+
+                var deserialized = MessagePackSerializer.Deserialize<Callback1_CB2>(d);
+                Assert.Equal(c1.X, deserialized.X);
+                deserialized.CalledBeforeDeserialize.IsTrue();
+                deserialized.CalledAfterDeserialize.IsTrue();
+                c1.CalledBeforeSerialize.IsFalse();
+                c1.CalledAfterSerialize.IsFalse();
+            }
+
+            {
+                var beforeSerialize = false;
+
+                var c1 = new Callback2(0, () => beforeSerialize = true, () => { });
+                var d = MessagePackSerializer.Serialize(c1);
+                beforeSerialize.IsTrue();
                 Callback2.CalledAfter.IsFalse();
                 MessagePackSerializer.Deserialize<Callback2>(d);
                 Callback2.CalledAfter.IsTrue();
@@ -235,8 +251,8 @@ namespace MessagePack.Tests
             {
                 var c1 = new Callback1_2(0);
                 var d = MessagePackSerializer.Serialize(c1);
-                c1.CalledBefore.IsTrue();
-                MessagePackSerializer.Deserialize<Callback1_2>(d).CalledAfter.IsTrue();
+                c1.CalledBeforeSerialize.IsTrue();
+                MessagePackSerializer.Deserialize<Callback1_2>(d).CalledAfterDeserialize.IsTrue();
             }
 
             {
@@ -246,9 +262,21 @@ namespace MessagePack.Tests
                 var d = MessagePackSerializer.Serialize(c1);
                 before.IsTrue();
 
-                Callback2_2.CalledAfter.IsFalse();
+                Callback2_2.CalledAfterDeserialize.IsFalse();
                 MessagePackSerializer.Deserialize<Callback2_2>(d);
-                Callback2_2.CalledAfter.IsTrue();
+                Callback2_2.CalledAfterDeserialize.IsTrue();
+            }
+
+            {
+                var before = false;
+
+                var c1 = new Callback2_2(0, () => before = true, () => { });
+                var d = MessagePackSerializer.Serialize(c1);
+                before.IsTrue();
+
+                Callback2_2.CalledAfterDeserialize.IsFalse();
+                MessagePackSerializer.Deserialize<Callback2_2>(d);
+                Callback2_2.CalledAfterDeserialize.IsTrue();
             }
         }
 

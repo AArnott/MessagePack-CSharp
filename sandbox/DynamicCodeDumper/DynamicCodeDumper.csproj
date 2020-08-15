@@ -27,6 +27,9 @@
     <Compile Include="..\..\src\MessagePack.UnityClient\Assets\Scripts\MessagePack\Annotations\IMessagePackSerializationCallbackReceiver.cs">
       <Link>Code\IMessagePackSerializationCallbackReceiver.cs</Link>
     </Compile>
+    <Compile Include="..\..\src\MessagePack.UnityClient\Assets\Scripts\MessagePack\Annotations\IMessagePackSerializationCallbackReceiver2.cs">
+      <Link>Code\IMessagePackSerializationCallbackReceiver2.cs</Link>
+    </Compile>
     <Compile Include="..\..\src\MessagePack.UnityClient\Assets\Scripts\MessagePack\Internal\AutomataDictionary.cs">
       <Link>Code\AutomataDictionary.cs</Link>
     </Compile>

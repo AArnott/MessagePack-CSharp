@@ -48,9 +48,15 @@ namespace MessagePackCompiler.CodeAnalysis
 
         public bool HasIMessagePackSerializationCallbackReceiver { get; set; }
 
-        public bool NeedsCastOnBefore { get; set; }
+        public bool HasIMessagePackSerializationCallbackReceiver2 { get; set; }
 
-        public bool NeedsCastOnAfter { get; set; }
+        public bool NeedsCastOnBeforeSerialize { get; set; }
+
+        public bool NeedsCastOnAfterDeserialize { get; set; }
+
+        public bool NeedsCastOnBeforeDeserialize { get; set; }
+
+        public bool NeedsCastOnAfterSerialize { get; set; }
 
         public string FormatterName => (this.Namespace == null ? this.Name : this.Namespace + "." + this.Name) + "Formatter";
 

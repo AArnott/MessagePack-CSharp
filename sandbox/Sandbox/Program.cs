@@ -182,20 +182,18 @@ namespace Sandbox
     }
 
     [MessagePackObject]
-    public class SampleCallback : IMessagePackSerializationCallbackReceiver
+    public class SampleCallback : IMessagePackSerializationCallbackReceiver2
     {
         [Key(0)]
         public int Key { get; set; }
 
-        public void OnBeforeSerialize()
-        {
-            Console.WriteLine("OnBefore");
-        }
+        public void OnBeforeSerialize() => Console.WriteLine("OnBeforeSerialize");
 
-        public void OnAfterDeserialize()
-        {
-            Console.WriteLine("OnAfter");
-        }
+        public void OnAfterDeserialize() => Console.WriteLine("OnAfterDeserialize");
+
+        public void OnAfterSerialize() => Console.WriteLine("OnAfterSerialize");
+
+        public void OnBeforeDeserialize() => Console.WriteLine("OnBeforeDeserialize");
     }
 
     [MessagePackObject]

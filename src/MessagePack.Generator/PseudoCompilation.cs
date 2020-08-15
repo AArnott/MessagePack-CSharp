@@ -229,6 +229,11 @@ namespace MessagePack
         void OnBeforeSerialize();
         void OnAfterDeserialize();
     }
+    public interface IMessagePackSerializationCallbackReceiver2 : IMessagePackSerializationCallbackReceiver
+    {
+        void OnBeforeDeserialize();
+        void OnAfterSerialize();
+    }
 }
 ";
     }

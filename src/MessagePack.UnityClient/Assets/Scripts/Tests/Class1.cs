@@ -248,24 +248,51 @@ namespace SharedData
         public int X { get; set; }
 
         [IgnoreMember]
-        public bool CalledBefore { get; private set; }
+        public bool CalledBeforeSerialize { get; private set; }
 
         [IgnoreMember]
-        public bool CalledAfter { get; private set; }
+        public bool CalledAfterDeserialize { get; private set; }
 
         public Callback1(int x)
         {
+            this.X = x;
         }
 
-        public void OnBeforeSerialize()
+        public void OnBeforeSerialize() => this.CalledBeforeSerialize = true;
+
+        public void OnAfterDeserialize() => this.CalledAfterDeserialize = true;
+    }
+
+    [MessagePackObject]
+    public class Callback1_CB2 : IMessagePackSerializationCallbackReceiver2
+    {
+        [Key(0)]
+        public int X { get; set; }
+
+        [IgnoreMember]
+        public bool CalledBeforeSerialize { get; private set; }
+
+        [IgnoreMember]
+        public bool CalledAfterDeserialize { get; private set; }
+
+        [IgnoreMember]
+        public bool CalledAfterSerialize { get; private set; }
+
+        [IgnoreMember]
+        public bool CalledBeforeDeserialize { get; private set; }
+
+        public Callback1_CB2(int x)
         {
-            this.CalledBefore = true;
+            this.X = x;
         }
 
-        public void OnAfterDeserialize()
-        {
-            this.CalledAfter = true;
-        }
+        public void OnBeforeSerialize() => this.CalledBeforeSerialize = true;
+
+        public void OnAfterDeserialize() => this.CalledAfterDeserialize = true;
+
+        public void OnAfterSerialize() => this.CalledAfterSerialize = true;
+
+        public void OnBeforeDeserialize() => this.CalledBeforeDeserialize = true;
     }
 
     [MessagePackObject]
@@ -275,25 +302,51 @@ namespace SharedData
         public int X { get; set; }
 
         [IgnoreMember]
-        public bool CalledBefore { get; private set; }
+        public bool CalledBeforeSerialize { get; private set; }
 
         [IgnoreMember]
-        public bool CalledAfter { get; private set; }
+        public bool CalledAfterDeserialize { get; private set; }
 
         public Callback1_2(int x)
         {
             this.X = x;
         }
 
-        void IMessagePackSerializationCallbackReceiver.OnBeforeSerialize()
+        void IMessagePackSerializationCallbackReceiver.OnBeforeSerialize() => this.CalledBeforeSerialize = true;
+
+        void IMessagePackSerializationCallbackReceiver.OnAfterDeserialize() => this.CalledAfterDeserialize = true;
+    }
+
+    [MessagePackObject]
+    public class Callback1_2_CB2 : IMessagePackSerializationCallbackReceiver2
+    {
+        [Key(0)]
+        public int X { get; set; }
+
+        [IgnoreMember]
+        public bool CalledBeforeSerialize { get; private set; }
+
+        [IgnoreMember]
+        public bool CalledAfterDeserialize { get; private set; }
+
+        [IgnoreMember]
+        public bool CalledAfterSerialize { get; private set; }
+
+        [IgnoreMember]
+        public bool CalledBeforeDeserialize { get; private set; }
+
+        public Callback1_2_CB2(int x)
         {
-            this.CalledBefore = true;
+            this.X = x;
         }
 
-        void IMessagePackSerializationCallbackReceiver.OnAfterDeserialize()
-        {
-            this.CalledAfter = true;
-        }
+        void IMessagePackSerializationCallbackReceiver.OnBeforeSerialize() => this.CalledBeforeSerialize = true;
+
+        void IMessagePackSerializationCallbackReceiver.OnAfterDeserialize() => this.CalledAfterDeserialize = true;
+
+        void IMessagePackSerializationCallbackReceiver2.OnAfterSerialize() => this.CalledAfterSerialize = true;
+
+        void IMessagePackSerializationCallbackReceiver2.OnBeforeDeserialize() => this.CalledBeforeDeserialize = true;
     }
 
     [MessagePackObject(true)]
@@ -304,29 +357,30 @@ namespace SharedData
         [Key(0)]
         public int X { get; set; }
 
-        private Action onBefore;
-        private Action onAfter;
+        private Action onBeforeSerialize;
+        private Action onAfterDeserialize;
 
         public Callback2(int x)
-            : this(x, () => { }, () => { })
+            : this(x, null, null)
         {
         }
 
-        public Callback2(int x, Action onBefore, Action onAfter)
+        public Callback2(int x, Action onBeforeSerialize, Action onAfterDeserialize)
         {
             this.X = x;
-            this.onBefore = onBefore;
-            this.onAfter = onAfter;
+            this.onBeforeSerialize = onBeforeSerialize;
+            this.onAfterDeserialize = onAfterDeserialize;
         }
 
         public void OnBeforeSerialize()
         {
-            this.onBefore();
+            this.onBeforeSerialize?.Invoke();
         }
 
         public void OnAfterDeserialize()
         {
             CalledAfter = true;
+            this.onAfterDeserialize?.Invoke();
         }
     }
 
@@ -336,31 +390,32 @@ namespace SharedData
         [Key(0)]
         public int X { get; set; }
 
-        public static bool CalledAfter = false;
+        public static bool CalledAfterDeserialize = false;
 
         public Callback2_2(int x)
             : this(x, () => { }, () => { })
         {
         }
 
-        private Action onBefore;
-        private Action onAfter;
+        private Action onBeforeSerialize;
+        private Action onAfterDeserialize;
 
-        public Callback2_2(int x, Action onBefore, Action onAfter)
+        public Callback2_2(int x, Action onBeforeSerialize, Action onAfterDeserialize)
         {
             this.X = x;
-            this.onBefore = onBefore;
-            this.onAfter = onAfter;
+            this.onBeforeSerialize = onBeforeSerialize;
+            this.onAfterDeserialize = onAfterDeserialize;
         }
 
         void IMessagePackSerializationCallbackReceiver.OnBeforeSerialize()
         {
-            this.onBefore();
+            this.onBeforeSerialize();
         }
 
         void IMessagePackSerializationCallbackReceiver.OnAfterDeserialize()
         {
-            CalledAfter = true;
+            CalledAfterDeserialize = true;
+            this.onAfterDeserialize?.Invoke();
         }
     }
 

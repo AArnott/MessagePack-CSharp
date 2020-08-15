@@ -427,6 +427,8 @@ public class SampleCallback : IMessagePackSerializationCallbackReceiver
 }
 ```
 
+The `IMessagePackSerializationCallbackReceiver2` interface provides additional callbacks and may be optionally implemented by your objects to be serialized.
+
 ## Union
 
 MessagePack for C# supports serializing interface-typed and abstract class-typed objects. It behaves like `XmlInclude` or `ProtoInclude`. In MessagePack for C# these are called `Union`. Only interfaces and abstracts classes are allowed to be annotated with `Union` attributes. Unique union keys are required.

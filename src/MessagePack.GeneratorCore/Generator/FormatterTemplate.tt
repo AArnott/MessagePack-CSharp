@@ -68,7 +68,7 @@ namespace <#= Namespace #>
 
 <# } #>
             IFormatterResolver formatterResolver = options.Resolver;
-<#if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnBefore) { #>
+<#if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnBeforeSerialize) { #>
             ((IMessagePackSerializationCallbackReceiver)value).OnBeforeSerialize();
 <# } else if(objInfo.HasIMessagePackSerializationCallbackReceiver) { #>
             value.OnBeforeSerialize();
@@ -89,6 +89,11 @@ namespace <#= Namespace #>
             writer.WriteRaw(this.____stringByteKeys[<#= index++ #>]);
             <#= x.GetSerializeMethodString() #>;
 <# } } #>
+<#if(objInfo.HasIMessagePackSerializationCallbackReceiver2 && objInfo.NeedsCastOnAfterSerialize) { #>
+            ((IMessagePackSerializationCallbackReceiver2)value).OnAfterSerialize();
+<# } else if(objInfo.HasIMessagePackSerializationCallbackReceiver2) { #>
+            value.OnAfterSerialize();
+<# } #>
         }
 
         public <#= objInfo.FullName #> Deserialize(ref MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
@@ -141,10 +146,15 @@ namespace <#= Namespace #>
             }
 
             var ____result = new <#= objInfo.GetConstructorString()  #>;
+<#if(objInfo.HasIMessagePackSerializationCallbackReceiver2 && objInfo.NeedsCastOnBeforeDeserialize) { #>
+            ((IMessagePackSerializationCallbackReceiver2)____result).OnBeforeDeserialize();
+<# } else if(objInfo.HasIMessagePackSerializationCallbackReceiver2) { #>
+            ____result.OnBeforeDeserialize();
+<# } #>
 <# foreach(var x in objInfo.Members.Where(x => x.IsWritable)) { #>
             ____result.<#= x.Name #> = __<#= x.Name #>__;
 <# } #>
-<#if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnAfter) { #>
+<#if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnAfterDeserialize) { #>
             ((IMessagePackSerializationCallbackReceiver)____result).OnAfterDeserialize();
 <# } else if(objInfo.HasIMessagePackSerializationCallbackReceiver) { #>
             ____result.OnAfterDeserialize();

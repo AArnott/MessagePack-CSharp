@@ -205,6 +205,49 @@ namespace DynamicCodeDumper
         }
     }
 
+    [MessagePackObject(true)]
+    public struct Callback2_3 : IMessagePackSerializationCallbackReceiver2
+    {
+        [Key(0)]
+        public int X { get; set; }
+
+        public static bool CalledAfter = false;
+
+        public Callback2_3(int x)
+            : this(x, null, null, null, null)
+        {
+        }
+
+        private Action onBeforeSerialize;
+        private Action onAfterDeserialize;
+        private Action onBeforeDeserialize;
+        private Action onAfterSerialize;
+
+        public Callback2_3(int x, Action onBeforeSerialize, Action onAfterDeserialize, Action onBeforeDeserialize, Action onAfterSerialize)
+        {
+            this.X = x;
+            this.onBeforeSerialize = onBeforeSerialize;
+            this.onAfterDeserialize = onAfterDeserialize;
+            this.onBeforeDeserialize = onBeforeDeserialize;
+            this.onAfterSerialize = onAfterSerialize;
+        }
+
+        void IMessagePackSerializationCallbackReceiver.OnBeforeSerialize()
+        {
+            this.onBeforeSerialize?.Invoke();
+        }
+
+        void IMessagePackSerializationCallbackReceiver.OnAfterDeserialize()
+        {
+            CalledAfter = true;
+            this.onAfterDeserialize?.Invoke();
+        }
+
+        void IMessagePackSerializationCallbackReceiver2.OnAfterSerialize() => this.onAfterSerialize?.Invoke();
+
+        void IMessagePackSerializationCallbackReceiver2.OnBeforeDeserialize() => this.onBeforeDeserialize?.Invoke();
+    }
+
     [Union(0, typeof(HogeMoge1))]
     [Union(1, typeof(HogeMoge2))]
     public interface IHogeMoge

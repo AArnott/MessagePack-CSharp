@@ -31,6 +31,7 @@ namespace MessagePackCompiler.CodeAnalysis
         internal readonly INamedTypeSymbol IgnoreAttribute;
         internal readonly INamedTypeSymbol IgnoreDataMemberAttribute;
         internal readonly INamedTypeSymbol IMessagePackSerializationCallbackReceiver;
+        internal readonly INamedTypeSymbol IMessagePackSerializationCallbackReceiver2;
         internal readonly INamedTypeSymbol MessagePackFormatterAttribute;
 #pragma warning restore SA1401 // Fields should be private
 
@@ -88,6 +89,12 @@ namespace MessagePackCompiler.CodeAnalysis
             if (IMessagePackSerializationCallbackReceiver == null)
             {
                 throw new InvalidOperationException("failed to get metadata of MessagePack.IMessagePackSerializationCallbackReceiver");
+            }
+
+            IMessagePackSerializationCallbackReceiver2 = compilation.GetTypeByMetadataName("MessagePack.IMessagePackSerializationCallbackReceiver2");
+            if (IMessagePackSerializationCallbackReceiver2 == null)
+            {
+                throw new InvalidOperationException("failed to get metadata of MessagePack.IMessagePackSerializationCallbackReceiver2");
             }
 
             MessagePackFormatterAttribute = compilation.GetTypeByMetadataName("MessagePack.MessagePackFormatterAttribute");
@@ -968,13 +975,21 @@ namespace MessagePackCompiler.CodeAnalysis
                 }
             }
 
-            var hasSerializationConstructor = type.AllInterfaces.Any(x => x.ApproximatelyEqual(this.typeReferences.IMessagePackSerializationCallbackReceiver));
-            var needsCastOnBefore = true;
-            var needsCastOnAfter = true;
-            if (hasSerializationConstructor)
+            var hasCallbackReceiver2 = type.AllInterfaces.Any(x => x.ApproximatelyEqual(this.typeReferences.IMessagePackSerializationCallbackReceiver2));
+            var hasCallbackReceiver = hasCallbackReceiver2 || type.AllInterfaces.Any(x => x.ApproximatelyEqual(this.typeReferences.IMessagePackSerializationCallbackReceiver));
+            var needsCastOnBeforeSerialize = true;
+            var needsCastOnAfterDeserialize = true;
+            var needsCastOnBeforeDeserialize = true;
+            var needsCastOnAfterSerialize = true;
+            if (hasCallbackReceiver)
             {
-                needsCastOnBefore = !type.GetMembers("OnBeforeSerialize").Any();
-                needsCastOnAfter = !type.GetMembers("OnAfterDeserialize").Any();
+                needsCastOnBeforeSerialize = !type.GetMembers("OnBeforeSerialize").Any();
+                needsCastOnAfterDeserialize = !type.GetMembers("OnAfterDeserialize").Any();
+                if (hasCallbackReceiver2)
+                {
+                    needsCastOnBeforeDeserialize = !type.GetMembers("OnBeforeDeserialize").Any();
+                    needsCastOnAfterSerialize = !type.GetMembers("OnAfterSerialize").Any();
+                }
             }
 
             string templateParametersString;
@@ -997,9 +1012,11 @@ namespace MessagePackCompiler.CodeAnalysis
                 TemplateParametersString = templateParametersString,
                 FullName = type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
                 Namespace = type.ContainingNamespace.IsGlobalNamespace ? null : type.ContainingNamespace.ToDisplayString(),
-                HasIMessagePackSerializationCallbackReceiver = hasSerializationConstructor,
-                NeedsCastOnAfter = needsCastOnAfter,
-                NeedsCastOnBefore = needsCastOnBefore,
+                HasIMessagePackSerializationCallbackReceiver = hasCallbackReceiver,
+                NeedsCastOnAfterDeserialize = needsCastOnAfterDeserialize,
+                NeedsCastOnBeforeSerialize = needsCastOnBeforeSerialize,
+                NeedsCastOnAfterSerialize = needsCastOnAfterSerialize,
+                NeedsCastOnBeforeDeserialize = needsCastOnBeforeDeserialize,
             };
 
             return info;

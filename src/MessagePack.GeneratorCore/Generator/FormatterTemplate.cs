@@ -96,7 +96,7 @@ namespace ");
                     "\r\n                return;\r\n            }\r\n\r\n");
  } 
             this.Write("            IFormatterResolver formatterResolver = options.Resolver;\r\n");
-if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnBefore) { 
+if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnBeforeSerialize) { 
             this.Write("            ((IMessagePackSerializationCallbackReceiver)value).OnBeforeSerialize(" +
                     ");\r\n");
  } else if(objInfo.HasIMessagePackSerializationCallbackReceiver) { 
@@ -127,6 +127,12 @@ if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnBe
             this.Write(this.ToStringHelper.ToStringWithCulture(x.GetSerializeMethodString()));
             this.Write(";\r\n");
  } } 
+if(objInfo.HasIMessagePackSerializationCallbackReceiver2 && objInfo.NeedsCastOnAfterSerialize) { 
+            this.Write("            ((IMessagePackSerializationCallbackReceiver2)value).OnAfterSerialize(" +
+                    ");\r\n");
+ } else if(objInfo.HasIMessagePackSerializationCallbackReceiver2) { 
+            this.Write("            value.OnAfterSerialize();\r\n");
+ } 
             this.Write("        }\r\n\r\n        public ");
             this.Write(this.ToStringHelper.ToStringWithCulture(objInfo.FullName));
             this.Write(" Deserialize(ref MessagePackReader reader, global::MessagePack.MessagePackSeriali" +
@@ -180,6 +186,12 @@ if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnBe
                     "ult = new ");
             this.Write(this.ToStringHelper.ToStringWithCulture(objInfo.GetConstructorString()));
             this.Write(";\r\n");
+if(objInfo.HasIMessagePackSerializationCallbackReceiver2 && objInfo.NeedsCastOnBeforeDeserialize) { 
+            this.Write("            ((IMessagePackSerializationCallbackReceiver2)____result).OnBeforeDese" +
+                    "rialize();\r\n");
+ } else if(objInfo.HasIMessagePackSerializationCallbackReceiver2) { 
+            this.Write("            ____result.OnBeforeDeserialize();\r\n");
+ } 
  foreach(var x in objInfo.Members.Where(x => x.IsWritable)) { 
             this.Write("            ____result.");
             this.Write(this.ToStringHelper.ToStringWithCulture(x.Name));
@@ -187,7 +199,7 @@ if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnBe
             this.Write(this.ToStringHelper.ToStringWithCulture(x.Name));
             this.Write("__;\r\n");
  } 
-if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnAfter) { 
+if(objInfo.HasIMessagePackSerializationCallbackReceiver && objInfo.NeedsCastOnAfterDeserialize) { 
             this.Write("            ((IMessagePackSerializationCallbackReceiver)____result).OnAfterDeseri" +
                     "alize();\r\n");
  } else if(objInfo.HasIMessagePackSerializationCallbackReceiver) { 
