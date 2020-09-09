@@ -112,6 +112,7 @@ namespace MessagePack.Tests
         }
 
         [Fact]
+        [Trait("FailsOnMono", "true")]
         public void Versioning()
         {
             var v1 = new Version1
@@ -158,6 +159,7 @@ namespace MessagePack.Tests
         }
 
         [Fact]
+        [Trait("FailsOnMono", "true")]
         public void Versioning2()
         {
             var v1 = new HolderV1
@@ -264,6 +266,7 @@ namespace MessagePack.Tests
         }
 
         [Fact]
+        [Trait("FailsOnMono", "true")]
         public void GenericStructTest()
         {
             var t = new GenericStruct<int, string> { MyProperty0 = 100, MyProperty1 = "aaa" };

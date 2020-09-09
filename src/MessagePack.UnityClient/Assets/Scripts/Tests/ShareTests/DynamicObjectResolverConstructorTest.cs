@@ -137,6 +137,7 @@ namespace MessagePack.Tests
         }
 
         [Fact]
+        [Trait("FailsOnMono", "true")]
         public void StringKey()
         {
             var ctor = new TestConstructor1(10, 20, 30);
@@ -157,6 +158,7 @@ namespace MessagePack.Tests
         }
 
         [Fact]
+        [Trait("FailsOnMono", "true")]
         public void SerializationCtor()
         {
             var ctor = new TestConstructor3(10, 20, 30);

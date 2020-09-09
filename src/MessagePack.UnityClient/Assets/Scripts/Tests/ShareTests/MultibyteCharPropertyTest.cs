@@ -22,6 +22,7 @@ namespace MessagePack.Tests
         }
 
         [Fact]
+        [Trait("FailsOnMono", "true")]
         public void ConvertMultibyteCharProperty()
         {
             var data = new データ

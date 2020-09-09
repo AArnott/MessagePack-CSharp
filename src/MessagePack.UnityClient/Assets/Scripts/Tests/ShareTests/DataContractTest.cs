@@ -80,6 +80,7 @@ namespace MessagePack.Tests
         }
 
         [Fact]
+        [Trait("FailsOnMono", "true")]
         public void SerializeName()
         {
             var mc = new MyClass1 { MyProperty1 = 100, MyProperty2 = "foobar" };

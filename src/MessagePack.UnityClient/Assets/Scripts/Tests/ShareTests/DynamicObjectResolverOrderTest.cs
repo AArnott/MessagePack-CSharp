@@ -46,6 +46,7 @@ namespace MessagePack.Tests
         }
 
         [Fact]
+        [Trait("FailsOnMono", "true")]
         public void InheritIterateOrder()
         {
             RealClass realClass = new RealClass { Str = "X" };

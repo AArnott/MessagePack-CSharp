@@ -179,6 +179,7 @@ public class MessagePackSecurityTests
     }
 
     [Fact]
+    [Trait("FailsOnMono", "true")]
     public void TypelessFormatterWithUntrustedData_UnsafeKeys()
     {
         var data = new

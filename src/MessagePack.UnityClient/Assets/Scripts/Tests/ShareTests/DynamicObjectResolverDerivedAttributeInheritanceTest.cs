@@ -11,6 +11,7 @@ namespace MessagePack.Tests
     public class DynamicObjectResolverDerivedAttributeInheritanceTest
     {
         [Fact]
+        [Trait("FailsOnMono", "true")]
         public void InheritanceAndDerivedAttributeTest()
         {
             var value = new ChildClass(1, "Hello", 2);

@@ -12,6 +12,7 @@ namespace MessagePack.Tests
     public class DynamicObjectResolverInterfaceTest
     {
         [Fact]
+        [Trait("FailsOnMono", "true")]
         public void TestConstructorWithParentInterface()
         {
             var myClass = new ConstructorEnumerableTest(new[] { "0", "2", "3" });
