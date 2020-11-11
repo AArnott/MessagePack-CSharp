@@ -16,6 +16,15 @@ namespace MessagePack.Tests
     {
         private readonly ITestOutputHelper logger;
 
+#if UNITY_2018_3_OR_NEWER
+
+        public ContractlessStandardResolverTest()
+        {
+            this.logger = new NullTestOutputHelper();
+        }
+
+#endif
+
         public ContractlessStandardResolverTest(ITestOutputHelper logger)
         {
             this.logger = logger;
@@ -135,6 +144,18 @@ namespace MessagePack.Tests
             public new string X;
 
             public new string Y;
+        }
+
+        public class ObjectWithStaticConstructor
+        {
+            public string StringValue { get; set; }
+
+            public static readonly string Empty;
+
+            static ObjectWithStaticConstructor()
+            {
+                Empty = string.Empty;
+            }
         }
 
         [Fact]
@@ -302,6 +323,16 @@ namespace MessagePack.Tests
             byte[] sr1 = MessagePackSerializer.Serialize(obj, ContractlessStandardResolver.Options);
             var obj2 = (Dictionary<object, object>)MessagePackSerializer.Deserialize<object>(sr1, ContractlessStandardResolver.Options);
             MessagePackSerializer.Serialize(obj2["nestedProp"], ContractlessStandardResolver.Options);
+        }
+
+        [Fact]
+        public void DeserializeWithStaticConstructor()
+        {
+            var options = ContractlessStandardResolverAllowPrivate.Options;
+            var original = new ObjectWithStaticConstructor { StringValue = "test" };
+
+            byte[] copyBin = MessagePackSerializer.Serialize(original, options);
+            var clone = MessagePackSerializer.Deserialize<ObjectWithStaticConstructor>(copyBin, options);
         }
     }
 }
