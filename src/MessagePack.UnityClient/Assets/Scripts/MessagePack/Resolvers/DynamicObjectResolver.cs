@@ -49,13 +49,6 @@ namespace MessagePack.Resolvers
         {
         }
 
-#if NETFRAMEWORK
-        public AssemblyBuilder Save()
-        {
-            return DynamicAssembly.Value.Save();
-        }
-#endif
-
         public IMessagePackFormatter<T> GetFormatter<T>()
         {
             return FormatterCache<T>.Formatter;
@@ -169,7 +162,7 @@ namespace MessagePack.Resolvers
 
         private const string ModuleName = "MessagePack.Resolvers.DynamicContractlessObjectResolver";
 
-        private static readonly Lazy<DynamicAssembly> DynamicAssembly;
+        internal static readonly Lazy<DynamicAssembly> DynamicAssembly;
 
         private DynamicContractlessObjectResolver()
         {
@@ -179,13 +172,6 @@ namespace MessagePack.Resolvers
         {
             DynamicAssembly = new Lazy<DynamicAssembly>(() => new DynamicAssembly(ModuleName));
         }
-
-#if NETFRAMEWORK
-        public AssemblyBuilder Save()
-        {
-            return DynamicAssembly.Value.Save();
-        }
-#endif
 
         public IMessagePackFormatter<T> GetFormatter<T>()
         {

@@ -11,9 +11,6 @@ namespace MessagePack.Internal
 {
     internal class DynamicAssembly
     {
-#if NETFRAMEWORK // We don't ship a net472 target, but we might add one for debugging purposes
-        private readonly string moduleName;
-#endif
         private readonly AssemblyBuilder assemblyBuilder;
         private readonly ModuleBuilder moduleBuilder;
 
@@ -22,15 +19,12 @@ namespace MessagePack.Internal
 
         public DynamicAssembly(string moduleName)
         {
-#if NETFRAMEWORK // We don't ship a net472 target, but we might add one for debugging purposes
-            AssemblyBuilderAccess builderAccess = AssemblyBuilderAccess.RunAndSave;
-            this.moduleName = moduleName;
-#else
             AssemblyBuilderAccess builderAccess = AssemblyBuilderAccess.Run;
-#endif
             this.assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(moduleName), builderAccess);
             this.moduleBuilder = this.assemblyBuilder.DefineDynamicModule(moduleName + ".dll");
         }
+
+        internal Assembly Assembly => this.assemblyBuilder;
 
         /* requires lock on mono environment. see: https://github.com/neuecc/MessagePack-CSharp/issues/161 */
 
@@ -39,16 +33,6 @@ namespace MessagePack.Internal
         public TypeBuilder DefineType(string name, TypeAttributes attr, Type parent) => this.moduleBuilder.DefineType(name, attr, parent);
 
         public TypeBuilder DefineType(string name, TypeAttributes attr, Type parent, Type[] interfaces) => this.moduleBuilder.DefineType(name, attr, parent, interfaces);
-
-#if NETFRAMEWORK
-
-        public AssemblyBuilder Save()
-        {
-            this.assemblyBuilder.Save(this.moduleName + ".dll");
-            return this.assemblyBuilder;
-        }
-
-#endif
     }
 }
 

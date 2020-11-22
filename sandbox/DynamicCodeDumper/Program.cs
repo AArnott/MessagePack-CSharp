@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
@@ -77,14 +78,16 @@ namespace DynamicCodeDumper
             }
             finally
             {
-                AssemblyBuilder a1 = DynamicObjectResolver.Instance.Save();
-                AssemblyBuilder a2 = DynamicUnionResolver.Instance.Save();
-                AssemblyBuilder a3 = DynamicEnumResolver.Instance.Save();
-                AssemblyBuilder a4 = DynamicContractlessObjectResolver.Instance.Save();
+                var generator = new Lokad.ILPack.AssemblyGenerator();
+                SaveAssembly(DynamicObjectResolver.DynamicAssembly.Value.Assembly);
+                SaveAssembly(DynamicUnionResolver.DynamicAssembly.Value.Assembly);
+                SaveAssembly(DynamicEnumResolver.DynamicAssembly.Value.Assembly);
+                SaveAssembly(DynamicContractlessObjectResolver.DynamicAssembly.Value.Assembly);
                 ////var a5 = AutomataKeyGen.Save();
 
                 ////Verify(a5);
-            }
+                void SaveAssembly(Assembly assembly) => generator.GenerateAssembly(assembly, $"{assembly.GetName().Name}.dll");
+           }
             ////Verify(a1, a2, a3, a4);
         }
 

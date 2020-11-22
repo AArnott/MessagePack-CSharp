@@ -36,7 +36,7 @@ namespace MessagePack.Resolvers
         /// </summary>
         public static readonly MessagePackSerializerOptions Options;
 
-        private static readonly Lazy<DynamicAssembly> DynamicAssembly;
+        internal static readonly Lazy<DynamicAssembly> DynamicAssembly;
 #if !UNITY_2018_3_OR_NEWER
         private static readonly Regex SubtractFullNameRegex = new Regex(@", Version=\d+.\d+.\d+.\d+, Culture=\w+, PublicKeyToken=\w+", RegexOptions.Compiled);
 #else
@@ -55,13 +55,6 @@ namespace MessagePack.Resolvers
         private DynamicUnionResolver()
         {
         }
-
-#if NETFRAMEWORK
-        public AssemblyBuilder Save()
-        {
-            return DynamicAssembly.Value.Save();
-        }
-#endif
 
         public IMessagePackFormatter<T> GetFormatter<T>()
         {

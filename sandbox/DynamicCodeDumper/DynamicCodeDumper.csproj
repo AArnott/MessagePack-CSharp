@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
+    <LangVersion>9</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <OutputType>exe</OutputType>
     <DefineConstants>$(DefineConstants);DYNAMICCODEDUMPER</DefineConstants>
@@ -143,5 +144,6 @@
     <PackageReference Include="Nerdbank.Streams" Version="2.4.48" />
     <PackageReference Include="System.Memory" Version="4.5.3" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.2" />
+    <PackageReference Include="Lokad.ILPack" Version="0.1.6" />
   </ItemGroup>
 </Project>
