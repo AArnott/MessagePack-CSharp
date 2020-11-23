@@ -38,7 +38,7 @@ namespace DynamicCodeDumper
                 ////DynamicObjectResolver.Instance.GetFormatter<FirstSimpleData>();
                 ////DynamicObjectResolver.Instance.GetFormatter<Version0>();
                 ////DynamicObjectResolver.Instance.GetFormatter<Version1>();
-                ////DynamicObjectResolver.Instance.GetFormatter<Version2>();
+                DynamicObjectResolver.Instance.GetFormatter<Version2>();
                 ////DynamicObjectResolver.Instance.GetFormatter<SimpleIntKeyData>();
                 ////DynamicObjectResolver.Instance.GetFormatter<SimpleStringKeyData>();
                 ////DynamicObjectResolver.Instance.GetFormatter<SimpleStringKeyData2>();
@@ -78,6 +78,7 @@ namespace DynamicCodeDumper
             }
             finally
             {
+                Console.WriteLine("Writing assemblies out to: " + Environment.CurrentDirectory);
                 var generator = new Lokad.ILPack.AssemblyGenerator();
                 SaveAssembly(DynamicObjectResolver.DynamicAssembly.Value.Assembly);
                 SaveAssembly(DynamicUnionResolver.DynamicAssembly.Value.Assembly);
