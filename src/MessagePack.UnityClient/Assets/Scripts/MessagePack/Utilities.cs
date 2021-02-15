@@ -3,6 +3,7 @@
 
 using System;
 using System.Buffers;
+using System.Linq.Expressions;
 
 namespace MessagePack
 {
@@ -43,5 +44,9 @@ namespace MessagePack
 
             return memory;
         }
+
+#if NET461
+        internal static TDelegate Compile<TDelegate>(this Expression<TDelegate> expression, bool preferInterpretation) => expression.Compile();
+#endif
     }
 }
