@@ -89,7 +89,7 @@ namespace MessagePack
                 {
                     using (var scratchRental = options.SequencePool.Rent())
                     {
-                        if (TryDecompress(ref reader, scratchRental.Value))
+                        if (LZ4Utilities.TryDecompress(ref reader, scratchRental.Value))
                         {
                             var scratchReader = new MessagePackReader(scratchRental.Value)
                             {
@@ -171,7 +171,7 @@ namespace MessagePack
                     }
 
                     scratchWriter.Flush();
-                    ToLZ4BinaryCore(scratchRental.Value, ref writer, options.Compression);
+                    LZ4Utilities.Compress(scratchRental.Value, ref writer, options.Compression);
                 }
             }
             else
