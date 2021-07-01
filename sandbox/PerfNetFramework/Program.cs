@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using MessagePack;
 using Newtonsoft.Json;
+using PeterO.Cbor;
 using ZeroFormatter;
 
 namespace PerfNetFramework
@@ -63,6 +64,10 @@ namespace PerfNetFramework
             ProtoBuf.Serializer.Serialize(new MemoryStream(), target);
             jsonSerializer.Serialize(new JsonTextWriter(new StringWriter()), target);
 
+            var cborTypeMapping = new CBORTypeMapper()
+                .AddConverter(typeof(Person), new CborPersonFormatter());
+            CBORObject.FromObject(target, cborTypeMapping);
+
             Console.WriteLine(typeof(T).Name + " serialization test");
             Console.WriteLine();
 
@@ -76,6 +81,7 @@ namespace PerfNetFramework
             byte[] data3 = null;
             byte[] dataJson = null;
             byte[] dataGzipJson = null;
+            byte[] dataCbor = null;
 
             using (new Measure("MessagePack for C#"))
             {
@@ -118,6 +124,14 @@ namespace PerfNetFramework
                 for (int i = 0; i < Iteration; i++)
                 {
                     data1 = ZeroFormatter.ZeroFormatterSerializer.Serialize(target);
+                }
+            }
+
+            using (new Measure("CBOR"))
+            {
+                for (int i = 0; i < Iteration; i++)
+                {
+                    dataCbor = CBORObject.FromObject(target, cborTypeMapping).EncodeToBytes();
                 }
             }
 
@@ -180,6 +194,7 @@ namespace PerfNetFramework
             msgpack.GetSerializer<T>().UnpackSingleObject(data);
             MessagePackSerializer.Deserialize<T>(data0);
             ////ZeroFormatterSerializer.Deserialize<T>(data1);
+            CBORObject.DecodeFromBytes(dataCbor).ToObject<T>(cborTypeMapping);
             ProtoBuf.Serializer.Deserialize<T>(new MemoryStream(data2));
             MessagePackSerializer.Deserialize<T>(data3, LZ4Standard);
             jsonSerializer.Deserialize<T>(new JsonTextReader(new StreamReader(new MemoryStream(dataJson))));
@@ -231,6 +246,14 @@ namespace PerfNetFramework
                 }
             }
 
+            using (new Measure("CBOR"))
+            {
+                for (int i = 0; i < Iteration; i++)
+                {
+                    CBORObject.DecodeFromBytes(dataCbor).ToObject<T>(cborTypeMapping);
+                }
+            }
+
             using (new Measure("Json.NET"))
             {
                 for (int i = 0; i < Iteration; i++)
@@ -271,6 +294,8 @@ namespace PerfNetFramework
             Console.WriteLine($"{label,-25} {data2.Length,14} byte");
             label = "ZeroFormatter";
             Console.WriteLine($"{label,-25} {data1.Length,14} byte");
+            label = "CBOR";
+            Console.WriteLine($"{label,-25} {dataCbor.Length,14} byte");
             label = "Json.NET";
             Console.WriteLine($"{label,-25} {dataJson.Length,14} byte");
             label = "Json.NET(+GZip)";
@@ -337,6 +362,29 @@ namespace PerfNetFramework
 
             bytes = bytes / 1024;
             return bytes + " ZB";
+        }
+
+        private class CborPersonFormatter : ICBORToFromConverter<Person>
+        {
+            public Person FromCBORObject(CBORObject obj)
+            {
+                return new Person
+                {
+                    Age = obj[0].AsInt32(),
+                    FirstName = obj[1].AsString(),
+                    LastName = obj[2].AsString(),
+                    Sex = (Sex)obj[3].AsInt32(),
+                };
+            }
+
+            public CBORObject ToCBORObject(Person obj)
+            {
+                return CBORObject.NewArray()
+                    .Add(obj.Age)
+                    .Add(obj.FirstName)
+                    .Add(obj.LastName)
+                    .Add((int)obj.Sex);
+            }
         }
     }
 }
