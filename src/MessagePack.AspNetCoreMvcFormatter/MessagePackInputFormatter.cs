@@ -6,25 +6,25 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace MessagePack.AspNetCoreMvcFormatter
 {
-    public class MessagePackInputFormatter : IInputFormatter
+    public class MessagePackInputFormatter : InputFormatter
     {
         private const string ContentType = "application/x-msgpack";
+        private static readonly MessagePackSerializerOptions DefaultOptions = MessagePackSerializerOptions.Standard.WithSecurity(MessagePackSecurity.UntrustedData);
         private readonly MessagePackSerializerOptions options;
 
         public MessagePackInputFormatter()
-            : this(null)
+            : this(DefaultOptions)
         {
         }
 
-        public MessagePackInputFormatter(MessagePackSerializerOptions options)
+        public MessagePackInputFormatter(MessagePackSerializerOptions? options)
         {
-            this.options = options;
+            this.options = options ?? DefaultOptions;
+
+            SupportedMediaTypes.Add(ContentType);
         }
 
-        public bool CanRead(InputFormatterContext context) =>
-            context.HttpContext.Request.ContentType == ContentType;
-
-        public async Task<InputFormatterResult> ReadAsync(InputFormatterContext context)
+        public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context)
         {
             var request = context.HttpContext.Request;
             var result = await MessagePackSerializer.DeserializeAsync(context.ModelType, request.Body, this.options, context.HttpContext.RequestAborted).ConfigureAwait(false);

@@ -1,8 +1,11 @@
 ﻿// Copyright (c) All contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !ENABLE_IL2CPP
+#if !(MESSAGEPACK_FORCE_AOT || ENABLE_IL2CPP)
+#define DYNAMIC_GENERATION
+#endif
 
+#if DYNAMIC_GENERATION
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -40,6 +43,16 @@ namespace MessagePack.Tests
             public string Name { get; set; }
 
             public object[] /*Address*/ Addresses { get; set; }
+        }
+
+        public class DefaultValueStringKeyClassWithoutExplicitConstructor
+        {
+            public const int Prop1Constant = 11;
+            public const int Prop2Constant = 45;
+
+            public int Prop1 { get; set; } = Prop1Constant;
+
+            public int Prop2 { get; set; } = Prop2Constant;
         }
 
         public class V1
@@ -182,6 +195,18 @@ namespace MessagePack.Tests
             var d2 = (IDictionary)addresses[1];
             ((string)d1["Street"]).Is("St.");
             ((string)d2["Street"]).Is("Ave.");
+        }
+
+        [Fact]
+        public void DefaultValueStringKeyClassWithoutExplicitConstructorTest()
+        {
+            var dictionary = new Dictionary<string, int>();
+
+            var result = MessagePackSerializer.Serialize(dictionary, Resolvers.ContractlessStandardResolver.Options);
+
+            var instance = MessagePackSerializer.Deserialize<DefaultValueStringKeyClassWithoutExplicitConstructor>(result, Resolvers.ContractlessStandardResolver.Options);
+            instance.Prop1.Is(DefaultValueStringKeyClassWithoutExplicitConstructor.Prop1Constant);
+            instance.Prop2.Is(DefaultValueStringKeyClassWithoutExplicitConstructor.Prop2Constant);
         }
 
         [Fact]

@@ -11,6 +11,7 @@ using BenchmarkDotNet.Attributes;
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1306 // Field names should begin with lower-case letter
 #pragma warning disable SA1401 // Fields should be private
+#pragma warning disable SA1402 // File may only contain a single type
 #pragma warning disable SA1649 // File name should match first type name
 
 namespace Benchmark
@@ -21,7 +22,7 @@ namespace Benchmark
         [ParamsSource(nameof(Serializers))]
         public SerializerBase Serializer;
 
-        // Currently BenchmarkdDotNet does not detect inherited ParamsSource so use copy and paste:)
+        // Currently BenchmarkDotNet does not detect inherited ParamsSource so use copy and paste:)
         public IEnumerable<SerializerBase> Serializers => new SerializerBase[]
         {
             new MessagePack_v1(),
@@ -29,21 +30,22 @@ namespace Benchmark
             new MessagePackLz4_v1(),
             new MessagePackLz4_v2(),
             new MsgPack_v2_opt(),
-            //new MsgPack_v2_string(),
-            //new MsgPack_v2_str_lz4(),
-            new ProtobufNet(),
-            new JsonNet(),
-            new BsonNet(),
-            new BinaryFormatter_(),
-            new DataContract_(),
-            new Hyperion_(),
-            new Jil_(),
-            new SpanJson_(),
-            new Utf8Json_(),
-            new SystemTextJson(),
-            new MsgPackCli(),
-            new FsPickler_(),
-            new Ceras_(),
+            ////new MsgPack_v2_string(),
+            ////new MsgPack_v2_str_lz4(),
+            new ProtobufNetSerializer(),
+            new JsonNetSerializer(),
+            new BsonNetSerializer(),
+            new BinaryFormatterSerializer(),
+            new DataContractSerializer(),
+            new HyperionSerializer(),
+            new JilSerializer(),
+            new SpanJsonSerializer(),
+            new Utf8JsonSerializer(),
+            new SystemTextJsonSerializer(),
+            new MsgPackCliSerializer(),
+            new FsPicklerSerializer(),
+            new CerasSerializer(),
+            new OdinSerializer_(),
         };
 
         protected static readonly ExpressionTreeFixture ExpressionTreeFixture = new ExpressionTreeFixture();
@@ -568,7 +570,7 @@ namespace Benchmark
         [ParamsSource(nameof(Serializers))]
         public SerializerBase Serializer;
 
-        // Currently BenchmarkdDotNet does not detect inherited ParamsSource so use copy and paste:)
+        // Currently BenchmarkDotNet does not detect inherited ParamsSource so use copy and paste:)
         public IEnumerable<SerializerBase> Serializers => new SerializerBase[]
         {
             new MessagePack_v1(),
@@ -1099,7 +1101,7 @@ namespace Benchmark
 
         private bool isContractless;
 
-        // Currently BenchmarkdDotNet does not detect inherited ParamsSource so use copy and paste:)
+        // Currently BenchmarkDotNet does not detect inherited ParamsSource so use copy and paste:)
         public IEnumerable<SerializerBase> Serializers => new SerializerBase[]
         {
             new MessagePack_v1(),
@@ -1111,19 +1113,20 @@ namespace Benchmark
             new MsgPack_v2_string(),
             new MsgPack_v1_str_lz4(),
             new MsgPack_v2_str_lz4(),
-            new ProtobufNet(),
-            new JsonNet(),
-            new BsonNet(),
-            new BinaryFormatter_(),
-            new DataContract_(),
-            new Hyperion_(),
-            new Jil_(),
-            new SpanJson_(),
-            new Utf8Json_(),
-            new SystemTextJson(),
-            new MsgPackCli(),
-            new FsPickler_(),
-            new Ceras_(),
+            new ProtobufNetSerializer(),
+            new JsonNetSerializer(),
+            new BsonNetSerializer(),
+            new BinaryFormatterSerializer(),
+            new DataContractSerializer(),
+            new HyperionSerializer(),
+            new JilSerializer(),
+            new SpanJsonSerializer(),
+            new Utf8JsonSerializer(),
+            new SystemTextJsonSerializer(),
+            new MsgPackCliSerializer(),
+            new FsPicklerSerializer(),
+            new CerasSerializer(),
+            new OdinSerializer_(),
         };
 
         protected static readonly ExpressionTreeFixture ExpressionTreeFixture = new ExpressionTreeFixture();
@@ -1133,6 +1136,7 @@ namespace Benchmark
 
         // models
         protected static readonly Benchmark.Models.Answer AnswerInput = ExpressionTreeFixture.Create<Benchmark.Models.Answer>();
+
         // not same data so does not gurantee correctly.
         protected static readonly Benchmark.Models.Answer2 Answer2Input = ExpressionTreeFixture.Create<Benchmark.Models.Answer2>();
 
@@ -1197,7 +1201,7 @@ namespace Benchmark
         [ParamsSource(nameof(Serializers))]
         public SerializerBase Serializer;
 
-        // Currently BenchmarkdDotNet does not detect inherited ParamsSource so use copy and paste:)
+        // Currently BenchmarkDotNet does not detect inherited ParamsSource so use copy and paste:)
         public IEnumerable<SerializerBase> Serializers => new SerializerBase[]
         {
             new MessagePack_v1(),

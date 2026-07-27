@@ -1,6 +1,8 @@
 ﻿// Copyright (c) All contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable disable
+
 #pragma warning disable SA1136 // enum values on their own lines
 #pragma warning disable SA1201 // type ordering
 #pragma warning disable SA1307 // capitalize public fields
@@ -85,6 +87,18 @@ namespace SharedData
         ////public int Prop7 { get; set; }
     }
 
+    [MessagePackObject]
+    public class SimpleGenericData<T>
+    {
+        [Key(0)]
+        public T Value { get; set; }
+
+        public SimpleGenericData(T value)
+        {
+            this.Value = value;
+        }
+    }
+
     public class OreOreFormatter : IMessagePackFormatter<int>
     {
         public int Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options)
@@ -112,6 +126,108 @@ namespace SharedData
         public void Serialize(ref MessagePackWriter writer, int value, MessagePackSerializerOptions options)
         {
             throw new NotImplementedException();
+        }
+    }
+
+    [MessagePackObject(true)]
+    public class DefaultValueStringKeyClassWithoutExplicitConstructor
+    {
+        public const int Prop1Constant = 11;
+        public const int Prop2Constant = 45;
+
+        public int Prop1 { get; set; } = Prop1Constant;
+
+        public int Prop2 { get; set; } = Prop2Constant;
+    }
+
+    [MessagePackObject(true)]
+    public class DefaultValueStringKeyClassWithExplicitConstructor
+    {
+        public const int Prop2Constant = 1419;
+
+        public int Prop1 { get; set; }
+
+        public int Prop2 { get; set; }
+
+        public DefaultValueStringKeyClassWithExplicitConstructor(int prop1)
+        {
+            Prop1 = prop1;
+            Prop2 = Prop2Constant;
+        }
+    }
+
+    [MessagePackObject(true)]
+    public struct DefaultValueStringKeyStructWithExplicitConstructor
+    {
+        public const int Prop2Constant = 198;
+
+        public int Prop1 { get; set; }
+
+        public int Prop2 { get; set; }
+
+        public DefaultValueStringKeyStructWithExplicitConstructor(int prop1)
+        {
+            Prop1 = prop1;
+            Prop2 = Prop2Constant;
+        }
+    }
+
+    [MessagePackObject]
+    public class DefaultValueIntKeyClassWithoutExplicitConstructor
+    {
+        public const int Prop1Constant = 33;
+        public const int Prop2Constant = -4;
+
+        [Key(0)]
+        public int Prop1 { get; set; } = Prop1Constant;
+
+        [Key(1)]
+        public int Prop2 { get; set; } = Prop2Constant;
+    }
+
+    [MessagePackObject]
+    public class DefaultValueIntKeyClassWithExplicitConstructor
+    {
+        public const int Prop2Constant = -109;
+        public const string Prop3Constant = "生命、宇宙、そして万物についての究極の疑問の答え";
+        public const string Prop4Constant = "Hello, world! To you, From me.";
+
+        [Key(0)]
+        public int Prop1 { get; set; }
+
+        [Key(1)]
+        public int Prop2 { get; set; }
+
+        [Key(2)]
+        public string Prop3 { get; set; }
+
+        [Key(3)]
+        public string Prop4 { get; set; }
+
+        public DefaultValueIntKeyClassWithExplicitConstructor(int prop1)
+        {
+            Prop1 = prop1;
+            Prop2 = Prop2Constant;
+            Prop3 = Prop3Constant;
+            Prop4 = Prop4Constant;
+        }
+    }
+
+    [MessagePackObject]
+    public struct DefaultValueIntKeyStructWithExplicitConstructor
+    {
+        public const int Prop2Constant = 31;
+
+        [Key(0)]
+        public int Prop1 { get; set; }
+
+        [Key(1)]
+        public int Prop2 { get; set; }
+
+        public DefaultValueIntKeyStructWithExplicitConstructor(int prop1)
+        {
+            Prop1 = prop1;
+            Prop2 = Prop2Constant;
         }
     }
 
@@ -1045,6 +1161,13 @@ public class SimpleModel
             return (long)Math.Round(this.Money, 0, MidpointRounding.ToEven);
         }
     }
+}
+
+[MessagePackObject]
+public class MessagePackFormatterFieldUser
+{
+    [Key(0), MessagePackFormatter(typeof(NativeDateTimeFormatter))]
+    public DateTime Timestamp { get; set; }
 }
 
 namespace PerfBenchmarkDotNet

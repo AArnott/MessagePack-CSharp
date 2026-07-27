@@ -1,11 +1,11 @@
-# MessagePack for C# (.NET, .NET Core, Unity, Xamarin)
+# MessagePack for C# (.NET Framework, .NET 6, Unity, Xamarin)
 
 [![NuGet](https://img.shields.io/nuget/v/MessagePack.svg)](https://www.nuget.org/packages/messagepack)
 [![NuGet](https://img.shields.io/nuget/vpre/MessagePack.svg)](https://www.nuget.org/packages/messagepack)
-[![Releases](https://img.shields.io/github/release/neuecc/MessagePack-CSharp.svg)][Releases]
+[![Releases](https://img.shields.io/github/release/neuecc/MessagePack-CSharp.svg)](https://github.com/MessagePack-CSharp/MessagePack-CSharp/releases)
 
 [![Join the chat at https://gitter.im/MessagePack-CSharp/Lobby](https://badges.gitter.im/MessagePack-CSharp/Lobby.svg)](https://gitter.im/MessagePack-CSharp/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://dev.azure.com/ils0086/MessagePack-CSharp/_apis/build/status/MessagePack-CSharp-CI)](https://dev.azure.com/ils0086/MessagePack-CSharp/_build/latest?definitionId=2)
+[![Build Status](https://dev.azure.com/ils0086/MessagePack-CSharp/_apis/build/status/MessagePack-CSharp-CI?branchName=master)](https://dev.azure.com/ils0086/MessagePack-CSharp/_build/latest?definitionId=2&branchName=master)
 
 The extremely fast [MessagePack](http://msgpack.org/) serializer for C#.
 It is 10x faster than [MsgPack-Cli](https://github.com/msgpack/msgpack-cli) and outperforms other C# serializers. MessagePack for C# also ships with built-in support for LZ4 compression - an extremely fast compression algorithm. Performance is important, particularly in applications like games, distributed computing, microservices, or data caches.
@@ -34,6 +34,7 @@ MessagePack has a compact binary size and a full set of general purpose expressi
 - [Security](#security)
 - [Performance](#performance)
     - [Deserialization Performance for different options](#deserialization-performance-for-different-options)
+    - [String interning](#string-interning)
 - [LZ4 Compression](#lz4-compression)
     - [Attributions](#attributions)
 - [Comparison with protobuf, JSON, ZeroFormatter](#comparison-with-protobuf-json-zeroformatter)
@@ -62,12 +63,13 @@ MessagePack has a compact binary size and a full set of general purpose expressi
     - [StreamJsonRpc](#streamjsonrpc)
 - [How to build](#how-to-build)
 - [Author Info](#author-info)
+- [Code of Conduct & .NET Foundation notice](#coc)
 
 ## Installation
 
 This library is distributed via NuGet. Special [Unity support](#unity) is available, too.
 
-We target .NET Standard 2.0 with special optimizations for .NET Core 2.1+, making it compatible with most reasonably recent .NET runtimes such as Core 2.0 and later, Framework 4.6.1 and later, Mono 5.4 and later and Unity 2018.3 and later.
+We target .NET Standard 2.0 with special optimizations for .NET 6+, making it compatible with most reasonably recent .NET runtimes such as Core 2.0 and later, Framework 4.6.1 and later, Mono 5.4 and later and Unity 2018.3 and later.
 The library code is pure C# (with Just-In-Time IL code generation on some platforms).
 
 ### NuGet packages
@@ -94,7 +96,7 @@ Install-Package MessagePack.AspNetCoreMvcFormatter
 
 ### Unity
 
-For Unity projects, the [releases][Releases] page provides downloadable `.unitypackage` files. When using in Unity IL2CPP or Xamarin AOT environments, please carefully read the [pre-code generation section](#aot).
+For Unity projects, the [Releases](https://github.com/MessagePack-CSharp/MessagePack-CSharp/releases) page provides downloadable `.unitypackage` files. When using in Unity IL2CPP or Xamarin AOT environments, please carefully read the [pre-code generation section](#aot).
 
 ### Migration notes from v1.x
 
@@ -184,7 +186,7 @@ These types can serialize by default:
 * Primitives (`int`, `string`, etc...), `Enum`s, `Nullable<>`, `Lazy<>`
 * `TimeSpan`,  `DateTime`, `DateTimeOffset`
 * `Guid`, `Uri`, `Version`, `StringBuilder`
-* `BigInteger`, `Complex`
+* `BigInteger`, `Complex`, `Half`
 * `Array[]`, `Array[,]`, `Array[,,]`, `Array[,,,]`, `ArraySegment<>`, `BitArray`
 * `KeyValuePair<,>`, `Tuple<,...>`, `ValueTuple<,...>`
 * `ArrayList`, `Hashtable`
@@ -404,6 +406,8 @@ public struct Point
 }
 ```
 
+### C# 9 `record` types
+
 C# 9.0 record with primary constructor is similar immutable object, also supports serialize/deserialize.
 
 ```csharp
@@ -412,7 +416,25 @@ C# 9.0 record with primary constructor is similar immutable object, also support
 
 // use property: to set KeyAttribute
 [MessagePackObject] public record Point([property:Key(0)] int X, [property: Key(1)] int Y);
+
+// Or use explicit properties
+[MessagePackObject]
+public record Person
+{
+    [Key(0)]
+    public string FirstName { get; init; }
+
+    [Key(1)]
+    public string LastName { get; init; }
+}
 ```
+
+### C# 9 `init` property setter limitations
+
+When using `init` property setters in _generic_ classes, [a CLR bug](https://github.com/neuecc/MessagePack-CSharp/issues/1134) prevents our most efficient code generation from invoking the property setter.
+As a result, you should avoid using `init` on property setters in generic classes when using the public-only `DynamicObjectResolver`/`StandardResolver`.
+
+When using the `DynamicObjectResolverAllowPrivate`/`StandardResolverAllowPrivate` resolver the bug does not apply and you may use `init` without restriction.
 
 ## Serialization Callback
 
@@ -679,7 +701,7 @@ Benchmarks comparing MessagePack For C# to other serializers were run on `Window
 * Avoid string key decoding for lookup maps (string key and use automata based name lookup with inlined IL code generation, see: [AutomataDictionary](https://github.com/neuecc/MessagePack-CSharp/blob/bcedbce3fd98cb294210d6b4a22bdc4c75ccd916/src/MessagePack/Internal/AutomataDictionary.cs)
 * To encode string keys, use pre-generated member name bytes and fixed sized byte array copies in IL, see: [UnsafeMemory.cs](https://github.com/neuecc/MessagePack-CSharp/blob/f17ddc5d107d3a2f66f60398b214ef87919ff892/src/MessagePack/Internal/UnsafeMemory.cs)
 
-Before creating this library, I implemented a fast fast serializer with [ZeroFormatter#Performance](https://github.com/neuecc/ZeroFormatter#performance). This is a further evolved implementation. MessagePack for C# is always fast and optimized for all types (primitive, small struct, large object, any collections).
+Before creating this library, I implemented a fast serializer with [ZeroFormatter#Performance](https://github.com/neuecc/ZeroFormatter#performance). This is a further evolved implementation. MessagePack for C# is always fast and optimized for all types (primitive, small struct, large object, any collections).
 
 ### <a name="deserialize-performance"></a>Deserialization Performance for different options
 
@@ -737,6 +759,49 @@ Extra note, this is serialization benchmark result.
  |     JilStreamWriter |   778.78 ns |    NA |   9.26 | 1.4448 |    6066 B |
 
  Of course, `IntKey` is fastest but `StringKey` also performs reasonably well.
+
+### <a name="string-interning"></a>String interning
+
+The msgpack format does not provide for reusing strings in the data stream.
+This naturally leads the deserializer to create a new `string` object for every string encountered,
+even if it is equal to another string previously encountered.
+
+When deserializing data that may contain the same strings repeatedly it can be worthwhile
+to have the deserializer take a little extra time to check whether it has seen a given string before
+and reuse it if it has.
+
+To enable string interning on *all* string values, use a resolver that specifies `StringInterningFormatter`
+before any of the standard ones, like this:
+
+```cs
+var options = MessagePackSerializerOptions.Standard.WithResolver(
+    CompositeResolver.Create(
+        new IMessagePackFormatter[] { new StringInterningFormatter() },
+        new IFormatterResolver[] { StandardResolver.Instance }));
+
+MessagePackSerializer.Deserialize<ClassOfStrings>(data, options);
+```
+
+If you know which fields of a particular type are likely to contain duplicate strings,
+you can apply the string interning formatter to just those fields so the deserializer only pays
+for the interned string check where it matters most.
+Note that this technique requires a `[MessagePackObject]` or `[DataContract]` class.
+
+```cs
+[MessagePackObject]
+public class ClassOfStrings
+{
+    [Key(0)]
+    [MessagePackFormatter(typeof(StringInterningFormatter))]
+    public string InternedString { get; set; }
+
+    [Key(1)]
+    public string OrdinaryString { get; set; }
+}
+```
+
+If you are writing your own formatter for some type that contains strings,
+you can call on the `StringInterningFormatter` directly from your formatter as well for the strings.
 
 ## LZ4 Compression
 
@@ -1068,7 +1133,7 @@ Here is an example of such a custom formatter implementation. Note its use of th
 
 ```csharp
 /// <summary>Serializes a <see cref="FileInfo" /> by its full path as a string.</summary>
-public class FileInfoFormatter<T> : IMessagePackFormatter<FileInfo>
+public class FileInfoFormatter : IMessagePackFormatter<FileInfo>
 {
     public void Serialize(
       ref MessagePackWriter writer, FileInfo value, MessagePackSerializerOptions options)
@@ -1111,7 +1176,7 @@ you must precede it with a map or array header. You must read the entire map/arr
 For example:
 
 ```csharp
-public class MySpecialObjectFormatter<T> : IMessagePackFormatter<MySpecialObject>
+public class MySpecialObjectFormatter : IMessagePackFormatter<MySpecialObject>
 {
     public void Serialize(
       ref MessagePackWriter writer, MySpecialObject value, MessagePackSerializerOptions options)
@@ -1149,15 +1214,18 @@ public class MySpecialObjectFormatter<T> : IMessagePackFormatter<MySpecialObject
         int count = reader.ReadArrayHeader();
         for (int i = 0; i < count; i++)
         {
-            case 0:
-                fullName = reader.ReadString();
-                break;
-            case 1:
-                age = reader.ReadInt32();
-                break;
-            default:
-                reader.Skip();
-                break;
+            switch (i)
+            {
+                case 0:
+                    fullName = reader.ReadString();
+                    break;
+                case 1:
+                    age = reader.ReadInt32();
+                    break;
+                default:
+                    reader.Skip();
+                    break;
+            }
         }
 
         reader.Depth--;
@@ -1342,12 +1410,6 @@ internal static class SampleCustomResolverGetFormatterHelper
             return formatter;
         }
 
-        // If target type is generics, use MakeGenericType.
-        if (t.IsGenericParameter && t.GetGenericTypeDefinition() == typeof(ValueTuple<,>))
-        {
-            return Activator.CreateInstance(typeof(ValueTupleFormatter<,>).MakeGenericType(t.GenericTypeArguments));
-        }
-
         // If type can not get, must return null for fallback mechanism.
         return null;
     }
@@ -1435,30 +1497,44 @@ var resolver = MessagePack.Resolvers.CompositeResolver.Create(
 
 ## Reserved Extension Types
 
-MessagePack for C# already used some MessagePack extension type codes, be careful to use same ext code.
+MessagePack for C# already used some MessagePack extension type codes, be careful to avoid using the same ext code for other purposes.
+
+Range | Reserved for
+--|--
+\[-128, -1\] | Reserved by the msgpack spec for predefined types
+\[30, 120) | Reserved for this library's use to support common types in .NET
+
+This leaves the following ranges for your use:
+
+- \[0, 30)
+- \[120, 127]
+
+Within the *reserved* ranges, this library defines or implements extensions that use these type codes:
 
 | Code | Type | Use by |
-| ---  | ---  | --- |
-| -1 | DateTime | MessagePack-spec reserved for timestamp |
-| 30 | Vector2[] | for Unity, UnsafeBlitFormatter |
-| 31 | Vector3[] | for Unity, UnsafeBlitFormatter |
-| 32 | Vector4[] | for Unity, UnsafeBlitFormatter |
-| 33 | Quaternion[] | for Unity, UnsafeBlitFormatter |
-| 34 | Color[] | for Unity, UnsafeBlitFormatter |
-| 35 | Bounds[] | for Unity, UnsafeBlitFormatter |
-| 36 | Rect[] | for Unity, UnsafeBlitFormatter |
-| 37 | Int[] | for Unity, UnsafeBlitFormatter |
-| 38 | Float[] | for Unity, UnsafeBlitFormatter |
-| 39 | Double[] | for Unity, UnsafeBlitFormatter |
-| 98 | All | MessagePackCompression.Lz4BlockArray |
-| 99 | All | MessagePackCompression.Lz4Block |
-| 100 | object | TypelessFormatter |
+| ---- | ---- | --- |
+| -1   | DateTime | MessagePack-spec reserved for timestamp |
+| 30   | Vector2[] | for Unity, UnsafeBlitFormatter |
+| 31   | Vector3[] | for Unity, UnsafeBlitFormatter |
+| 32   | Vector4[] | for Unity, UnsafeBlitFormatter |
+| 33   | Quaternion[] | for Unity, UnsafeBlitFormatter |
+| 34   | Color[] | for Unity, UnsafeBlitFormatter |
+| 35   | Bounds[] | for Unity, UnsafeBlitFormatter |
+| 36   | Rect[] | for Unity, UnsafeBlitFormatter |
+| 37   | Int[] | for Unity, UnsafeBlitFormatter |
+| 38   | Float[] | for Unity, UnsafeBlitFormatter |
+| 39   | Double[] | for Unity, UnsafeBlitFormatter |
+| 98   | All | MessagePackCompression.Lz4BlockArray |
+| 99   | All | MessagePackCompression.Lz4Block |
+| 100  | object | TypelessFormatter |
 
 ## Unity support
 
 Unity lowest supported version is `2018.3`, API Compatibility Level supports both `.NET 4.x` and `.NET Standard 2.0`.
 
-You can install the `unitypackage` from the [releases][Releases] page. If your build targets PC, you can use it as is, but if your build targets IL2CPP, you can not use `Dynamic***Resolver`, so it is required to use pre-code generation. Please see [pre-code generation section](#aot).
+You can install the `unitypackage` from the [Releases](https://github.com/MessagePack-CSharp/MessagePack-CSharp/releases) page.
+If your build targets .NET Framework 4.x and runs on mono, you can use it as is.
+But if your build targets IL2CPP, you can not use `Dynamic***Resolver`, so it is required to use pre-code generation. Please see [pre-code generation section](#aot).
 
 MessagePack for C# includes some additional `System.*.dll` libraries that originally provides in NuGet. They are located under `Plugins`. If other packages use these libraries (e.g. Unity Collections package using `System.Runtime.CompilerServices.Unsafe.dll`), to avoid conflicts, please delete the DLL under `Plugins`.
 
@@ -1491,7 +1567,7 @@ The `MessagePack.UnityShims` NuGet package is for .NET server-side serialization
 
 If you want to share a class between Unity and a server, you can use `SharedProject` or `Reference as Link` or a glob reference (with `LinkBase`), etc. Anyway, you need to share at source-code level. This is a sample project structure using a glob reference (recommended).
 
-- ServerProject(.NET 4.6/.NET Core/.NET Standard)
+- ServerProject(.NET Framework 4.6/.NET/.NET Standard)
   - \[`<Compile Include="..\UnityProject\Assets\Scripts\Shared\**\*.cs" LinkBase="Shared" />`\]
   - \[MessagePack\]
   - \[MessagePack.UnityShims\]
@@ -1504,11 +1580,12 @@ If you want to share a class between Unity and a server, you can use `SharedProj
 By default, MessagePack for C# serializes custom objects by [generating IL](https://msdn.microsoft.com/en-us/library/system.reflection.emit.ilgenerator.aspx) on the fly at runtime to create custom, highly tuned formatters for each type. This code generation has a minor upfront performance cost.
 Because strict-AOT environments such as Xamarin and Unity IL2CPP forbid runtime code generation, MessagePack provides a way for you to run a code generator ahead of time as well.
 
-> Note: When Unity targets the PC it allows dynamic code generation, so AOT is not required.
+> Note: When using Unity, dynamic code generation only works when targeting .NET Framework 4.x + mono runtime.
+For all other Unity targets, AOT is required.
 
 If you want to avoid the upfront dynamic generation cost or you need to run on Xamarin or Unity, you need AOT code generation. `mpc` (MessagePackCompiler) is the code generator of MessagePack for C#. mpc uses [Roslyn](https://github.com/dotnet/roslyn) to analyze source code.
 
-First of all, mpc requires [.NET Core 3 Runtime](https://dotnet.microsoft.com/download). The easiest way to acquire and run mpc is as a dotnet tool.
+First of all, mpc requires [.NET 6+ Runtime](https://dotnet.microsoft.com/download). The easiest way to acquire and run mpc is as a dotnet tool.
 
 ```
 dotnet tool install --global MessagePack.Generator
@@ -1526,16 +1603,12 @@ Check in your `.config\dotnet-tools.json` file. On another machine you can "rest
 Once you have the tool installed, simply invoke using `dotnet mpc` within your repo:
 
 ```
-dotnet mpc -h
-```
+dotnet mpc --help
 
-Alternatively, you can download mpc from the [releases][Releases] page, that includes platform native binaries (that don't require a separate dotnet runtime).
-
-```
 Usage: mpc [options...]
 
 Options:
-  -i, -input <String>                                Input path of analyze csproj or directory, if input multiple csproj split with ','. (Required)
+  -i, -input <String>                                Input path to MSBuild project file or the directory containing Unity source files. (Required)
   -o, -output <String>                               Output file path(.cs) or directory(multiple generate file). (Required)
   -c, -conditionalSymbol <String>                    Conditional compiler symbols, split with ','. (Default: null)
   -r, -resolverName <String>                         Set resolver name. (Default: GeneratedResolver)
@@ -1601,7 +1674,7 @@ In Unity, you can use MessagePack CodeGen windows at `Windows -> MessagePack -> 
 
 ![](https://user-images.githubusercontent.com/46207/69414381-f14da400-0d55-11ea-9f8d-9af448d347dc.png)
 
-Install the .NET Core runtime, install mpc (as a .NET Core Tool as described above), and execute `dotnet mpc`. Currently this tool is experimental so please tell me your opinion.
+Install the .NET runtime, install mpc (as a .NET Tool as described above), and execute `dotnet mpc`. Currently this tool is experimental so please tell me your opinion.
 
 In Xamarin, you can install the [the `MessagePack.MSBuild.Tasks` NuGet package](doc/msbuildtask.md) into your projects to pre-compile fast serialization code and run in environments where JIT compilation is not allowed.
 
@@ -1621,16 +1694,11 @@ The StreamJsonRpc library is based on [JSON-RPC](https://www.jsonrpc.org/) and i
 
 See our [contributor's guide](CONTRIBUTING.md).
 
-## Author Info
+## <a name="coc"></a>Code of Conduct
 
-Yoshifumi Kawai (a.k.a. neuecc) is a software developer in Japan.
-He is the Director/CTO at Grani, Inc.
-Grani is a mobile game developer company in Japan and well known for using C#.
-He is awarding Microsoft MVP for Visual C# since 2011.
-He is known as the creator of [UniRx](https://github.com/neuecc/UniRx/) (Reactive Extensions for Unity)
+This project has adopted the code of conduct defined by the Contributor Covenant to clarify expected behavior in our community.
+For more information see the [.NET Foundation Code of Conduct](https://dotnetfoundation.org/code-of-conduct).
 
-* Blog: [https://medium.com/@neuecc](https://medium.com/@neuecc) (English)
-* Blog: [http://neue.cc/](http://neue.cc/) (Japanese)
-* Twitter: [https://twitter.com/neuecc](https://twitter.com/neuecc) (Japanese)
+## .NET Foundation
 
-[Releases]: https://github.com/neuecc/MessagePack-CSharp/releases
+This project is supported by the [.NET Foundation](https://dotnetfoundation.org).

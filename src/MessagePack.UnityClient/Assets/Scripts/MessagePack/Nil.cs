@@ -7,6 +7,7 @@
 
 using System;
 using System.Buffers;
+using System.Data.Common;
 
 namespace MessagePack
 {
@@ -19,7 +20,11 @@ namespace MessagePack
     {
         public static readonly Nil Default = default(Nil);
 
-        public override bool Equals(object obj)
+        public static bool operator ==(Nil left, Nil right) => true;
+
+        public static bool operator !=(Nil left, Nil right) => false;
+
+        public override bool Equals(object? obj)
         {
             return obj is Nil;
         }

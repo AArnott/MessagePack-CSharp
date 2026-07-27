@@ -53,7 +53,7 @@ namespace TempProject
     }
 }
             ";
-            tempWorkarea.AddFileToProject("MyMessagePackObject.cs", contents);
+            tempWorkarea.AddFileToTargetProject("MyMessagePackObject.cs", contents);
 
             var compiler = new MessagePackCompiler.CodeGenerator(testOutputHelper.WriteLine, CancellationToken.None);
             await compiler.GenerateFileAsync(
@@ -100,7 +100,7 @@ namespace TempProject
     }
 }
             ";
-            tempWorkarea.AddFileToProject("MyMessagePackObject.cs", contents);
+            tempWorkarea.AddFileToTargetProject("MyMessagePackObject.cs", contents);
 
             var compiler = new MessagePackCompiler.CodeGenerator(testOutputHelper.WriteLine, CancellationToken.None);
             await compiler.GenerateFileAsync(
@@ -148,7 +148,7 @@ namespace TempProject
     }
 }
             ";
-            tempWorkarea.AddFileToProject("MyMessagePackObject.cs", contents);
+            tempWorkarea.AddFileToTargetProject("MyMessagePackObject.cs", contents);
 
             var compiler = new MessagePackCompiler.CodeGenerator(testOutputHelper.WriteLine, CancellationToken.None);
             await compiler.GenerateFileAsync(
@@ -213,7 +213,7 @@ namespace TempProject
     }
 }
             ";
-            tempWorkarea.AddFileToProject("MyMessagePackObject.cs", contents);
+            tempWorkarea.AddFileToTargetProject("MyMessagePackObject.cs", contents);
 
             var compiler = new MessagePackCompiler.CodeGenerator(testOutputHelper.WriteLine, CancellationToken.None);
             await compiler.GenerateFileAsync(
@@ -297,7 +297,7 @@ namespace TempProject
     }
 }
             ";
-            tempWorkarea.AddFileToProject("MyMessagePackObject.cs", contents);
+            tempWorkarea.AddFileToTargetProject("MyMessagePackObject.cs", contents);
 
             var compiler = new MessagePackCompiler.CodeGenerator(testOutputHelper.WriteLine, CancellationToken.None);
             await compiler.GenerateFileAsync(
@@ -365,7 +365,7 @@ namespace TempProject
     }
 }
             ";
-            tempWorkarea.AddFileToProject("MyMessagePackObject.cs", contents);
+            tempWorkarea.AddFileToTargetProject("MyMessagePackObject.cs", contents);
 
             var compiler = new MessagePackCompiler.CodeGenerator(testOutputHelper.WriteLine, CancellationToken.None);
             await compiler.GenerateFileAsync(
@@ -393,6 +393,7 @@ namespace TempProject
             {
                 "global::MessagePack.Formatters.ListFormatter<global::TempProject.MyObject2>",
                 "global::MessagePack.Formatters.ArrayFormatter<global::TempProject.MyObject2>",
+
                 // "TempProject.Generated.Formatters.TempProject.MyGenericObjectFormatter<string>", // MyGenericObjectFormatter<T> is not used as a property/field in the code. The generated resolver can ignore it.
                 "TempProject.Generated.Formatters.TempProject.MyObjectFormatter",
                 "TempProject.Generated.Formatters.TempProject.MyObject2Formatter",
@@ -434,7 +435,7 @@ namespace TempProject
     }
 }
             ";
-            tempWorkarea.AddFileToProject("MyMessagePackObject.cs", contents);
+            tempWorkarea.AddFileToTargetProject("MyMessagePackObject.cs", contents);
 
             var compiler = new MessagePackCompiler.CodeGenerator(testOutputHelper.WriteLine, CancellationToken.None);
             await compiler.GenerateFileAsync(
@@ -503,7 +504,7 @@ namespace TempProject
     }
 }
             ";
-            tempWorkarea.AddFileToProject("MyMessagePackObject.cs", contents);
+            tempWorkarea.AddFileToTargetProject("MyMessagePackObject.cs", contents);
 
             var compiler = new MessagePackCompiler.CodeGenerator(testOutputHelper.WriteLine, CancellationToken.None);
             await compiler.GenerateFileAsync(
@@ -558,7 +559,7 @@ namespace TempProject
     }
 }
                 ";
-            tempWorkarea.AddFileToProject("MyMessagePackObject.cs", contents);
+            tempWorkarea.AddFileToTargetProject("MyMessagePackObject.cs", contents);
 
             var compiler = new MessagePackCompiler.CodeGenerator(testOutputHelper.WriteLine, CancellationToken.None);
             await compiler.GenerateFileAsync(
@@ -607,7 +608,7 @@ namespace TempProject
     }
 }
                 ";
-            tempWorkarea.AddFileToProject("MyMessagePackObject.cs", contents);
+            tempWorkarea.AddFileToTargetProject("MyMessagePackObject.cs", contents);
 
             var compiler = new MessagePackCompiler.CodeGenerator(testOutputHelper.WriteLine, CancellationToken.None);
             await compiler.GenerateFileAsync(
@@ -626,6 +627,7 @@ namespace TempProject
 
             var formatterType = symbols.FirstOrDefault(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == "global::TempProject.Generated.Formatters.TempProject.MyGenericObjectFormatter<T>");
             formatterType.Should().NotBeNull();
+
             // IDisposable
             formatterType.TypeParameters[0].HasReferenceTypeConstraint.Should().BeFalse();
             formatterType.TypeParameters[0].HasValueTypeConstraint.Should().BeFalse();
@@ -664,7 +666,7 @@ namespace TempProject
     public interface IMyInterface {}
 }
                 ";
-            tempWorkarea.AddFileToProject("MyMessagePackObject.cs", contents);
+            tempWorkarea.AddFileToTargetProject("MyMessagePackObject.cs", contents);
 
             var compiler = new MessagePackCompiler.CodeGenerator(testOutputHelper.WriteLine, CancellationToken.None);
             await compiler.GenerateFileAsync(
@@ -684,15 +686,19 @@ namespace TempProject
             var displayFormat = SymbolDisplayFormat.FullyQualifiedFormat.WithMiscellaneousOptions(SymbolDisplayMiscellaneousOptions.IncludeNullableReferenceTypeModifier);
             var formatterType = symbols.FirstOrDefault(x => x.ToDisplayString(displayFormat) == "global::TempProject.Generated.Formatters.TempProject.MyGenericObjectFormatter<T1, T2, T3, T4>");
             formatterType.Should().NotBeNull();
+
             // MyClass?
             formatterType.TypeParameters[0].ConstraintTypes.Should().Contain(x => x.ToDisplayString(displayFormat) == "global::TempProject.MyClass?");
             formatterType.TypeParameters[0].ConstraintNullableAnnotations[0].Should().Be(NullableAnnotation.Annotated);
+
             // MyClass
             formatterType.TypeParameters[1].ConstraintTypes.Should().Contain(x => x.ToDisplayString(displayFormat) == "global::TempProject.MyClass");
             formatterType.TypeParameters[1].ConstraintNullableAnnotations[0].Should().Be(NullableAnnotation.None);
+
             // MyGenericClass<MyGenericClass<MyClass?>?>?
             formatterType.TypeParameters[2].ConstraintTypes.Should().Contain(x => x.ToDisplayString(displayFormat) == "global::TempProject.MyGenericClass<global::TempProject.MyGenericClass<global::TempProject.MyClass?>?>?");
             formatterType.TypeParameters[2].ConstraintNullableAnnotations[0].Should().Be(NullableAnnotation.Annotated);
+
             // MyClass, IMyInterface?
             formatterType.TypeParameters[3].ConstraintTypes.Should().Contain(x => x.ToDisplayString(displayFormat) == "global::TempProject.MyClass");
             formatterType.TypeParameters[3].ConstraintTypes.Should().Contain(x => x.ToDisplayString(displayFormat) == "global::TempProject.IMyInterface?");
@@ -722,7 +728,7 @@ namespace TempProject
     }
 }
                 ";
-            tempWorkarea.AddFileToProject("MyMessagePackObject.cs", contents);
+            tempWorkarea.AddFileToTargetProject("MyMessagePackObject.cs", contents);
 
             var compiler = new MessagePackCompiler.CodeGenerator(testOutputHelper.WriteLine, CancellationToken.None);
             await compiler.GenerateFileAsync(
@@ -741,6 +747,7 @@ namespace TempProject
 
             var formatterType = symbols.FirstOrDefault(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == "global::TempProject.Generated.Formatters.TempProject.MyGenericObjectFormatter<T>");
             formatterType.Should().NotBeNull();
+
             // struct
             formatterType.TypeParameters[0].HasReferenceTypeConstraint.Should().BeFalse();
             formatterType.TypeParameters[0].HasValueTypeConstraint.Should().BeTrue();
@@ -781,7 +788,7 @@ namespace TempProject
     }
 }
                 ";
-            tempWorkarea.AddFileToProject("MyMessagePackObject.cs", contents);
+            tempWorkarea.AddFileToTargetProject("MyMessagePackObject.cs", contents);
 
             var compiler = new MessagePackCompiler.CodeGenerator(testOutputHelper.WriteLine, CancellationToken.None);
             await compiler.GenerateFileAsync(
@@ -800,6 +807,7 @@ namespace TempProject
 
             var formatterType = symbols.FirstOrDefault(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == "global::TempProject.Generated.Formatters.TempProject.MyGenericObjectFormatter<T1, T2, T3, T4>");
             formatterType.Should().NotBeNull();
+
             // struct
             formatterType.TypeParameters[0].HasReferenceTypeConstraint.Should().BeFalse();
             formatterType.TypeParameters[0].HasValueTypeConstraint.Should().BeTrue();
@@ -807,6 +815,7 @@ namespace TempProject
             formatterType.TypeParameters[0].HasNotNullConstraint.Should().BeFalse();
             formatterType.TypeParameters[0].HasUnmanagedTypeConstraint.Should().BeFalse();
             formatterType.TypeParameters[0].ConstraintTypes.Should().BeEmpty();
+
             // IDisposable, new()
             formatterType.TypeParameters[1].HasReferenceTypeConstraint.Should().BeFalse();
             formatterType.TypeParameters[1].HasValueTypeConstraint.Should().BeFalse();
@@ -814,6 +823,7 @@ namespace TempProject
             formatterType.TypeParameters[1].HasNotNullConstraint.Should().BeFalse();
             formatterType.TypeParameters[1].HasUnmanagedTypeConstraint.Should().BeFalse();
             formatterType.TypeParameters[1].ConstraintTypes.Should().Contain(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == "global::System.IDisposable");
+
             // notnull
             formatterType.TypeParameters[2].HasReferenceTypeConstraint.Should().BeFalse();
             formatterType.TypeParameters[2].HasValueTypeConstraint.Should().BeFalse();
@@ -821,6 +831,7 @@ namespace TempProject
             formatterType.TypeParameters[2].HasNotNullConstraint.Should().BeTrue();
             formatterType.TypeParameters[2].HasUnmanagedTypeConstraint.Should().BeFalse();
             formatterType.TypeParameters[2].ConstraintTypes.Should().BeEmpty();
+
             // unmanaged
             formatterType.TypeParameters[3].HasReferenceTypeConstraint.Should().BeFalse();
             formatterType.TypeParameters[3].HasValueTypeConstraint.Should().BeTrue(); // unmanaged constraint includes value-type constraint
@@ -855,7 +866,7 @@ namespace TempProject
     }
 }
                 ";
-            tempWorkarea.AddFileToProject("MyMessagePackObject.cs", contents);
+            tempWorkarea.AddFileToTargetProject("MyMessagePackObject.cs", contents);
 
             var compiler = new MessagePackCompiler.CodeGenerator(testOutputHelper.WriteLine, CancellationToken.None);
             await compiler.GenerateFileAsync(
@@ -874,14 +885,93 @@ namespace TempProject
 
             var formatterType = symbols.FirstOrDefault(x => x.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) == "global::TempProject.Generated.Formatters.TempProject.MyGenericObjectFormatter<T1, T2>");
             formatterType.Should().NotBeNull();
+
             // class?
             formatterType.TypeParameters[0].HasReferenceTypeConstraint.Should().BeTrue();
             formatterType.TypeParameters[0].ConstraintTypes.Should().BeEmpty();
             formatterType.TypeParameters[0].ReferenceTypeConstraintNullableAnnotation.Should().Be(NullableAnnotation.Annotated);
+
             // class
             formatterType.TypeParameters[1].HasReferenceTypeConstraint.Should().BeTrue();
             formatterType.TypeParameters[1].ConstraintTypes.Should().BeEmpty();
             formatterType.TypeParameters[1].ReferenceTypeConstraintNullableAnnotation.Should().Be(NullableAnnotation.None);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Generics_Defined_In_ReferencedProject(bool isSingleFileOutput)
+        {
+            using var tempWorkarea = TemporaryProjectWorkarea.Create();
+            var defineContents = @"
+using System;
+using System.Collections.Generic;
+using MessagePack;
+
+namespace TempProject
+{
+    [MessagePackObject]
+    public class MyGenericObject<T>
+    {
+        [Key(0)]
+        public T Content { get; set; }
+    }
+}
+            ";
+            tempWorkarea.AddFileToReferencedProject("MyGenericObject.cs", defineContents);
+
+            var usageContents = @"
+using System;
+using System.Collections.Generic;
+using MessagePack;
+
+namespace TempProject
+{
+    [MessagePackObject]
+    public class MyObject
+    {
+        [Key(0)]
+        public MyGenericObject<int> Value { get; set; }
+    }
+
+    [MessagePackObject]
+    public class MyObjectNested
+    {
+        [Key(0)]
+        public MyGenericObject<MyGenericObject<int>> Value { get; set; }
+    }
+}
+            ";
+            tempWorkarea.AddFileToTargetProject("MyObject.cs", usageContents);
+
+            var compiler = new MessagePackCompiler.CodeGenerator(testOutputHelper.WriteLine, CancellationToken.None);
+            await compiler.GenerateFileAsync(
+                tempWorkarea.GetOutputCompilation().Compilation,
+                isSingleFileOutput ? Path.Combine(tempWorkarea.OutputDirectory, "Generated.cs") : tempWorkarea.OutputDirectory,
+                "TempProjectResolver",
+                "TempProject.Generated",
+                false,
+                string.Empty,
+                Array.Empty<string>());
+
+            var compilation = tempWorkarea.GetOutputCompilation();
+            compilation.Compilation.GetDiagnostics().Where(x => x.WarningLevel == 0).Should().BeEmpty();
+
+            var symbols = compilation.GetNamedTypeSymbolsFromGenerated();
+
+            var types = symbols.Select(x => x.ToDisplayString()).ToArray();
+            types.Should().Contain("TempProject.Generated.Formatters.TempProject.MyGenericObjectFormatter<T>");
+
+            var formatters = symbols.SelectMany(x => x.Interfaces).Select(x => x.ToDisplayString()).ToArray();
+            formatters.Should().Contain("MessagePack.Formatters.IMessagePackFormatter<TempProject.MyGenericObject<T>>");
+
+            compilation.GetResolverKnownFormatterTypes().Should().Contain(new[]
+            {
+                "TempProject.Generated.Formatters.TempProject.MyGenericObjectFormatter<global::TempProject.MyGenericObject<int>>",
+                "TempProject.Generated.Formatters.TempProject.MyGenericObjectFormatter<int>",
+                "TempProject.Generated.Formatters.TempProject.MyObjectFormatter",
+                "TempProject.Generated.Formatters.TempProject.MyObjectNestedFormatter",
+            });
         }
     }
 }

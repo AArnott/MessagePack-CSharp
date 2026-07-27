@@ -1,7 +1,11 @@
 ﻿// Copyright (c) All contributors. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if !ENABLE_IL2CPP
+#if !(MESSAGEPACK_FORCE_AOT || ENABLE_IL2CPP)
+#define DYNAMIC_GENERATION
+#endif
+
+#if DYNAMIC_GENERATION
 
 using System;
 using System.Collections.Generic;
@@ -157,7 +161,29 @@ namespace MessagePack.Tests
             internal InternalEnum EnumProperty { get; set; }
         }
 
-#if !ENABLE_IL2CPP
+        [MessagePackObject]
+        public class PrivateReadonlyField
+        {
+            public static PrivateReadonlyField WithNullValue { get; } = new PrivateReadonlyField();
+
+            [Key(0)]
+            private readonly string field;
+
+            [SerializationConstructor]
+            public PrivateReadonlyField(string field)
+            {
+                this.field = field ?? "not null";
+            }
+
+            private PrivateReadonlyField()
+            {
+            }
+
+            [IgnoreMember]
+            public string Field => field;
+        }
+
+#if DYNAMIC_GENERATION
 
         [MessagePackObject]
         public class ImmutablePrivateClass
@@ -191,6 +217,25 @@ namespace MessagePack.Tests
 
             [IgnoreMember]
             public bool CreatedUsingPrivateCtor { get; }
+        }
+
+        public class ContractlessClassPrivateCtor
+        {
+            public int X { get; private set; }
+
+            public int Y { get; private set; }
+
+            [SerializationConstructor]
+            private ContractlessClassPrivateCtor(int x, int y)
+            {
+                X = x;
+                Y = y;
+            }
+
+            public static ContractlessClassPrivateCtor Create(int x, int y)
+            {
+                return new ContractlessClassPrivateCtor(x, y);
+            }
         }
 
         [MessagePackObject]
@@ -310,7 +355,16 @@ namespace MessagePack.Tests
             Assert.Equal(expected.EnumProperty, actual.EnumProperty);
         }
 
-#if !ENABLE_IL2CPP
+        [Fact]
+        public void PrivateReadonlyFieldSetInConstructor()
+        {
+            PrivateReadonlyField initial = PrivateReadonlyField.WithNullValue;
+            var bin = MessagePackSerializer.Serialize(initial, StandardResolverAllowPrivate.Options);
+            var deserialized = MessagePackSerializer.Deserialize<PrivateReadonlyField>(bin, StandardResolverAllowPrivate.Options);
+            Assert.Equal("not null", deserialized.Field);
+        }
+
+#if DYNAMIC_GENERATION
 
         [Fact]
         public void PrivateConstructor()
@@ -331,6 +385,17 @@ namespace MessagePack.Tests
             var p1 = CompletelyPrivateConstructor.Create(10, 20);
             var bin = MessagePackSerializer.Serialize(p1, StandardResolverAllowPrivate.Options);
             var p2 = MessagePackSerializer.Deserialize<CompletelyPrivateConstructor>(bin, StandardResolverAllowPrivate.Options);
+
+            Assert.Equal(p1.X, p2.X);
+            Assert.Equal(p1.Y, p2.Y);
+        }
+
+        [Fact]
+        public void ContractlessAttributedPrivateConstructor()
+        {
+            var p1 = ContractlessClassPrivateCtor.Create(10, 20);
+            var bin = MessagePackSerializer.Serialize(p1, ContractlessStandardResolver.Options);
+            var p2 = MessagePackSerializer.Deserialize<ContractlessClassPrivateCtor>(bin, ContractlessStandardResolver.Options);
 
             Assert.Equal(p1.X, p2.X);
             Assert.Equal(p1.Y, p2.Y);

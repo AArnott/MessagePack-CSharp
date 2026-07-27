@@ -2,6 +2,10 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Xunit;
 
 namespace MessagePack.Tests
@@ -255,6 +259,125 @@ namespace MessagePack.Tests
             }
         }
 
+        /// <summary>
+        /// This constructor tests the case where there are missing int keys, to ensure that
+        /// the correct ctor is still found using index numbers of the keys, not their values.
+        /// </summary>
+        [MessagePackObject]
+        public class TestConstructor10
+        {
+            [Key(0)]
+            public int X { get; }
+
+            [Key(2)]
+            public int Y { get; }
+
+            [Key(5)]
+            public int Z { get; }
+
+            public TestConstructor10(int x, int y, int z)
+            {
+                X = x;
+                Y = y;
+                Z = z;
+            }
+        }
+
+        [MessagePackObject]
+        public class DeviceCommands : IDictionary<int, string>
+        {
+            [IgnoreMember]
+            public static readonly DeviceCommands Empty = new(new Dictionary<int, string>());
+
+            [Key(0)]
+            public IDictionary<int, string> Commands { get; }
+
+            [IgnoreMember]
+            public ICollection<int> Keys => throw new NotImplementedException();
+
+            [IgnoreMember]
+            public ICollection<string> Values => throw new NotImplementedException();
+
+            [IgnoreMember]
+            public int Count => 0;
+
+            [IgnoreMember]
+            public bool IsReadOnly => throw new NotImplementedException();
+
+            public string this[int key]
+            {
+                get => throw new NotImplementedException();
+                set => throw new NotImplementedException();
+            }
+
+            [SerializationConstructor]
+            public DeviceCommands(IDictionary<int, string> commands)
+            {
+                Commands = commands;
+            }
+
+            public void Add(int key, string value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool ContainsKey(int key)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool Remove(int key)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool TryGetValue(int key, [MaybeNullWhen(false)] out string value)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Add(KeyValuePair<int, string> item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Clear()
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool Contains(KeyValuePair<int, string> item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void CopyTo(KeyValuePair<int, string>[] array, int arrayIndex)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool Remove(KeyValuePair<int, string> item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerator<KeyValuePair<int, string>> GetEnumerator()
+            {
+                return Enumerable.Empty<KeyValuePair<int, string>>().GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        [Fact]
+        public void DictionaryWithStaticCtor()
+        {
+            MessagePackSerializer.Serialize(new DeviceCommands(new Dictionary<int, string>()), MessagePackSerializerOptions.Standard);
+        }
+
         [Fact]
         public void StringKey()
         {
@@ -349,6 +472,18 @@ namespace MessagePack.Tests
             r.X.Is(7);
             r.Y.Is(8);
             r.Z.Is(9);
+        }
+
+        [Fact]
+        public void MatchedClassCtorFoundWithMissingIntKeys()
+        {
+            var ctor = new TestConstructor10(10, 11, 12);
+            var bin = MessagePackSerializer.Serialize(ctor);
+            var r = MessagePackSerializer.Deserialize<TestConstructor10>(bin);
+
+            r.X.Is(10);
+            r.Y.Is(11);
+            r.Z.Is(12);
         }
     }
 }

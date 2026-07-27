@@ -3,12 +3,10 @@
   <PropertyGroup>
     <AssemblyName>mpc</AssemblyName>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <LangVersion>8</LangVersion>
-    <Nullable>enable</Nullable>
-    <IsPackable>true</IsPackable>
+    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>mpc</ToolCommandName>
+    <RollForward>Major</RollForward>
 
     <!-- NuGet Info -->
     <PackageId>MessagePack.Generator</PackageId>
@@ -18,11 +16,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ConsoleAppFramework" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Build.Locator" Version="1.2.6" />
-    <PackageReference Include="Microsoft.Build.Framework" Version="16.0.461" ExcludeAssets="runtime" />
-    <PackageReference Include="Microsoft.Build" Version="16.0.461" ExcludeAssets="runtime" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="3.6.0" />
+    <PackageReference Include="ConsoleAppFramework" />
+    <PackageReference Include="Microsoft.Build.Locator" />
+    <PackageReference Include="Microsoft.Build.Framework" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.Build" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" />
+    <PackageReference Include="System.CodeDom" ExcludeAssets="runtime" />
   </ItemGroup>
 
   <ItemGroup>

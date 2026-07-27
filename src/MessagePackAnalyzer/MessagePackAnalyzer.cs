@@ -16,6 +16,7 @@ namespace MessagePackAnalyzer
         public const string UseMessagePackObjectAttributeId = "MsgPack003";
         public const string AttributeMessagePackObjectMembersId = "MsgPack004";
         public const string InvalidMessagePackObjectId = "MsgPack005";
+        public const string MessagePackFormatterMustBeMessagePackFormatterId = "MsgPack006";
 
         internal const string Category = "Usage";
 
@@ -35,6 +36,16 @@ namespace MessagePackAnalyzer
             isEnabledByDefault: true,
             helpLinkUri: AnalyzerUtilities.GetHelpLink(UseMessagePackObjectAttributeId));
 
+        internal static readonly DiagnosticDescriptor MessageFormatterMustBeMessagePackFormatter = new DiagnosticDescriptor(
+            id: MessagePackFormatterMustBeMessagePackFormatterId,
+            title: "Must be IMessageFormatter",
+            category: Category,
+            messageFormat: "Type must be of IMessagePackFormatter. {0}.", // type.Name
+            description: "Type must be of IMessagePackFormatter.",
+            defaultSeverity: DiagnosticSeverity.Error,
+            isEnabledByDefault: true,
+            helpLinkUri: AnalyzerUtilities.GetHelpLink(UseMessagePackObjectAttributeId));
+
         internal static readonly DiagnosticDescriptor PublicMemberNeedsKey = new DiagnosticDescriptor(
             id: AttributeMessagePackObjectMembersId,
             title: "Attribute public members of MessagePack objects",
@@ -49,7 +60,7 @@ namespace MessagePackAnalyzer
             id: InvalidMessagePackObjectId,
             title: "MessagePackObject validation",
             category: Category,
-            messageFormat: "Invalid MessagePackObject definition. {0}", // details
+            messageFormat: "Invalid MessagePackObject definition: {0}", // details
             description: "Invalid MessagePackObject definition.",
             defaultSeverity: DiagnosticSeverity.Error,
             isEnabledByDefault: true,
@@ -58,7 +69,8 @@ namespace MessagePackAnalyzer
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             TypeMustBeMessagePackObject,
             PublicMemberNeedsKey,
-            InvalidMessagePackObject);
+            InvalidMessagePackObject,
+            MessageFormatterMustBeMessagePackFormatter);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -68,7 +80,14 @@ namespace MessagePackAnalyzer
             {
                 if (ReferenceSymbols.TryCreate(ctxt.Compilation, out ReferenceSymbols? typeReferences))
                 {
-                    ctxt.RegisterSyntaxNodeAction(c => Analyze(c, typeReferences), SyntaxKind.ClassDeclaration, SyntaxKind.StructDeclaration, SyntaxKind.InterfaceDeclaration);
+                    var relevantSyntaxKinds = new[]
+                    {
+                         SyntaxKind.ClassDeclaration,
+                         SyntaxKind.StructDeclaration,
+                         SyntaxKind.InterfaceDeclaration,
+                         SyntaxKind.RecordDeclaration,
+                    };
+                    ctxt.RegisterSyntaxNodeAction(c => Analyze(c, typeReferences), relevantSyntaxKinds);
                 }
             });
         }
@@ -83,9 +102,9 @@ namespace MessagePackAnalyzer
             }
 
             if (
-               ((declaredSymbol.TypeKind == TypeKind.Interface) && declaredSymbol.GetAttributes().Any(x2 => Equals(x2.AttributeClass, typeReferences.UnionAttribute)))
-            || ((declaredSymbol.TypeKind == TypeKind.Class) && declaredSymbol.GetAttributes().Any(x2 => Equals(x2.AttributeClass, typeReferences.MessagePackObjectAttribute)))
-            || ((declaredSymbol.TypeKind == TypeKind.Struct) && declaredSymbol.GetAttributes().Any(x2 => Equals(x2.AttributeClass, typeReferences.MessagePackObjectAttribute))))
+               ((declaredSymbol.TypeKind == TypeKind.Interface) && declaredSymbol.GetAttributes().Any(x2 => SymbolEqualityComparer.Default.Equals(x2.AttributeClass, typeReferences.UnionAttribute)))
+            || ((declaredSymbol.TypeKind == TypeKind.Class) && declaredSymbol.GetAttributes().Any(x2 => SymbolEqualityComparer.Default.Equals(x2.AttributeClass, typeReferences.MessagePackObjectAttribute)))
+            || ((declaredSymbol.TypeKind == TypeKind.Struct) && declaredSymbol.GetAttributes().Any(x2 => SymbolEqualityComparer.Default.Equals(x2.AttributeClass, typeReferences.MessagePackObjectAttribute))))
             {
                 var reportContext = new DiagnosticsReportContext(context);
                 var collector = new TypeCollector(reportContext, typeReferences);
